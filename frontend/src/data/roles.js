@@ -32,7 +32,7 @@ export const ROLES = [
 		id: "pm",
 		persona: "Project Manager",
 		name: __("Project Manager"),
-		shortName: __("PM"),
+		shortName: __("PM", null, "Project Manager"),
 		description: __("Owns project delivery — schedule, scope, budget, day-to-day approvals."),
 		color: "bg-info-600",
 	},

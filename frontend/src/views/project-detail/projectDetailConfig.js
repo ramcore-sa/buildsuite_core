@@ -8,7 +8,7 @@ export const SUB_COLS = [
 	{ key: "status", label: __("Status") },
 	{ key: "budget", label: __("Budget"), align: "right" },
 	{ key: "progress", label: __("Progress"), align: "right" },
-	{ key: "pm", label: __("PM") },
+	{ key: "pm", label: __("PM", null, "Project Manager") },
 ];
 
 export const WP_COLS = [
