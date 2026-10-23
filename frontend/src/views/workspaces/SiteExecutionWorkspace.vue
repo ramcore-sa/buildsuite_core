@@ -29,6 +29,7 @@ import { useDataStore } from "@/stores";
 import UserAvatar from "@/components/UserAvatar.vue";
 import WorkspaceShortcut from "@/components/WorkspaceShortcut.vue";
 import { getWorkspaceIconPath } from "@/utils/workspaceIcons";
+import { __ } from "@/utils/translate";
 
 const store = useDataStore();
 
@@ -46,13 +47,13 @@ const today = computed(() => {
 // schema migration to add `description` to the WSST child table is straight-
 // forward but out of scope for this UX tweak.
 const SHORTCUT_DESCRIPTIONS = {
-	"/projects": "Plan, track, and manage construction projects.",
-	"/work-packages": "Cost-and-control boundaries within a project.",
-	"/tasks": "Day-to-day execution items with progress tracking.",
-	"/stage-plannings": "Time-phased delivery stages and dependencies.",
-	"/progress-entries": "Daily task progress, labour, and blockers.",
-	"/sco": "Scope change orders and BOQ revision tie-ins.",
-	"/schedule": "Gantt view across projects and stages.",
+	"/projects": __("Plan, track, and manage construction projects."),
+	"/work-packages": __("Cost-and-control boundaries within a project."),
+	"/tasks": __("Day-to-day execution items with progress tracking."),
+	"/stage-plannings": __("Time-phased delivery stages and dependencies."),
+	"/progress-entries": __("Daily task progress, labour, and blockers."),
+	"/sco": __("Scope change orders and BOQ revision tie-ins."),
+	"/schedule": __("Gantt view across projects and stages."),
 };
 function descriptionFor(routePath) {
 	return SHORTCUT_DESCRIPTIONS[routePath] || "";
@@ -73,36 +74,36 @@ const REPORT_TILES = [
 	{
 		slug: "project-status-summary",
 		icon: "chart-line",
-		label: "Project Status Summary",
-		desc: "Active projects · status · progress · variance.",
+		label: __("Project Status Summary"),
+		desc: __("Active projects · status · progress · variance."),
 		roles: "all",
 	},
 	{
 		slug: "task-completion-by-week",
 		icon: "chart-line",
-		label: "Task Completion by Week",
-		desc: "Tasks completed per project per week.",
+		label: __("Task Completion by Week"),
+		desc: __("Tasks completed per project per week."),
 		roles: "all",
 	},
 	{
 		slug: "pending-progress-entries",
 		icon: "file-text",
-		label: "Pending Progress Entries",
-		desc: "Open tasks with no progress entry in N days.",
+		label: __("Pending Progress Entries"),
+		desc: __("Open tasks with no progress entry in N days."),
 		roles: "all",
 	},
 	{
 		slug: "stage-vs-actual",
 		icon: "calendar",
-		label: "Stage Plan vs Actual",
-		desc: "Planned stages vs actual task progress per stage.",
+		label: __("Stage Plan vs Actual"),
+		desc: __("Planned stages vs actual task progress per stage."),
 		roles: ["director", "pm", "qs", "admin", "bsa"],
 	},
 	{
 		slug: "labour-deployed",
 		icon: "workforce",
-		label: "Labour Deployed",
-		desc: "Skilled + unskilled labour by task / week.",
+		label: __("Labour Deployed"),
+		desc: __("Skilled + unskilled labour by task / week."),
 		roles: ["director", "pm", "site-engineer", "foreman", "admin", "bsa"],
 	},
 ];
@@ -123,7 +124,7 @@ const visibleReportTiles = computed(() =>
 			<!-- Title strip — workspace name as the heading; date eyebrow only -->
 			<div class="mb-6">
 				<div class="text-xs text-ink-500 mb-1">{{ today }}</div>
-				<h1 class="text-2xl font-semibold text-ink-900">Site Execution</h1>
+				<h1 class="text-2xl font-semibold text-ink-900">{{ __("Site Execution") }}</h1>
 			</div>
 
 			<!-- BSA hint banner — only visible to BSA (the audience who can reconfigure) -->
@@ -132,15 +133,16 @@ const visibleReportTiles = computed(() =>
 				class="mb-5 px-3 py-2 bg-brand-50 border border-brand-100 text-[11px] text-brand-700 flex items-center justify-between"
 				style="border-radius: 6px"
 			>
-				<span
-					>Customize shortcuts shown on this workspace — reorder, hide per role, or add
-					new ones.</span
-				>
+				<span>{{
+					__(
+						"Customize shortcuts shown on this workspace — reorder, hide per role, or add new ones."
+					)
+				}}</span>
 				<RouterLink
 					to="/settings/workspace-structure"
 					class="font-medium hover:underline whitespace-nowrap ml-3"
 				>
-					Configure →
+					{{ __("Configure") }} →
 				</RouterLink>
 			</div>
 
@@ -172,16 +174,16 @@ const visibleReportTiles = computed(() =>
 							<div
 								class="text-base font-semibold text-ink-900 group-hover:text-brand-700 transition-colors dark:text-[#F5F5F5]"
 							>
-								Project Dashboard
+								{{ __("Project Dashboard") }}
 							</div>
 							<span
 								class="text-[9px] px-1.5 py-0.5 bg-brand-100 text-brand-700 font-medium uppercase tracking-wider"
 								style="border-radius: 2px"
-								>Owner view</span
+								>{{ __("Owner view") }}</span
 							>
 						</div>
 						<div class="text-xs text-brand-700 mt-1 leading-snug">
-							Portfolio health, top risks, and high-value approvals at a glance.
+							{{ __("Portfolio health, top risks, and high-value approvals at a glance.") }}
 						</div>
 					</div>
 					<svg
@@ -223,17 +225,17 @@ const visibleReportTiles = computed(() =>
 				style="border-radius: 8px"
 			>
 				<div class="text-sm text-ink-500 mb-1">
-					Site Execution workspace is not configured.
+					{{ __("Site Execution workspace is not configured.") }}
 				</div>
 				<RouterLink
 					v-if="store.isBSA"
 					to="/settings/workspace-structure"
 					class="text-xs text-brand-700 hover:underline"
 				>
-					Open Workspace Structure Settings →
+					{{ __("Open Workspace Structure Settings") }} →
 				</RouterLink>
 				<div v-else class="text-[11px] text-ink-400 italic">
-					Contact your BuildSuite Administrator to enable.
+					{{ __("Contact your BuildSuite Administrator to enable.") }}
 				</div>
 			</div>
 
@@ -244,10 +246,10 @@ const visibleReportTiles = computed(() =>
 				style="border-radius: 8px"
 			>
 				<div class="text-sm text-ink-500 mb-1">
-					No Site Execution shortcuts available for your role.
+					{{ __("No Site Execution shortcuts available for your role.") }}
 				</div>
 				<div class="text-[11px] text-ink-400 italic">
-					Active role: {{ store.currentRole?.name }}
+					{{ __("Active role: {0}", [store.currentRole?.name]) }}
 				</div>
 			</div>
 
@@ -255,7 +257,7 @@ const visibleReportTiles = computed(() =>
            Uses the shared WorkspaceShortcut with a "Report" badge slot. -->
 			<div v-if="visibleReportTiles.length" class="mt-8">
 				<h2 class="text-[11px] font-semibold uppercase tracking-wider text-ink-700 mb-2">
-					Reports
+					{{ __("Reports") }}
 				</h2>
 				<div class="border-t border-ink-200 mb-3"></div>
 				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -271,7 +273,7 @@ const visibleReportTiles = computed(() =>
 							<span
 								class="text-[9px] px-1 py-0.5 bg-ink-100 text-ink-600 font-medium uppercase tracking-wider"
 								style="border-radius: 2px"
-								>Report</span
+								>{{ __("Report") }}</span
 							>
 						</template>
 					</WorkspaceShortcut>

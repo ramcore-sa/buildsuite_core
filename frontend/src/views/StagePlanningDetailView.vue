@@ -11,6 +11,7 @@ import { useSessionStore } from "@/stores/session";
 import { showToast } from "@/utils/appToast";
 import { useFormErrors } from "@/composables/useFormErrors";
 import { createDataAdapter } from "@/data/adapters";
+import { __ } from "@/utils/translate";
 
 // Mirrors the backend Stage Planning Approval workflow (permissions/setup.py
 // _STAGE_TRANSITIONS) — real BuildSuite roles, checked against session.access.roles.
@@ -22,18 +23,35 @@ const STAGE_FULL_ROLES = [
 ];
 const STAGE_FIELD_ROLES = [...STAGE_FULL_ROLES, "BuildSuite Site Engineer", "BuildSuite Foreman"];
 
+// `action` is the workflow transition name sent to apply_workflow and must stay
+// English; `label` is what the button shows.
 const WORKFLOW_ACTIONS = {
-	Draft: [{ action: "Submit for Approval", roles: STAGE_FIELD_ROLES, variant: "primary" }],
+	Draft: [
+		{
+			action: "Submit for Approval",
+			label: __("Submit for Approval"),
+			roles: STAGE_FIELD_ROLES,
+			variant: "primary",
+		},
+	],
 	"Pending Approval": [
-		{ action: "Approve", roles: STAGE_FULL_ROLES, variant: "success" },
-		{ action: "Reject", roles: STAGE_FULL_ROLES, variant: "danger" },
+		{ action: "Approve", label: __("Approve"), roles: STAGE_FULL_ROLES, variant: "success" },
+		{ action: "Reject", label: __("Reject"), roles: STAGE_FULL_ROLES, variant: "danger" },
 	],
 	// Rejected is an audit record (SAW-006): editing it isn't allowed; instead
 	// "Revise" CLONES it into a fresh Draft and opens the clone in edit mode.
-	Rejected: [{ action: "Revise", roles: STAGE_FIELD_ROLES, variant: "warning", clone: true }],
+	Rejected: [
+		{
+			action: "Revise",
+			label: __("Revise"),
+			roles: STAGE_FIELD_ROLES,
+			variant: "warning",
+			clone: true,
+		},
+	],
 	Approved: [
-		{ action: "Revise", roles: STAGE_FULL_ROLES, variant: "warning" },
-		{ action: "Cancel", roles: STAGE_FULL_ROLES, variant: "danger" },
+		{ action: "Revise", label: __("Revise"), roles: STAGE_FULL_ROLES, variant: "warning" },
+		{ action: "Cancel", label: __("Cancel"), roles: STAGE_FULL_ROLES, variant: "danger" },
 	],
 };
 
@@ -384,9 +402,9 @@ async function applyWorkflowAction(action) {
 		}
 		await stageResource.value?.reload?.();
 		await fetchActivity();
-		showToast(`${action} applied`);
+		showToast(__("{0} applied", [__(action)]));
 	} catch (err) {
-		showToast(err.message || `Failed to apply ${action}`, "error");
+		showToast(err.message || __("Failed to apply {0}", [__(action)]), "error");
 	} finally {
 		workflowActing.value = null;
 	}
@@ -416,10 +434,10 @@ async function reviseRejectedStage() {
 			throw new Error(data?.exception || data?.exc_type || `HTTP ${response.status}`);
 		}
 		const newName = data?.message?.name;
-		showToast("Stage revised — editing the new draft");
+		showToast(__("Stage revised — editing the new draft"));
 		if (newName) router.push({ path: `/stage-plannings/${newName}`, query: { edit: "1" } });
 	} catch (err) {
-		showToast(err.message || "Failed to revise stage", "error");
+		showToast(err.message || __("Failed to revise stage"), "error");
 	} finally {
 		workflowActing.value = null;
 	}
@@ -477,7 +495,7 @@ async function confirmReject() {
 	if (!stage.value) return;
 	const reason = rejectReason.value.trim();
 	if (!reason) {
-		rejectError.value = "Please enter a rejection reason.";
+		rejectError.value = __("Please enter a rejection reason.");
 		return;
 	}
 	rejectError.value = "";
@@ -503,9 +521,9 @@ async function confirmReject() {
 		showRejectModal.value = false;
 		await stageResource.value?.reload?.();
 		await fetchActivity();
-		showToast("Stage rejected");
+		showToast(__("Stage rejected"));
 	} catch (err) {
-		rejectError.value = err.message || "Failed to reject stage";
+		rejectError.value = err.message || __("Failed to reject stage");
 	} finally {
 		workflowActing.value = null;
 	}
@@ -546,6 +564,20 @@ watch(
 	{ immediate: true }
 );
 
+// Whole phrase per plural form, so a translation inflects the noun.
+function taskCountLabel(n) {
+	return n === 1 ? __("1 task") : __("{0} tasks", [n]);
+}
+
+// In script rather than the attribute: the quotes around the name would have
+// to be HTML-escaped there, and the catalogue key must be the plain text.
+const deleteMessage = computed(() =>
+	__(
+		'Delete "{0}"? Dependencies in other stages pointing at this one will be cleaned up automatically.',
+		[stage.value?.stageName]
+	)
+);
+
 function startEdit() {
 	if (!canEdit.value) return;
 	editForm.value = snapshotStage(stage.value);
@@ -569,13 +601,13 @@ function toggleDependency(depId) {
 
 function validateEdit() {
 	const e = {};
-	if (!editForm.value.stageName?.trim()) e.stageName = "Stage name is required";
+	if (!editForm.value.stageName?.trim()) e.stageName = __("Stage name is required");
 	if (
 		editForm.value.plannedEnd &&
 		editForm.value.plannedStart &&
 		editForm.value.plannedEnd < editForm.value.plannedStart
 	) {
-		e.plannedEnd = "End must be on or after start";
+		e.plannedEnd = __("End must be on or after start");
 	}
 	setErrors(e);
 	return Object.keys(e).length === 0;
@@ -594,9 +626,9 @@ async function saveEdit() {
 		});
 		await stageResource.value?.reload?.();
 		editing.value = false;
-		showToast("Stage updated");
+		showToast(__("Stage updated"));
 	} catch (err) {
-		showToast(applyServerErrors(err) ?? "Failed to update stage", "error");
+		showToast(applyServerErrors(err) ?? __("Failed to update stage"), "error");
 	} finally {
 		saving.value = false;
 	}
@@ -613,7 +645,7 @@ async function persistChildRows(rows) {
 		});
 		await stageResource.value?.reload?.();
 	} catch (err) {
-		showToast(applyServerErrors(err) ?? "Failed to update stage tasks", "error");
+		showToast(applyServerErrors(err) ?? __("Failed to update stage tasks"), "error");
 		throw err;
 	} finally {
 		saving.value = false;
@@ -623,7 +655,7 @@ async function persistChildRows(rows) {
 async function onPickerSave(payload) {
 	try {
 		await persistChildRows(payload?.newChildRows || []);
-		showToast("Stage tasks updated");
+		showToast(__("Stage tasks updated"));
 	} catch {
 		// toast already shown
 	}
@@ -654,7 +686,7 @@ async function confirmDelete() {
 		if (project.value) router.push(`/projects/${project.value.id}`);
 		else router.push("/stage-plannings");
 	} catch (err) {
-		showToast(applyServerErrors(err) ?? "Failed to delete stage", "error");
+		showToast(applyServerErrors(err) ?? __("Failed to delete stage"), "error");
 	}
 }
 
@@ -713,7 +745,7 @@ const isStageDelayed = computed(() => {
 const breadcrumbs = computed(() => {
 	const out = [
 		{ label: "BuildSuite Core", to: "/" },
-		{ label: "Stage Planning", to: "/stage-plannings" },
+		{ label: __("Stage Planning"), to: "/stage-plannings" },
 	];
 	if (project.value)
 		out.push({ label: project.value.name, to: `/projects/${project.value.id}` });
@@ -737,7 +769,7 @@ const breadcrumbs = computed(() => {
 				style="border-radius: 6px"
 				@click="onStageReview"
 			>
-				Stage Review
+				{{ __("Stage Review") }}
 			</button>
 
 			<!-- Workflow action buttons -->
@@ -749,7 +781,7 @@ const breadcrumbs = computed(() => {
 					:disabled="!!workflowActing"
 					@click="runAction(wf)"
 				>
-					{{ workflowActing === wf.action ? `${wf.action}…` : wf.action }}
+					{{ workflowActing === wf.action ? __("{0}…", [wf.label]) : wf.label }}
 				</button>
 				<button
 					v-else-if="wf.variant === 'success'"
@@ -759,7 +791,7 @@ const breadcrumbs = computed(() => {
 					:disabled="!!workflowActing"
 					@click="runAction(wf)"
 				>
-					{{ workflowActing === wf.action ? `${wf.action}…` : wf.action }}
+					{{ workflowActing === wf.action ? __("{0}…", [wf.label]) : wf.label }}
 				</button>
 				<button
 					v-else-if="wf.variant === 'warning'"
@@ -769,7 +801,7 @@ const breadcrumbs = computed(() => {
 					:disabled="!!workflowActing"
 					@click="runAction(wf)"
 				>
-					{{ workflowActing === wf.action ? `${wf.action}…` : wf.action }}
+					{{ workflowActing === wf.action ? __("{0}…", [wf.label]) : wf.label }}
 				</button>
 				<button
 					v-else-if="wf.variant === 'danger'"
@@ -779,7 +811,7 @@ const breadcrumbs = computed(() => {
 					:disabled="!!workflowActing"
 					@click="runAction(wf)"
 				>
-					{{ workflowActing === wf.action ? `${wf.action}…` : wf.action }}
+					{{ workflowActing === wf.action ? __("{0}…", [wf.label]) : wf.label }}
 				</button>
 			</template>
 
@@ -791,7 +823,7 @@ const breadcrumbs = computed(() => {
 				style="border-radius: 6px"
 				@click="startEdit"
 			>
-				Edit
+				{{ __("Edit") }}
 			</button>
 
 			<button
@@ -801,7 +833,7 @@ const breadcrumbs = computed(() => {
 				style="border-radius: 6px"
 				@click="showDeleteConfirm = true"
 			>
-				Delete
+				{{ __("Delete") }}
 			</button>
 		</template>
 
@@ -812,7 +844,7 @@ const breadcrumbs = computed(() => {
 			style="border-radius: 8px"
 		>
 			<div class="text-[11px] uppercase tracking-wider font-semibold text-danger-700 mb-1">
-				Stage rejected
+				{{ __("Stage rejected") }}
 			</div>
 			<div
 				v-if="stage.rejectReason"
@@ -820,7 +852,7 @@ const breadcrumbs = computed(() => {
 			>
 				{{ stage.rejectReason }}
 			</div>
-			<div v-else class="text-sm text-ink-500 italic">No reason recorded.</div>
+			<div v-else class="text-sm text-ink-500 italic">{{ __("No reason recorded.") }}</div>
 		</div>
 
 		<!-- KPI strip -->
@@ -843,13 +875,13 @@ const breadcrumbs = computed(() => {
 						aria-hidden="true"
 						v-html="getWorkspaceIconPath('calendar')"
 					/>
-					Window
+					{{ __("Window") }}
 				</div>
 				<div class="text-sm font-semibold text-ink-900 mt-1.5 dark:text-[#F5F5F5]">
 					{{ fmtDate(stage.plannedStart) || "—" }}
 				</div>
 				<div class="text-[11px] text-ink-500 mt-0.5">
-					to {{ fmtDate(stage.plannedEnd) || "—" }}
+					{{ __("to {0}", [fmtDate(stage.plannedEnd) || "—"]) }}
 				</div>
 			</div>
 			<div
@@ -870,7 +902,7 @@ const breadcrumbs = computed(() => {
 						aria-hidden="true"
 						v-html="getWorkspaceIconPath('chart-line')"
 					/>
-					Duration
+					{{ __("Duration") }}
 				</div>
 				<div
 					class="text-lg font-semibold text-ink-900 mt-1 tabular-nums dark:text-[#F5F5F5]"
@@ -879,7 +911,7 @@ const breadcrumbs = computed(() => {
 					<span
 						v-if="stageDurationDays !== null"
 						class="text-xs text-ink-500 font-normal"
-						>day{{ stageDurationDays === 1 ? "" : "s" }}</span
+						>{{ stageDurationDays === 1 ? __("day") : __("days") }}</span
 					>
 				</div>
 			</div>
@@ -901,7 +933,7 @@ const breadcrumbs = computed(() => {
 						aria-hidden="true"
 						v-html="getWorkspaceIconPath('clipboard-list')"
 					/>
-					Tasks
+					{{ __("Tasks") }}
 				</div>
 				<div
 					class="text-lg font-semibold text-ink-900 mt-1 tabular-nums dark:text-[#F5F5F5]"
@@ -912,9 +944,9 @@ const breadcrumbs = computed(() => {
 					<span class="text-success-700 font-medium">{{
 						stageTaskStats.completed
 					}}</span>
-					done ·
+					{{ __("done") }} ·
 					<span class="text-info-700 font-medium">{{ stageTaskStats.inProgress }}</span>
-					in progress
+					{{ __("in progress") }}
 				</div>
 			</div>
 			<div
@@ -935,7 +967,7 @@ const breadcrumbs = computed(() => {
 						aria-hidden="true"
 						v-html="getWorkspaceIconPath('refresh-ccw')"
 					/>
-					Dependencies
+					{{ __("Dependencies") }}
 				</div>
 				<div
 					class="text-lg font-semibold text-ink-900 mt-1 tabular-nums dark:text-[#F5F5F5]"
@@ -945,10 +977,10 @@ const breadcrumbs = computed(() => {
 				<div class="text-[11px] text-ink-500 mt-0.5">
 					{{
 						dependencyCount === 0
-							? "starts independently"
+							? __("starts independently")
 							: dependencyCount === 1
-							? "stage must complete first"
-							: "stages must complete first"
+							? __("stage must complete first")
+							: __("stages must complete first")
 					}}
 				</div>
 			</div>
@@ -974,13 +1006,13 @@ const breadcrumbs = computed(() => {
 					v-html="getWorkspaceIconPath('info')"
 				/>
 				<h2 class="text-sm font-semibold text-ink-900 dark:text-[#F5F5F5]">
-					Stage details
+					{{ __("Stage details") }}
 				</h2>
 			</header>
 			<div class="p-5 space-y-4">
 				<div>
 					<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-						Project
+						{{ __("Project") }}
 					</div>
 					<div class="text-sm mt-1">
 						<DeskLink v-if="project" :to="`/projects/${project.id}`">{{
@@ -991,7 +1023,7 @@ const breadcrumbs = computed(() => {
 				</div>
 				<div>
 					<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-						Description
+						{{ __("Description") }}
 					</div>
 					<div class="text-sm text-ink-700 mt-1 whitespace-pre-line dark:text-ink-300">
 						{{ stage.description || "—" }}
@@ -1001,7 +1033,7 @@ const breadcrumbs = computed(() => {
 		</section>
 
 		<!-- Dependencies -->
-		<DeskSection title="Dependencies">
+		<DeskSection :title="__('Dependencies')">
 			<div class="md:col-span-2">
 				<div v-if="(stage.dependencies || []).length" class="flex flex-wrap gap-1.5">
 					<DeskLink
@@ -1014,7 +1046,7 @@ const breadcrumbs = computed(() => {
 					>
 				</div>
 				<div v-else class="text-xs text-ink-400 italic">
-					No dependencies · this stage can start independently.
+					{{ __("No dependencies · this stage can start independently.") }}
 				</div>
 			</div>
 		</DeskSection>
@@ -1023,16 +1055,14 @@ const breadcrumbs = computed(() => {
 		<section class="mb-6">
 			<div class="flex items-center justify-between mb-2">
 				<div class="text-[11px] uppercase tracking-wider text-ink-500 font-medium">
-					Tasks in this stage
+					{{ __("Tasks in this stage") }}
 				</div>
 				<div class="flex items-center gap-3">
 					<span class="text-[11px] text-ink-500 tabular-nums">
-						{{ (stage.stagePlanningTasks || []).length }} task{{
-							(stage.stagePlanningTasks || []).length === 1 ? "" : "s"
-						}}
+						{{ taskCountLabel((stage.stagePlanningTasks || []).length) }}
 					</span>
 					<span v-if="tasksLocked" class="text-[11px] text-ink-400 italic"
-						>Locked — stage is approved</span
+						>{{ __("Locked — stage is approved") }}</span
 					>
 					<button
 						v-else
@@ -1042,7 +1072,7 @@ const breadcrumbs = computed(() => {
 						:disabled="saving"
 						@click="openPicker"
 					>
-						Add/Remove Tasks
+						{{ __("Add/Remove Tasks") }}
 					</button>
 				</div>
 			</div>
@@ -1056,11 +1086,11 @@ const breadcrumbs = computed(() => {
 						class="grid bg-ink-50 border-b border-ink-200 text-[10px] uppercase tracking-wider text-ink-500 font-medium dark:bg-ink-800 dark:border-ink-700"
 						style="grid-template-columns: minmax(220px, 1fr) 110px 110px 110px 110px"
 					>
-						<div class="px-3 py-1.5">Task</div>
-						<div class="px-3 py-1.5">Planned Start</div>
-						<div class="px-3 py-1.5">Planned End</div>
-						<div class="px-3 py-1.5 text-right">Planned Qty (%)</div>
-						<div class="px-3 py-1.5">Status</div>
+						<div class="px-3 py-1.5">{{ __("Task") }}</div>
+						<div class="px-3 py-1.5">{{ __("Planned Start") }}</div>
+						<div class="px-3 py-1.5">{{ __("Planned End") }}</div>
+						<div class="px-3 py-1.5 text-right">{{ __("Planned Qty (%)") }}</div>
+						<div class="px-3 py-1.5">{{ __("Status") }}</div>
 					</div>
 					<div
 						v-for="row in stage.stagePlanningTasks"
@@ -1075,7 +1105,7 @@ const breadcrumbs = computed(() => {
 								class="text-ink-900 font-medium hover:underline dark:text-[#F5F5F5]"
 								>{{ taskName(row.task) }}</RouterLink
 							>
-							<span v-else class="text-ink-400 italic">No task linked</span>
+							<span v-else class="text-ink-400 italic">{{ __("No task linked") }}</span>
 						</div>
 						<div class="px-3 py-1.5 text-xs text-ink-700 dark:text-ink-300">
 							{{ fmtDate(row.plannedStart) || "—" }}
@@ -1109,7 +1139,9 @@ const breadcrumbs = computed(() => {
 					</div>
 				</div>
 				<div v-else class="text-xs text-ink-400 italic">
-					No task rows yet · click "Add/Remove Tasks" above to pick tasks for this stage.
+					{{
+					__('No task rows yet · click "Add/Remove Tasks" above to pick tasks for this stage.')
+				}}
 				</div>
 			</div>
 		</section>
@@ -1125,7 +1157,7 @@ const breadcrumbs = computed(() => {
 				style="border-radius: 6px 6px 0 0"
 			>
 				<div class="text-[11px] uppercase tracking-wider text-ink-500 font-medium">
-					Activity
+					{{ __("Activity") }}
 				</div>
 			</header>
 			<div v-if="activityEntries.length" class="divide-y divide-ink-100 dark:divide-ink-800">
@@ -1144,12 +1176,12 @@ const breadcrumbs = computed(() => {
 							{{ entry.text || entry.type }}
 						</div>
 						<div class="text-[11px] text-ink-500 mt-0.5">
-							by {{ entry.by_name || entry.by }} · {{ activityWhen(entry.at) }}
+							{{ __("by {0} · {1}", [entry.by_name || entry.by, activityWhen(entry.at)]) }}
 						</div>
 					</div>
 				</div>
 			</div>
-			<div v-else class="px-4 py-3 text-xs text-ink-400 italic">No activity yet.</div>
+			<div v-else class="px-4 py-3 text-xs text-ink-400 italic">{{ __("No activity yet.") }}</div>
 		</section>
 
 		<!-- Edit modal -->
@@ -1170,7 +1202,7 @@ const breadcrumbs = computed(() => {
 					>
 						<div class="min-w-0 flex-1">
 							<h2 class="text-sm font-semibold text-ink-900 dark:text-[#F5F5F5]">
-								Edit stage
+								{{ __("Edit stage") }}
 							</h2>
 							<p class="text-[11px] text-ink-500 mt-0.5 truncate">
 								{{ stage.stageName
@@ -1180,7 +1212,7 @@ const breadcrumbs = computed(() => {
 						<button
 							type="button"
 							class="text-ink-500 hover:text-ink-900 text-lg leading-none flex-shrink-0 ml-3 dark:text-ink-400 dark:hover:text-ink-200"
-							aria-label="Close"
+							:aria-label="__('Close')"
 							@click="cancelEdit"
 						>
 							×
@@ -1188,38 +1220,40 @@ const breadcrumbs = computed(() => {
 					</header>
 
 					<div class="p-5 overflow-y-auto flex-1">
-						<DeskSection title="Stage details">
-							<DeskField label="Stage name" required :error="errors.stageName">
+						<DeskSection :title="__('Stage details')">
+							<DeskField :label="__('Stage name')" required :error="errors.stageName">
 								<DeskInput
 									v-model="editForm.stageName"
 									@input="clearError('stageName')"
 								/>
 							</DeskField>
 							<DeskField
-								label="Project"
-								hint="Locked after create — move tasks instead of reparenting a stage."
+:label="__('Project')"
+								:hint="
+									__('Locked after create — move tasks instead of reparenting a stage.')
+								"
 							>
 								<DeskInput
 									:model-value="project ? project.name : editForm.project"
 									disabled
 								/>
 							</DeskField>
-							<DeskField label="Planned start">
+							<DeskField :label="__('Planned start')">
 								<DeskInput v-model="editForm.plannedStart" type="date" />
 							</DeskField>
-							<DeskField label="Planned end" :error="errors.plannedEnd">
+							<DeskField :label="__('Planned end')" :error="errors.plannedEnd">
 								<DeskInput
 									v-model="editForm.plannedEnd"
 									type="date"
 									@input="clearError('plannedEnd')"
 								/>
 							</DeskField>
-							<DeskField label="Description">
+							<DeskField :label="__('Description')">
 								<DeskTextarea v-model="editForm.description" :rows="3" />
 							</DeskField>
 						</DeskSection>
 
-						<DeskSection title="Dependencies">
+						<DeskSection :title="__('Dependencies')">
 							<div class="md:col-span-2">
 								<div v-if="siblingStages.length" class="flex flex-wrap gap-2">
 									<label
@@ -1243,25 +1277,26 @@ const breadcrumbs = computed(() => {
 									</label>
 								</div>
 								<div v-else class="text-xs text-ink-400 italic">
-									No other stages on this project yet · add one to create a
-									dependency.
+									{{
+										__(
+											"No other stages on this project yet · add one to create a dependency."
+										)
+									}}
 								</div>
 								<div class="text-[11px] text-ink-500 mt-1.5">
-									Pick the stages that must complete before this one can start.
+									{{ __("Pick the stages that must complete before this one can start.") }}
 								</div>
 							</div>
 						</DeskSection>
 
-						<DeskSection title="Tasks">
+						<DeskSection :title="__('Tasks')">
 							<div class="md:col-span-2 text-xs text-ink-500">
-								{{ (stage.stagePlanningTasks || []).length }} task{{
-									(stage.stagePlanningTasks || []).length === 1 ? "" : "s"
+								{{
+									__("{0} linked · manage via the {1} button on the page.", [
+										taskCountLabel((stage.stagePlanningTasks || []).length),
+										__("Add/Remove Tasks"),
+									])
 								}}
-								linked · manage via the
-								<span class="font-medium text-ink-700 dark:text-ink-300"
-									>Add/Remove Tasks</span
-								>
-								button on the page.
 							</div>
 						</DeskSection>
 					</div>
@@ -1277,7 +1312,7 @@ const breadcrumbs = computed(() => {
 							:disabled="saving"
 							@click="cancelEdit"
 						>
-							Cancel
+							{{ __("Cancel") }}
 						</button>
 						<button
 							type="button"
@@ -1285,7 +1320,7 @@ const breadcrumbs = computed(() => {
 							:disabled="saving"
 							@click="saveEdit"
 						>
-							{{ saving ? "Saving…" : "Save" }}
+							{{ saving ? __("Saving…") : __("Save") }}
 						</button>
 					</footer>
 				</div>
@@ -1333,7 +1368,7 @@ const breadcrumbs = computed(() => {
 					>
 						<div class="min-w-0 flex-1">
 							<h2 class="text-sm font-semibold text-ink-900 dark:text-[#F5F5F5]">
-								Reject stage
+								{{ __("Reject stage") }}
 							</h2>
 							<p class="text-[11px] text-ink-500 mt-0.5 truncate">
 								{{ stage.stageName }}
@@ -1342,7 +1377,7 @@ const breadcrumbs = computed(() => {
 						<button
 							type="button"
 							class="text-ink-500 hover:text-ink-900 text-lg leading-none flex-shrink-0 ml-3 dark:text-ink-400 dark:hover:text-ink-200"
-							aria-label="Close"
+							:aria-label="__('Close')"
 							@click="showRejectModal = false"
 						>
 							×
@@ -1350,18 +1385,21 @@ const breadcrumbs = computed(() => {
 					</header>
 
 					<div class="p-5">
-						<DeskField label="Rejection reason" required :error="rejectError">
+						<DeskField :label="__('Rejection reason')" required :error="rejectError">
 							<DeskTextarea
 								v-model="rejectReason"
 								data-test="reject-reason-input"
 								:rows="4"
-								placeholder="Explain why this stage is being rejected…"
+								:placeholder="__('Explain why this stage is being rejected…')"
 								@input="rejectError = ''"
 							/>
 						</DeskField>
 						<p class="text-[11px] text-ink-500 mt-1.5">
-							This reason is recorded on the stage. Rejection is final — the stage
-							cannot be revised afterwards.
+							{{
+								__(
+									"This reason is recorded on the stage. Rejection is final — the stage cannot be revised afterwards."
+								)
+							}}
 						</p>
 					</div>
 
@@ -1376,7 +1414,7 @@ const breadcrumbs = computed(() => {
 							:disabled="workflowActing === 'Reject'"
 							@click="showRejectModal = false"
 						>
-							Cancel
+							{{ __("Cancel") }}
 						</button>
 						<button
 							type="button"
@@ -1386,7 +1424,7 @@ const breadcrumbs = computed(() => {
 							:disabled="workflowActing === 'Reject'"
 							@click="confirmReject"
 						>
-							{{ workflowActing === "Reject" ? "Rejecting…" : "Reject stage" }}
+							{{ workflowActing === "Reject" ? __("Rejecting…") : __("Reject stage") }}
 						</button>
 					</footer>
 				</div>
@@ -1395,16 +1433,16 @@ const breadcrumbs = computed(() => {
 
 		<ConfirmDialog
 			v-model:open="showDeleteConfirm"
-			title="Delete stage"
-			:message="`Delete &quot;${stage.stageName}&quot;? Dependencies in other stages pointing at this one will be cleaned up automatically.`"
-			confirm-label="Delete"
+			:title="__('Delete stage')"
+			:message="deleteMessage"
+			:confirm-label="__('Delete')"
 			:destructive="true"
 			@confirm="confirmDelete"
 		/>
 	</DeskPage>
 
 	<div v-else class="px-6 py-20 text-center text-sm text-ink-400">
-		Stage not found ·
-		<RouterLink to="/stage-plannings" class="desk-link">Back to list →</RouterLink>
+		{{ __("Stage not found") }} ·
+		<RouterLink to="/stage-plannings" class="desk-link">{{ __("Back to list →") }}</RouterLink>
 	</div>
 </template>

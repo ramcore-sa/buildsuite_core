@@ -3,12 +3,15 @@ import { computed, ref, watch } from "vue";
 import { watchDebounced } from "@vueuse/core";
 import Autocomplete from "../../../node_modules/frappe-ui/src/components/Autocomplete/Autocomplete.vue";
 import { useDocTypeList } from "@/composables/useDocTypeList";
+import { __ } from "@/utils/translate";
 
 const props = defineProps({
 	doctype: { type: String, required: true },
 	modelValue: { type: [String, Number, null], default: "" },
 	label: { type: String, default: "" },
-	placeholder: { type: String, default: "Select" },
+	// A factory so the default is translated per instance; callers translate
+	// the placeholders they pass in.
+	placeholder: { type: String, default: () => __("Select") },
 	disabled: { type: Boolean, default: false },
 	filters: { type: [Array, Object, String], default: () => [] },
 	labelField: { type: String, default: "name" },

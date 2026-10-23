@@ -8,100 +8,122 @@
 // BuildSuite-product admin (Workspace Structure Settings, Site Execution
 // Settings, Project Type templates, Pro license). Both get ✓ on every workspace.
 
+import { __ } from "@/utils/translate";
+
 // =====================================================================
-// ROLES — 12 stable role objects. `id` is the persisted slug; `shortName`
+// ROLES — 12 stable role objects. `id` is the persisted slug; `persona` is the
+// English User.persona Select value it is matched against, kept apart from the
+// translated `name` so a user on Arabic still resolves to their persona; `shortName`
 // shows in the topbar dropdown trigger; `color` is a Tailwind bg- class for
 // the role badge, picked from the project's named palette (see tailwind.config.js).
 // =====================================================================
 export const ROLES = [
 	{
 		id: "director",
-		name: "Director / Owner",
-		shortName: "Director",
-		description:
-			"Executive oversight — portfolio P&L, approvals at threshold, strategic decisions.",
+		persona: "Director / Owner",
+		name: __("Director / Owner"),
+		shortName: __("Director"),
+		description: __(
+			"Executive oversight — portfolio P&L, approvals at threshold, strategic decisions."
+		),
 		color: "bg-ink-900",
 	},
 	{
 		id: "pm",
-		name: "Project Manager",
-		shortName: "PM",
-		description: "Owns project delivery — schedule, scope, budget, day-to-day approvals.",
+		persona: "Project Manager",
+		name: __("Project Manager"),
+		shortName: __("PM"),
+		description: __("Owns project delivery — schedule, scope, budget, day-to-day approvals."),
 		color: "bg-info-600",
 	},
 	{
 		id: "estimator",
-		name: "Estimator",
-		shortName: "Estimator",
-		description: "Builds tenders and initial BOQs from drawings and rate analysis.",
+		persona: "Estimator",
+		name: __("Estimator"),
+		shortName: __("Estimator"),
+		description: __("Builds tenders and initial BOQs from drawings and rate analysis."),
 		color: "bg-warning-500",
 	},
 	{
 		id: "qs",
-		name: "Quantity Surveyor",
-		shortName: "QS",
-		description:
-			"Maintains rates, measurement books, RA bills, and BOQ revisions during execution.",
+		persona: "Quantity Surveyor",
+		name: __("Quantity Surveyor"),
+		shortName: __("QS"),
+		description: __(
+			"Maintains rates, measurement books, RA bills, and BOQ revisions during execution."
+		),
 		color: "bg-warning-700",
 	},
 	{
 		id: "site-engineer",
-		name: "Site Engineer",
-		shortName: "Site Engineer",
-		description:
-			"Runs the site day-to-day — tasks, material requests, daily diary, scope flags.",
+		persona: "Site Engineer",
+		name: __("Site Engineer"),
+		shortName: __("Site Engineer"),
+		description: __(
+			"Runs the site day-to-day — tasks, material requests, daily diary, scope flags."
+		),
 		color: "bg-success-600",
 	},
 	{
 		id: "foreman",
-		name: "Foreman / Supervisor",
-		shortName: "Foreman",
-		description: "Field supervisor — crews, overtime, on-site execution.",
+		persona: "Foreman / Supervisor",
+		name: __("Foreman / Supervisor"),
+		shortName: __("Foreman"),
+		description: __("Field supervisor — crews, overtime, on-site execution."),
 		color: "bg-success-700",
 	},
 	{
 		id: "procurement",
-		name: "Procurement Officer",
-		shortName: "Procurement",
-		description: "Converts material requests into POs, manages suppliers and GRN.",
+		persona: "Procurement Officer",
+		name: __("Procurement Officer"),
+		shortName: __("Procurement"),
+		description: __("Converts material requests into POs, manages suppliers and GRN."),
 		color: "bg-info-700",
 	},
 	{
 		id: "store-keeper",
-		name: "Store Keeper",
-		shortName: "Store",
-		description: "Receives, issues, and reconciles stock at site stores.",
+		persona: "Store Keeper",
+		name: __("Store Keeper"),
+		shortName: __("Store"),
+		description: __("Receives, issues, and reconciles stock at site stores."),
 		color: "bg-ink-600",
 	},
 	{
 		id: "accountant",
-		name: "Accountant",
-		shortName: "Accountant",
-		description: "Books vendor and subcontractor payments, petty cash, journals.",
+		persona: "Accountant",
+		name: __("Accountant"),
+		shortName: __("Accountant"),
+		description: __("Books vendor and subcontractor payments, petty cash, journals."),
 		color: "bg-danger-600",
 	},
 	{
 		id: "hr-manager",
-		name: "HR Manager",
-		shortName: "HR Manager",
-		description:
-			"Office-staff HR — employees, leave, salary, appraisal (site labour lives in Workforce).",
+		persona: "HR Manager",
+		name: __("HR Manager"),
+		shortName: __("HR Manager"),
+		description: __(
+			"Office-staff HR — employees, leave, salary, appraisal (site labour lives in Workforce)."
+		),
 		color: "bg-info-500",
 	},
 	{
 		id: "admin",
-		name: "System Manager (Admin)",
-		shortName: "Admin",
-		description:
-			"Full access — Frappe-platform admin: sites, apps, backups, integrations, troubleshooting.",
+		persona: "System Manager (Admin)",
+		name: __("System Manager (Admin)"),
+		shortName: __("Admin"),
+		description: __(
+			"Full access — Frappe-platform admin: sites, apps, backups, integrations, troubleshooting."
+		),
 		color: "bg-brand-600",
 	},
 	{
 		id: "bsa",
-		name: "BuildSuite Administrator",
-		shortName: "BS Admin",
-		description:
-			'BuildSuite-product admin — Workspace Structure, Site Execution Settings, Project Type templates, Pro license. The "BuildSuite owner" at a customer org.',
+		persona: "BuildSuite Administrator",
+		name: __("BuildSuite Administrator"),
+		shortName: __("BS Admin"),
+		description: __(
+			"BuildSuite-product admin — Workspace Structure, Site Execution Settings, Project Type templates, Pro license. The \"BuildSuite owner\" at a customer org."
+		),
 		color: "bg-brand-700",
 	},
 ];
@@ -374,7 +396,7 @@ export const WORKSPACE_ORDER = {
 // when the label isn't a recognised persona.
 export function personaIdFromName(name) {
 	if (!name) return null;
-	const match = ROLES.find((r) => r.name === name);
+	const match = ROLES.find((r) => r.persona === name);
 	return match ? match.id : null;
 }
 

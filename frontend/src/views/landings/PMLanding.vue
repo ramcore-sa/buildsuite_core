@@ -120,25 +120,31 @@ const pendingApprovalsCount = computed(() => approvals.value.length);
 			<div class="flex items-center gap-3 mb-2">
 				<span :class="role.color" class="w-2.5 h-2.5 rounded-full"></span>
 				<p class="text-xs text-ink-500 uppercase tracking-wider font-medium">
-					{{ role.shortName }} · My projects
+					{{ role.shortName }} · {{ __("My projects") }}
 				</p>
 			</div>
-			<h1 class="text-2xl font-semibold text-ink-900 tracking-tight">Good morning</h1>
+			<h1 class="text-2xl font-semibold text-ink-900 tracking-tight">{{ __("Good morning") }}</h1>
 			<p class="text-sm text-ink-500 mt-1">
 				{{ todayLabel }} ·
 				<span class="text-ink-700 font-medium"
-					>{{ myActiveCount }} active project{{ myActiveCount === 1 ? "" : "s" }}</span
+					>{{
+						myActiveCount === 1
+							? __("{0} active project", [myActiveCount])
+							: __("{0} active projects", [myActiveCount])
+					}}</span
 				>
 				·
 				<span class="text-ink-700 font-medium"
-					>{{ pendingApprovalsCount }} pending approval{{
-						pendingApprovalsCount === 1 ? "" : "s"
+					>{{
+						pendingApprovalsCount === 1
+							? __("{0} pending approval", [pendingApprovalsCount])
+							: __("{0} pending approvals", [pendingApprovalsCount])
 					}}</span
 				>
 			</p>
 
 			<!-- My projects -->
-			<h2 class="text-sm font-semibold text-ink-900 mt-10 mb-3">My projects</h2>
+			<h2 class="text-sm font-semibold text-ink-900 mt-10 mb-3">{{ __("My projects") }}</h2>
 			<div v-if="projectCards.length" class="grid grid-cols-1 md:grid-cols-2 gap-3">
 				<RouterLink
 					v-for="p in projectCards"
@@ -156,7 +162,11 @@ const pendingApprovalsCount = computed(() => approvals.value.length);
 						</div>
 						<div class="text-right flex-shrink-0">
 							<div class="text-[11px] text-ink-500">
-								{{ p.days > 0 ? `${p.days}d to deadline` : `${-p.days}d overdue` }}
+								{{
+									p.days > 0
+										? __("{0}d to deadline", [p.days])
+										: __("{0}d overdue", [-p.days])
+								}}
 							</div>
 							<div
 								class="text-[11px] tabular-nums mt-0.5"
@@ -186,16 +196,20 @@ const pendingApprovalsCount = computed(() => approvals.value.length);
 					</div>
 					<div class="flex items-center gap-4 text-xs text-ink-500">
 						<span
-							>{{ p.openTasksCount }} open task{{
-								p.openTasksCount === 1 ? "" : "s"
+							>{{
+								p.openTasksCount === 1
+									? __("{0} open task", [p.openTasksCount])
+									: __("{0} open tasks", [p.openTasksCount])
 							}}</span
 						>
 						<span>·</span>
 						<span
 							:class="p.pendingScosCount > 0 ? 'text-warning-700 font-medium' : ''"
 						>
-							{{ p.pendingScosCount }} pending SCO{{
-								p.pendingScosCount === 1 ? "" : "s"
+							{{
+								p.pendingScosCount === 1
+									? __("{0} pending SCO", [p.pendingScosCount])
+									: __("{0} pending SCOs", [p.pendingScosCount])
 							}}
 						</span>
 						<span class="ml-auto text-ink-400">{{ fmtCompactINR(p.budget) }}</span>
@@ -206,14 +220,14 @@ const pendingApprovalsCount = computed(() => approvals.value.length);
 				v-else
 				class="bg-white border border-ink-200 rounded-xl px-4 py-8 text-center text-sm text-ink-500"
 			>
-				No projects assigned to you.
+				{{ __("No projects assigned to you.") }}
 				<RouterLink to="/projects/new" class="text-brand-600 hover:underline"
-					>Create one →</RouterLink
+					>{{ __("Create one") }} →</RouterLink
 				>
 			</div>
 
 			<!-- Pending approvals -->
-			<h2 class="text-sm font-semibold text-ink-900 mt-10 mb-3">Pending approvals</h2>
+			<h2 class="text-sm font-semibold text-ink-900 mt-10 mb-3">{{ __("Pending approvals") }}</h2>
 			<div class="bg-white border border-ink-200 rounded-xl overflow-hidden">
 				<div class="divide-y divide-ink-100">
 					<RouterLink
@@ -232,7 +246,7 @@ const pendingApprovalsCount = computed(() => approvals.value.length);
 								{{ a.title }}
 							</div>
 							<div class="text-xs text-ink-500 mt-0.5 truncate">
-								{{ a.project }} · raised {{ a.daysAgo }}d ago
+								{{ a.project }} · {{ __("raised {0}d ago", [a.daysAgo]) }}
 							</div>
 						</div>
 						<div class="text-right flex-shrink-0">
@@ -241,13 +255,13 @@ const pendingApprovalsCount = computed(() => approvals.value.length);
 							</div>
 						</div>
 						<UserAvatar :user-id="a.raisedBy" size="xs" />
-						<span class="text-brand-600 text-sm flex-shrink-0">Review →</span>
+						<span class="text-brand-600 text-sm flex-shrink-0">{{ __("Review") }} →</span>
 					</RouterLink>
 					<div
 						v-if="!approvals.length"
 						class="px-4 py-6 text-center text-sm text-ink-400"
 					>
-						No SCO approvals waiting on you.
+						{{ __("No SCO approvals waiting on you.") }}
 					</div>
 					<!-- Stubs for the other two approval kinds — flagged as not yet wired -->
 					<div class="flex items-center gap-3 px-4 py-3 bg-ink-50/50">
@@ -256,9 +270,9 @@ const pendingApprovalsCount = computed(() => approvals.value.length);
 							>MR</span
 						>
 						<div class="flex-1 min-w-0">
-							<div class="text-sm text-ink-500">Material requests</div>
+							<div class="text-sm text-ink-500">{{ __("Material requests") }}</div>
 							<div class="text-xs text-ink-400 mt-0.5">
-								0 pending · Procurement (M4) — coming soon
+								{{ __("0 pending · Procurement (M4) — coming soon") }}
 							</div>
 						</div>
 					</div>
@@ -268,9 +282,9 @@ const pendingApprovalsCount = computed(() => approvals.value.length);
 							>PC</span
 						>
 						<div class="flex-1 min-w-0">
-							<div class="text-sm text-ink-500">Petty cash requests</div>
+							<div class="text-sm text-ink-500">{{ __("Petty cash requests") }}</div>
 							<div class="text-xs text-ink-400 mt-0.5">
-								0 pending · Project Finance (M8) — coming soon
+								{{ __("0 pending · Project Finance (M8) — coming soon") }}
 							</div>
 						</div>
 					</div>
@@ -278,7 +292,7 @@ const pendingApprovalsCount = computed(() => approvals.value.length);
 			</div>
 
 			<!-- Today's critical tasks -->
-			<h2 class="text-sm font-semibold text-ink-900 mt-10 mb-3">Today's critical tasks</h2>
+			<h2 class="text-sm font-semibold text-ink-900 mt-10 mb-3">{{ __("Today's critical tasks") }}</h2>
 			<div class="bg-white border border-ink-200 rounded-xl overflow-hidden">
 				<div class="divide-y divide-ink-100">
 					<RouterLink
@@ -294,7 +308,7 @@ const pendingApprovalsCount = computed(() => approvals.value.length);
 						<div class="flex-1 min-w-0">
 							<div class="text-sm text-ink-900 truncate">{{ t.name }}</div>
 							<div class="text-xs text-ink-500 mt-0.5 truncate">
-								Due {{ fmtDate(t.endDate) }} · {{ t.priority }} priority
+								{{ __("Due {0} · {1} priority", [fmtDate(t.endDate), __(t.priority)]) }}
 							</div>
 						</div>
 						<div class="flex items-center gap-2 flex-shrink-0">
@@ -314,7 +328,7 @@ const pendingApprovalsCount = computed(() => approvals.value.length);
 						v-if="!criticalTasks.length"
 						class="px-4 py-8 text-center text-sm text-ink-400"
 					>
-						No critical tasks · you're caught up.
+						{{ __("No critical tasks · you're caught up.") }}
 					</div>
 				</div>
 			</div>

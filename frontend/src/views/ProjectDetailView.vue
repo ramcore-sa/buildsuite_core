@@ -38,6 +38,7 @@ import {
 	WP_COLS,
 } from "@/views/project-detail/projectDetailConfig";
 import { useProjectDetailListFilters } from "@/views/project-detail/useProjectDetailListFilters";
+import { __ } from "@/utils/translate";
 
 const props = defineProps({ id: String });
 const router = useRouter();
@@ -595,9 +596,9 @@ async function confirmAddMember() {
 		await addProjectTeamMember(resolvedProjectId.value, teamPickUserId.value);
 		teamModalOpen.value = false;
 		projectResource.value?.reload?.();
-		showToast("Team member added");
+		showToast(__("Team member added"));
 	} catch (err) {
-		teamError.value = err?.message || "Failed to add team member";
+		teamError.value = err?.message || __("Failed to add team member");
 	} finally {
 		teamSaving.value = false;
 	}
@@ -606,18 +607,18 @@ async function removeTeamMember(userId) {
 	if (!userId) return;
 	const m = projectTeam.value.find((x) => x.id === userId);
 	const ok = await confirmDialog({
-		title: "Remove team member",
-		message: `Remove ${m?.name || userId} from this project's team?`,
-		confirmLabel: "Remove",
+		title: __("Remove team member"),
+		message: __("Remove {0} from this project's team?", [m?.name || userId]),
+		confirmLabel: __("Remove"),
 		destructive: true,
 	});
 	if (!ok) return;
 	try {
 		await removeProjectTeamMember(resolvedProjectId.value, userId);
 		projectResource.value?.reload?.();
-		showToast("Team member removed");
+		showToast(__("Team member removed"));
 	} catch (err) {
-		showToast(err?.message || "Failed to remove team member", "error");
+		showToast(err?.message || __("Failed to remove team member"), "error");
 	}
 }
 
@@ -656,9 +657,9 @@ async function saveEdit() {
 		});
 		editing.value = false;
 		projectResource.value?.reload?.();
-		showToast("Project updated");
+		showToast(__("Project updated"));
 	} catch (err) {
-		showToast(applyEditErrors(err) ?? "Failed to save project", "error");
+		showToast(applyEditErrors(err) ?? __("Failed to save project"), "error");
 	}
 }
 function cancelEdit() {
@@ -685,9 +686,9 @@ async function confirmDelete() {
 		showDeleteConfirm.value = false;
 		await router.push("/projects");
 		await nextTick();
-		showToast("Project deleted");
+		showToast(__("Project deleted"));
 	} catch (err) {
-		showToast("Failed to delete project", "error");
+		showToast(__("Failed to delete project"), "error");
 		console.error("deleteProject failed:", err);
 	} finally {
 		deleteLoading.value = false;
@@ -729,9 +730,12 @@ async function seedFromTemplate() {
 	if (!templateSummary.value) return;
 	const n = templateSummary.value.stage_count;
 	const ok = await confirmDialog({
-		title: "Seed default stages",
-		message: `Seed ${n} default stages from the ${project.value.type} template?\n\nThis creates ${n} stages on top of any existing ones — it does not replace or merge.`,
-		confirmLabel: "Seed stages",
+		title: __("Seed default stages"),
+		message: __(
+			"Seed {0} default stages from the {1} template?\n\nThis creates {0} stages on top of any existing ones — it does not replace or merge.",
+			[n, project.value.type]
+		),
+		confirmLabel: __("Seed stages"),
 	});
 	if (!ok) return;
 	try {
@@ -750,10 +754,10 @@ async function seedFromTemplate() {
 		);
 		const data = await res.json().catch(() => ({}));
 		if (!res.ok) throw new Error(data?.exception || data?.exc_type || `HTTP ${res.status}`);
-		showToast(`Seeded ${data?.message?.seeded ?? n} stages`);
+		showToast(__("Seeded {0} stages", [data?.message?.seeded ?? n]));
 		stageListRef.value?.reload();
 	} catch (err) {
-		showToast(err.message || "Failed to seed stages", "error");
+		showToast(err.message || __("Failed to seed stages"), "error");
 	}
 }
 
@@ -811,15 +815,15 @@ const tabs = computed(() => {
 	// Counts render as " (N)" appended to the label. Overview / Activity have
 	// no count.
 	const all = [
-		{ id: "overview", label: "Overview", count: null },
-		{ id: "subprojects", label: "Subprojects", count: subs.value.length },
-		{ id: "work-packages", label: "Work Packages", count: workPackages.value.length },
-		{ id: "tasks", label: "Tasks", count: tasks.value.length },
-		{ id: "stage-planning", label: "Stage Planning", count: stageCount.value },
-		{ id: "boq", label: "BOQ", count: boqs.value.length },
-		{ id: "scos", label: "Scope Changes", count: scos.value.length },
-		{ id: "attachments", label: "Attachments", count: attachmentCount.value },
-		{ id: "team", label: "Team", count: projectTeam.value.length },
+		{ id: "overview", label: __("Overview"), count: null },
+		{ id: "subprojects", label: __("Subprojects"), count: subs.value.length },
+		{ id: "work-packages", label: __("Work Packages"), count: workPackages.value.length },
+		{ id: "tasks", label: __("Tasks"), count: tasks.value.length },
+		{ id: "stage-planning", label: __("Stage Planning"), count: stageCount.value },
+		{ id: "boq", label: __("BOQ"), count: boqs.value.length },
+		{ id: "scos", label: __("Scope Changes"), count: scos.value.length },
+		{ id: "attachments", label: __("Attachments"), count: attachmentCount.value },
+		{ id: "team", label: __("Team"), count: projectTeam.value.length },
 	];
 	return subprojectsEnabled.value ? all : all.filter((t) => t.id !== "subprojects");
 });
@@ -827,7 +831,7 @@ const tabs = computed(() => {
 const breadcrumbs = computed(() => {
 	const out = [
 		{ label: "BuildSuite Core", to: "/" },
-		{ label: "Project", to: "/projects" },
+		{ label: __("Project"), to: "/projects" },
 	];
 	if (parent.value) out.push({ label: parent.value.name, to: `/projects/${parent.value.id}` });
 	return out;
@@ -895,7 +899,7 @@ function onBoqRowClick(row) {
 				style="border-radius: 6px"
 				@click="startEdit"
 			>
-				Edit
+				{{ __("Edit") }}
 			</button>
 			<button
 				v-if="canDelete('project')"
@@ -904,7 +908,7 @@ function onBoqRowClick(row) {
 				style="border-radius: 6px"
 				@click="deleteProject"
 			>
-				Delete
+				{{ __("Delete") }}
 			</button>
 		</template>
 
@@ -951,7 +955,11 @@ function onBoqRowClick(row) {
 				<div class="flex items-center gap-2 mb-2">
 					<span class="text-xs text-ink-500">
 						<span class="text-ink-900 font-medium"
-							>{{ subs.length }} subproject{{ subs.length === 1 ? "" : "s" }}</span
+							>{{
+								subs.length === 1
+									? __("1 subproject")
+									: __("{0} subprojects", [subs.length])
+							}}</span
 						>
 					</span>
 					<button
@@ -960,7 +968,7 @@ function onBoqRowClick(row) {
 						class="desk-save-btn ml-auto"
 						@click="addSubproject"
 					>
-						+ New Subproject
+						{{ "+ " + __("New Subproject") }}
 					</button>
 				</div>
 				<DeskList
@@ -968,7 +976,7 @@ function onBoqRowClick(row) {
 					:rows="subsFiltered"
 					:columns="subCols"
 					row-key="id"
-					search-placeholder="Search subprojects…"
+					:search-placeholder="__('Search subprojects…')"
 					@row-click="onSubRowClick"
 				>
 					<template #cell-code="{ row }">
@@ -1010,8 +1018,8 @@ function onBoqRowClick(row) {
 					</template>
 					<template #empty>
 						<div class="text-sm text-ink-500">
-							No subprojects yet ·
-							<DeskLink @click="addSubproject">Create the first one →</DeskLink>
+							{{ __("No subprojects yet") }} ·
+							<DeskLink @click="addSubproject">{{ __("Create the first one →") }}</DeskLink>
 						</div>
 					</template>
 				</DeskList>
@@ -1021,15 +1029,19 @@ function onBoqRowClick(row) {
 			<div v-if="tab === 'work-packages'" class="pt-4">
 				<div class="flex items-center gap-2 mb-2">
 					<span class="text-xs text-ink-500">
-						{{ workPackages.length }} package{{ workPackages.length === 1 ? "" : "s" }}
-						· avg progress
+						{{
+							workPackages.length === 1
+								? __("1 package")
+								: __("{0} packages", [workPackages.length])
+						}}
+						· {{ __("avg progress") }}
 						<span class="text-ink-900 font-medium">{{ wpProgress }}%</span>
 					</span>
 					<RouterLink
 						v-if="canCreate('workPackage')"
 						:to="{ name: 'wp-new', query: { projectId: project.id } }"
 						class="desk-save-btn ml-auto"
-						>+ Add Work Package</RouterLink
+						>+ {{ __("Add Work Package") }}</RouterLink
 					>
 				</div>
 				<DeskList
@@ -1037,12 +1049,12 @@ function onBoqRowClick(row) {
 					:rows="wpFiltered"
 					:columns="wpCols"
 					row-key="id"
-					search-placeholder="Search work packages…"
+					:search-placeholder="__('Search work packages…')"
 					@row-click="onWpRowClick"
 				>
 					<template #filter-chips>
 						<DeskSelect v-model="wpProjectFilter" class="!w-52">
-							<option value="">Project: Any</option>
+							<option value="">{{ __("Project: Any") }}</option>
 							<option v-for="p in wpProjectFilterOptions" :key="p.id" :value="p.id">
 								{{ p.name }}
 							</option>
@@ -1087,7 +1099,7 @@ function onBoqRowClick(row) {
 						>
 					</template>
 					<template #empty>
-						<div class="text-sm text-ink-500">No work packages yet.</div>
+						<div class="text-sm text-ink-500">{{ __("No work packages yet.") }}</div>
 					</template>
 				</DeskList>
 			</div>
@@ -1096,15 +1108,23 @@ function onBoqRowClick(row) {
 			<div v-if="tab === 'tasks'" class="pt-4">
 				<div class="flex items-center gap-2 mb-2">
 					<span class="text-xs text-ink-500">
-						<span class="text-ink-900 font-medium">{{ taskStats.total }} tasks</span>
-						· {{ taskStats.completed }} completed · {{ taskStats.inProgress }} in
-						progress · {{ taskStats.open }} open
+						<span class="text-ink-900 font-medium">{{
+							__("{0} tasks", [taskStats.total])
+						}}</span>
+						·
+						{{
+							__("{0} completed · {1} in progress · {2} open", [
+								taskStats.completed,
+								taskStats.inProgress,
+								taskStats.open,
+							])
+						}}
 					</span>
 					<RouterLink
 						v-if="canCreate('task')"
 						:to="{ name: 'task-new', query: { projectId: project.id } }"
 						class="desk-save-btn ml-auto"
-						>+ Add Task</RouterLink
+						>+ {{ __("Add Task") }}</RouterLink
 					>
 				</div>
 				<DeskList
@@ -1112,12 +1132,12 @@ function onBoqRowClick(row) {
 					:rows="tasksFiltered"
 					:columns="taskCols"
 					row-key="id"
-					search-placeholder="Search tasks…"
+					:search-placeholder="__('Search tasks…')"
 					@row-click="onTaskRowClick"
 				>
 					<template #filter-chips>
 						<DeskSelect v-model="taskProjectFilter" class="!w-52">
-							<option value="">Project: Any</option>
+							<option value="">{{ __("Project: Any") }}</option>
 							<option
 								v-for="p in taskProjectFilterOptions"
 								:key="p.id"
@@ -1183,11 +1203,11 @@ function onBoqRowClick(row) {
 					</template>
 					<template #empty>
 						<div class="text-sm text-ink-500">
-							No tasks yet ·
+							{{ __("No tasks yet") }} ·
 							<RouterLink
 								:to="{ name: 'task-new', query: { projectId: project.id } }"
 								class="desk-link"
-								>Create the first task →</RouterLink
+								>{{ __("Create the first task →") }}</RouterLink
 							>
 						</div>
 					</template>
@@ -1210,15 +1230,15 @@ function onBoqRowClick(row) {
 					:columns="[
 						{
 							key: 'stage_name',
-							label: 'Stage',
+							label: __('Stage'),
 							fields: ['stage_name', 'description'],
 						},
-						{ key: 'planned_start', label: 'Start' },
-						{ key: 'planned_end', label: 'End' },
-						{ key: 'planned_task_count', label: 'Tasks' },
+						{ key: 'planned_start', label: __('Start') },
+						{ key: 'planned_end', label: __('End') },
+						{ key: 'planned_task_count', label: __('Tasks') },
 						{
 							key: '_status',
-							label: 'Status',
+							label: __('Status'),
 							fields: ['planned_start', 'planned_end'],
 						},
 						{ key: '_open', label: '', fields: ['name'], align: 'right' },
@@ -1228,7 +1248,7 @@ function onBoqRowClick(row) {
 					cache-key="buildsuite-stage-planning-project-tab"
 					row-key="name"
 					initial-order-by="planned_start asc"
-					search-placeholder="Search stages…"
+					:search-placeholder="__('Search stages…')"
 					:compact="true"
 					@row-click="(row) => router.push('/stage-plannings/' + row.name)"
 					@count-change="stageCount = $event"
@@ -1238,7 +1258,7 @@ function onBoqRowClick(row) {
 							v-if="canCreate('stagePlanning')"
 							:to="{ name: 'stage-planning-new', query: { projectId: project.id } }"
 							class="desk-save-btn"
-							>+ Add Stage</RouterLink
+							>+ {{ __("Add Stage") }}</RouterLink
 						>
 					</template>
 
@@ -1271,19 +1291,19 @@ function onBoqRowClick(row) {
 							class="text-[10px] px-1.5 py-0.5 font-medium"
 							style="border-radius: 2px"
 							:class="stageStatusClass(stageStatus(row))"
-							>{{ stageStatus(row) }}</span
+							>{{ __(stageStatus(row)) }}</span
 						>
 					</template>
 					<template #cell-_open="{ row }">
 						<DeskLink :to="`/stage-plannings/${row.name}`" @click.stop class="text-xs"
-							>Open →</DeskLink
+							>{{ __("Open →") }}</DeskLink
 						>
 					</template>
 
 					<template #empty>
 						<div class="py-4">
 							<div class="text-sm text-ink-500 italic mb-3">
-								No stages planned yet.
+								{{ __("No stages planned yet.") }}
 							</div>
 							<div v-if="templateSummary" class="flex items-center gap-2 flex-wrap">
 								<button
@@ -1291,7 +1311,7 @@ function onBoqRowClick(row) {
 									class="desk-save-btn"
 									@click="seedFromTemplate"
 								>
-									+ Seed from {{ project.type }} template
+									{{ "+ " + __("Seed from {0} template", [project.type]) }}
 								</button>
 								<RouterLink
 									:to="{
@@ -1300,11 +1320,15 @@ function onBoqRowClick(row) {
 									}"
 									class="desk-link text-xs"
 								>
-									or plan one manually →
+									{{ __("or plan one manually →") }}
 								</RouterLink>
 								<div class="basis-full text-[11px] text-ink-500 mt-1">
-									Will seed {{ templateSummary.stage_count }} stages —
-									{{ templateSummary.stage_names.join(" → ") }}.
+									{{
+										__("Will seed {0} stages — {1}.", [
+											templateSummary.stage_count,
+											templateSummary.stage_names.join(" → "),
+										])
+									}}
 								</div>
 							</div>
 							<div v-else class="flex items-center gap-2 flex-wrap">
@@ -1315,11 +1339,15 @@ function onBoqRowClick(row) {
 									}"
 									class="desk-save-btn"
 								>
-									+ Plan first stage
+									{{ "+ " + __("Plan first stage") }}
 								</RouterLink>
 								<div class="basis-full text-[11px] text-ink-500 mt-1 italic">
-									No template configured for project type "{{ project.type }}" —
-									plan stages manually.
+									{{
+										__(
+											'No template configured for project type "{0}" — plan stages manually.',
+											[project.type]
+										)
+									}}
 								</div>
 							</div>
 						</div>
@@ -1331,21 +1359,29 @@ function onBoqRowClick(row) {
 			<div v-if="tab === 'boq'" class="pt-4">
 				<div class="flex items-center gap-2 mb-2">
 					<span class="text-xs text-ink-500">
-						{{ boqs.length }} BOQ revision{{ boqs.length === 1 ? "" : "s" }}
+						{{
+							boqs.length === 1
+								? __("1 BOQ revision")
+								: __("{0} BOQ revisions", [boqs.length])
+						}}
 						<template v-if="activeBoq">
-							· active:
+							· {{ __("active:") }}
 							<DeskLink :to="`/boq/${activeBoq.id}`" class="font-mono">{{
 								activeBoq.id
 							}}</DeskLink>
-							({{ fmtCompactINR(store.boqTotals(activeBoq.id).planned) }} planned ·
-							{{ fmtCompactINR(store.boqTotals(activeBoq.id).actual) }} actual)
+							({{
+								__("{0} planned · {1} actual", [
+									fmtCompactINR(store.boqTotals(activeBoq.id).planned),
+									fmtCompactINR(store.boqTotals(activeBoq.id).actual),
+								])
+							}})
 						</template>
 					</span>
 					<RouterLink
 						to="/boq"
 						class="text-xs text-ink-600 hover:text-ink-900 px-2 py-1 border border-ink-200 bg-white ml-auto"
 						style="border-radius: 2px"
-						>Open BOQ module →</RouterLink
+						>{{ __("Open BOQ module →") }}</RouterLink
 					>
 				</div>
 				<DeskList
@@ -1353,7 +1389,7 @@ function onBoqRowClick(row) {
 					:rows="boqsFiltered"
 					:columns="boqCols"
 					row-key="id"
-					search-placeholder="Search BOQ revisions…"
+					:search-placeholder="__('Search BOQ revisions…')"
 					@row-click="onBoqRowClick"
 				>
 					<template #cell-id="{ row }">
@@ -1390,9 +1426,9 @@ function onBoqRowClick(row) {
 					</template>
 					<template #empty>
 						<div class="text-sm text-ink-500">
-							No BOQ on this project ·
+							{{ __("No BOQ on this project") }} ·
 							<RouterLink to="/boq" class="desk-link"
-								>Create one in the BOQ module →</RouterLink
+								>{{ __("Create one in the BOQ module →") }}</RouterLink
 							>
 						</div>
 					</template>
@@ -1404,14 +1440,18 @@ function onBoqRowClick(row) {
 				<div class="flex items-center gap-2 mb-2">
 					<span class="text-xs text-ink-500">
 						<span class="text-ink-900 font-medium"
-							>{{ scos.length }} scope change{{ scos.length === 1 ? "" : "s" }}</span
+							>{{
+								scos.length === 1
+									? __("1 scope change")
+									: __("{0} scope changes", [scos.length])
+							}}</span
 						>
 					</span>
 					<RouterLink
 						to="/sco"
 						class="text-xs text-ink-600 hover:text-ink-900 px-2 py-1 border border-ink-200 bg-white ml-auto"
 						style="border-radius: 2px"
-						>Open SCO module →</RouterLink
+						>{{ __("Open SCO module →") }}</RouterLink
 					>
 				</div>
 				<DeskList
@@ -1419,7 +1459,7 @@ function onBoqRowClick(row) {
 					:rows="scosFiltered"
 					:columns="scoCols"
 					row-key="id"
-					search-placeholder="Search scope changes…"
+					:search-placeholder="__('Search scope changes…')"
 				>
 					<template #cell-id="{ row }">
 						<DeskLink to="/sco" class="font-mono text-xs">{{ row.id }}</DeskLink>
@@ -1442,7 +1482,7 @@ function onBoqRowClick(row) {
 						<UserAvatar :user-id="row.raisedBy" size="xs" />
 					</template>
 					<template #empty>
-						<div class="text-sm text-ink-500">No scope changes on this project.</div>
+						<div class="text-sm text-ink-500">{{ __("No scope changes on this project.") }}</div>
 					</template>
 				</DeskList>
 			</div>
@@ -1515,9 +1555,14 @@ function onBoqRowClick(row) {
 		<!-- Delete confirmation dialog -->
 		<ConfirmDialog
 			v-model:open="showDeleteConfirm"
-			title="Delete project"
-			:message="`Delete '${project?.name}' and all its subprojects, work packages, and tasks? This cannot be undone.`"
-			confirm-label="Delete"
+			:title="__('Delete project')"
+			:message="
+				__(
+					'Delete \'{0}\' and all its subprojects, work packages, and tasks? This cannot be undone.',
+					[project?.name]
+				)
+			"
+			:confirm-label="__('Delete')"
 			:destructive="true"
 			:loading="deleteLoading"
 			@confirm="confirmDelete"
@@ -1525,7 +1570,7 @@ function onBoqRowClick(row) {
 	</DeskPage>
 
 	<div v-else class="px-6 py-20 text-center">
-		<div class="text-ink-400 mb-3">Project not found</div>
-		<RouterLink to="/projects" class="desk-link text-sm">Back to projects</RouterLink>
+		<div class="text-ink-400 mb-3">{{ __("Project not found") }}</div>
+		<RouterLink to="/projects" class="desk-link text-sm">{{ __("Back to projects") }}</RouterLink>
 	</div>
 </template>

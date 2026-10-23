@@ -12,6 +12,7 @@ import DeskSection from "@/components/desk/DeskSection.vue";
 import DeskField from "@/components/desk/DeskField.vue";
 import DeskInput from "@/components/desk/DeskInput.vue";
 import DeskSelect from "@/components/desk/DeskSelect.vue";
+import { __ } from "@/utils/translate";
 
 const router = useRouter();
 const store = useDataStore();
@@ -31,13 +32,13 @@ const templateOptions = computed(() => Object.keys(PROJECT_TYPE_TEMPLATES));
 
 function validate() {
 	const e = {};
-	if (!form.name.trim()) e.name = "Name is required";
+	if (!form.name.trim()) e.name = __("Name is required");
 	// Defend against duplicate names — the join key onto project.type is `name`.
 	if (
 		form.name.trim() &&
 		store.projectTypes.find((pt) => pt.name.toLowerCase() === form.name.trim().toLowerCase())
 	) {
-		e.name = `A project type named "${form.name.trim()}" already exists.`;
+		e.name = __('A project type named "{0}" already exists.', [form.name.trim()]);
 	}
 	errors.value = e;
 	return Object.keys(e).length === 0;
@@ -63,10 +64,16 @@ function cancel() {
 
 const breadcrumbs = [
 	{ label: "BuildSuite Core", to: "/" },
-	{ label: "Settings", to: "/settings" },
-	{ label: "Project Types", to: "/settings/project-types" },
-	{ label: "New" },
+	{ label: __("Settings"), to: "/settings" },
+	{ label: __("Project Types"), to: "/settings/project-types" },
+	{ label: __("New") },
 ];
+
+// Kept in script: the example names are double-quoted, which a quoted template
+// attribute cannot hold.
+const singularHint = __(
+	'e.g. "Block", "Tower", "Villa Type", "Chainage Segment", "Package". Leave empty to use the site default.'
+);
 
 onMounted(() => {
 	if (!store.isAdmin) router.replace("/settings");
@@ -74,11 +81,11 @@ onMounted(() => {
 </script>
 
 <template>
-	<DeskPage title="New Project Type" :breadcrumbs="breadcrumbs">
+	<DeskPage :title="__('New Project Type')" :breadcrumbs="breadcrumbs">
 		<DeskForm>
 			<template #action-bar>
 				<DeskActionBar
-					:save-label="saving ? 'Creating…' : 'Create project type'"
+					:save-label="saving ? __('Creating…') : __('Create project type')"
 					:saving="saving"
 					@save="save"
 					@cancel="cancel"
@@ -86,26 +93,26 @@ onMounted(() => {
 			</template>
 
 			<div class="max-w-3xl mx-auto">
-				<DeskSection title="Basic">
+				<DeskSection :title="__('Basic')">
 					<DeskField
-						label="Project Type name"
+						:label="__('Project Type name')"
 						required
 						:error="errors.name"
-						hint="e.g. Commercial, Residential, Infrastructure, EPC, Interiors."
+						:hint="__('e.g. Commercial, Residential, Infrastructure, EPC, Interiors.')"
 					>
-						<DeskInput v-model="form.name" placeholder="e.g. EPC" />
+						<DeskInput v-model="form.name" :placeholder="__('e.g. EPC')" />
 					</DeskField>
 					<DeskField
-						label="Sort order"
-						hint="Position in the new-project type dropdown."
+						:label="__('Sort order')"
+						:hint="__('Position in the new-project type dropdown.')"
 					>
 						<DeskInput
 							v-model="form.sort_order"
 							type="number"
-							placeholder="auto-appended"
+							:placeholder="__('auto-appended')"
 						/>
 					</DeskField>
-					<DeskField label="Enabled">
+					<DeskField :label="__('Enabled')">
 						<label class="flex items-center gap-2 py-1 text-sm cursor-pointer">
 							<input
 								type="checkbox"
@@ -114,35 +121,39 @@ onMounted(() => {
 							/>
 							<span>{{
 								form.enabled
-									? "Enabled — appears in the new-project dropdown"
-									: "Disabled — hidden from the new-project dropdown"
+									? __("Enabled — appears in the new-project dropdown")
+									: __("Disabled — hidden from the new-project dropdown")
 							}}</span>
 						</label>
 					</DeskField>
 				</DeskSection>
 
-				<DeskSection title="Work Package label">
+				<DeskSection :title="__('Work Package label')">
 					<DeskField
-						label="Singular"
-						hint='e.g. "Block", "Tower", "Villa Type", "Chainage Segment", "Package". Leave empty to use the site default.'
+						:label="__('Singular')"
+						:hint="singularHint"
 					>
-						<DeskInput v-model="form.workPackageLabel" placeholder="Work Package" />
+						<DeskInput v-model="form.workPackageLabel" :placeholder="__('Work Package')" />
 					</DeskField>
-					<DeskField label="Plural">
+					<DeskField :label="__('Plural')">
 						<DeskInput
 							v-model="form.workPackageLabelPlural"
-							placeholder="Work Packages"
+							:placeholder="__('Work Packages')"
 						/>
 					</DeskField>
 				</DeskSection>
 
-				<DeskSection title="Default template">
+				<DeskSection :title="__('Default template')">
 					<DeskField
-						label="Template"
-						hint="Seeds default stages, work packages and tasks on new projects of this type. Leave empty to create empty projects."
+						:label="__('Template')"
+						:hint="
+							__(
+								'Seeds default stages, work packages and tasks on new projects of this type. Leave empty to create empty projects.'
+							)
+						"
 					>
 						<DeskSelect v-model="form.defaultTemplate">
-							<option value="">— No template —</option>
+							<option value="">{{ __("— No template —") }}</option>
 							<option v-for="t in templateOptions" :key="t">{{ t }}</option>
 						</DeskSelect>
 					</DeskField>

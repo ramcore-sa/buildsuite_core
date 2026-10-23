@@ -6,85 +6,87 @@
 // of this same metadata. Eventually one should import the other — leaving them as
 // parallel copies for now to avoid a refactor outside the prompt's scope.
 
+import { __ } from "@/utils/translate";
+
 export const WORKSPACE_META = {
 	"site-execution": {
-		name: "Site Execution",
+		name: __("Site Execution"),
 		icon: "🏗️",
 		to: "/site-execution",
 		group: "buildsuite",
-		desc: "Projects, work packages, tasks, schedule.",
+		desc: __("Projects, work packages, tasks, schedule."),
 	},
 	estimation: {
-		name: "Estimation",
+		name: __("Estimation"),
 		icon: "📐",
 		to: "/estimation",
 		group: "buildsuite",
-		desc: "BOQ, Rate Master, revision compare.",
+		desc: __("BOQ, Rate Master, revision compare."),
 	},
 	procurement: {
-		name: "Procurement",
+		name: __("Procurement"),
 		icon: "🛒",
 		to: "/procurement",
 		group: "buildsuite",
-		desc: "Material requests, supplier follow-up, GRN.",
+		desc: __("Material requests, supplier follow-up, GRN."),
 	},
 	subcontract: {
-		name: "Subcontract",
+		name: __("Subcontract"),
 		icon: "🤝",
 		to: "/subcontract",
 		group: "buildsuite",
-		desc: "Vendors, work orders, RA bills, retention.",
+		desc: __("Vendors, work orders, RA bills, retention."),
 	},
 	workforce: {
-		name: "Workforce",
+		name: __("Workforce"),
 		icon: "👷",
 		to: "/workforce",
 		group: "buildsuite",
-		desc: "Crews, overtime, wages to contractor.",
+		desc: __("Crews, overtime, wages to contractor."),
 	},
 	// 'scope-change' removed Session 33 — merged into Site Execution. SCO surface
 	// lives at /app/sco and is reached via the Site Execution workspace tile grid.
 	"project-finance": {
-		name: "Project Finance",
+		name: __("Project Finance"),
 		icon: "💵",
 		to: "/project-finance",
 		group: "buildsuite",
-		desc: "Petty cash, cost summary, project P&L.",
+		desc: __("Petty cash, cost summary, project P&L."),
 	},
 	accounting: {
-		name: "Accounting",
+		name: __("Accounting"),
 		icon: "📊",
 		to: "/accounting",
 		group: "erpnext",
-		desc: "Inherited from ERPNext.",
+		desc: __("Inherited from ERPNext."),
 	},
 	buying: {
-		name: "Buying",
+		name: __("Buying"),
 		icon: "📥",
 		to: "/buying",
 		group: "erpnext",
-		desc: "Inherited from ERPNext.",
+		desc: __("Inherited from ERPNext."),
 	},
 	stock: {
-		name: "Stock",
+		name: __("Stock"),
 		icon: "📦",
 		to: "/stock",
 		group: "erpnext",
-		desc: "Inherited from ERPNext.",
+		desc: __("Inherited from ERPNext."),
 	},
 	assets: {
-		name: "Assets",
+		name: __("Assets"),
 		icon: "🏭",
 		to: "/assets",
 		group: "erpnext",
-		desc: "Inherited from ERPNext — extended for Plant & Machinery.",
+		desc: __("Inherited from ERPNext — extended for Plant & Machinery."),
 	},
 	hr: {
-		name: "HR",
+		name: __("HR"),
 		icon: "👤",
 		to: "/hr",
 		group: "erpnext",
-		desc: "Inherited from Frappe HR — office staff only.",
+		desc: __("Inherited from Frappe HR — office staff only."),
 	},
 };
 
@@ -92,13 +94,13 @@ export const WORKSPACE_META = {
 // single-letter abbreviations (R, A, C, …); landings have more horizontal space so they
 // show the full word.
 export const ACCESS_LABEL = {
-	read: "Read",
-	approve: "Approve",
-	"create-own": "Create",
-	"self-service": "Self-service",
-	"team-only": "Team",
-	"pay-only": "Pay",
-	"mr-only": "MR raise",
+	read: __("Read"),
+	approve: __("Approve"),
+	"create-own": __("Create"),
+	"self-service": __("Self-service"),
+	"team-only": __("Team"),
+	"pay-only": __("Pay"),
+	"mr-only": __("MR raise"),
 };
 
 // One-line "live metric" string for a workspace tile. Returns null when the seed/store
@@ -111,14 +113,24 @@ export function workspaceMetric(slug, store) {
 			// Session 33: includes pending-SCO count since Scope Change merged here.
 			const projects = store.activeProjectsCount;
 			const scos = store.pendingScosCount;
-			const base = `${projects} active project${projects === 1 ? "" : "s"}`;
-			return scos ? `${base} · ${scos} pending SCO${scos === 1 ? "" : "s"}` : base;
+			// Each count is its own phrase so the singular/plural pair is a whole
+			// string a translator can render, not an English "s" suffix.
+			const base =
+				projects === 1
+					? __("{0} active project", [projects])
+					: __("{0} active projects", [projects]);
+			if (!scos) return base;
+			const pending =
+				scos === 1 ? __("{0} pending SCO", [scos]) : __("{0} pending SCOs", [scos]);
+			return `${base} · ${pending}`;
 		}
 		case "estimation": {
 			const active = store.activeBoqsCount;
 			const draft = store.draftBoqsCount;
 			if (!active && !draft) return null;
-			return `${active} active · ${draft} draft BOQ${draft === 1 ? "" : "s"}`;
+			return draft === 1
+				? __("{0} active · {1} draft BOQ", [active, draft])
+				: __("{0} active · {1} draft BOQs", [active, draft]);
 		}
 		// The four below have no domain data in seed yet — return null to omit the metric.
 		case "procurement":

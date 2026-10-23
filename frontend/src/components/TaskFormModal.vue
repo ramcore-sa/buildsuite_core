@@ -16,6 +16,7 @@ import DeskTextarea from "@/components/desk/DeskTextarea.vue";
 import DeskLinkPicker from "@/components/desk/DeskLinkPicker.vue";
 import { createDataAdapter } from "@/data/adapters";
 import { setTaskAssignee } from "@/data/taskAssignmentApi";
+import { __ } from "@/utils/translate";
 
 const props = defineProps({
 	open: { type: Boolean, default: false },
@@ -123,10 +124,10 @@ function close() {
 
 function validate() {
 	const e = {};
-	if (!form.name.trim()) e.name = "Task name is required";
-	if (!form.projectId) e.projectId = "Project is required";
+	if (!form.name.trim()) e.name = __("Task name is required");
+	if (!form.projectId) e.projectId = __("Project is required");
 	if (form.endDate && form.startDate && form.endDate < form.startDate) {
-		e.endDate = "End must be after start";
+		e.endDate = __("End must be after start");
 	}
 	setErrors(e);
 	return Object.keys(e).length === 0;
@@ -159,7 +160,7 @@ async function save() {
 		close();
 	} catch (err) {
 		const summary = applyServerErrors(err);
-		showToast(summary ?? "Failed to create task", "error");
+		showToast(summary ?? __("Failed to create task"), "error");
 	} finally {
 		saving.value = false;
 	}
@@ -183,7 +184,7 @@ async function save() {
 					style="border-radius: 12px 12px 0 0"
 				>
 					<div class="min-w-0 flex-1">
-						<h2 class="text-sm font-semibold text-ink-900">New task</h2>
+						<h2 class="text-sm font-semibold text-ink-900">{{ __("New task") }}</h2>
 						<p v-if="selectedProject" class="text-[11px] text-ink-500 mt-0.5 truncate">
 							{{ selectedProject.project_name
 							}}<template v-if="selectedWP">
@@ -194,7 +195,7 @@ async function save() {
 					<button
 						type="button"
 						class="text-ink-500 hover:text-ink-900 text-lg leading-none flex-shrink-0 ml-3"
-						aria-label="Close"
+						:aria-label="__('Close')"
 						@click="close"
 					>
 						×
@@ -202,42 +203,46 @@ async function save() {
 				</header>
 
 				<div class="p-5 overflow-y-auto flex-1">
-					<DeskSection title="Task details">
-						<DeskField label="Task name" required :error="errors.name">
+					<DeskSection :title="__('Task details')">
+						<DeskField :label="__('Task name')" required :error="errors.name">
 							<DeskInput
 								v-model="form.name"
-								placeholder="e.g. Level 5 column casting"
+								:placeholder="__('e.g. Level 5 column casting')"
 								@input="clearError('name')"
 							/>
 						</DeskField>
 						<DeskField
-							label="Task Type"
+							:label="__('Task Type')"
 							required
-							hint="Activity = standard work with progress entries; Milestone = checkpoint; Inspection = pass/fail gate."
+							:hint="
+								__(
+									'Activity = standard work with progress entries; Milestone = checkpoint; Inspection = pass/fail gate.'
+								)
+							"
 						>
 							<DeskSelect v-model="form.task_type">
-								<option value="Activity">Activity</option>
-								<option value="Milestone">Milestone</option>
-								<option value="Inspection">Inspection</option>
+								<option value="Activity">{{ __("Activity") }}</option>
+								<option value="Milestone">{{ __("Milestone") }}</option>
+								<option value="Inspection">{{ __("Inspection") }}</option>
 							</DeskSelect>
 						</DeskField>
-						<DeskField label="Description">
+						<DeskField :label="__('Description')">
 							<DeskTextarea
 								v-model="form.description"
 								:rows="3"
-								placeholder="Optional context for this task"
+								:placeholder="__('Optional context for this task')"
 							/>
 						</DeskField>
 					</DeskSection>
 
-					<DeskSection title="Hierarchy">
+					<DeskSection :title="__('Hierarchy')">
 						<DeskField
-							label="Project"
+							:label="__('Project')"
 							required
 							:error="errors.projectId"
 							:hint="
 								projectLocked
-									? 'Pre-selected from where you came in — locked.'
+									? __('Pre-selected from where you came in — locked.')
 									: ''
 							"
 						>
@@ -246,7 +251,7 @@ async function save() {
 								:disabled="projectLocked"
 								@change="clearError('projectId')"
 							>
-								<option value="">— Select project —</option>
+								<option value="">{{ __("— Select project —") }}</option>
 								<option
 									v-for="p in projectsResource.data"
 									:key="p.name"
@@ -257,26 +262,26 @@ async function save() {
 							</DeskSelect>
 						</DeskField>
 						<DeskField
-							label="Work Package"
+							:label="__('Work Package')"
 							:hint="
 								wpLocked
-									? 'Pre-selected — locked.'
-									: 'Optional — leave blank to attach directly to the project.'
+									? __('Pre-selected — locked.')
+									: __('Optional — leave blank to attach directly to the project.')
 							"
 						>
 							<DeskSelect v-model="form.workPackageId" :disabled="wpLocked">
-								<option :value="null">— None —</option>
+								<option :value="null">{{ __("— None —") }}</option>
 								<option v-for="wp in availableWPs" :key="wp.name" :value="wp.name">
 									{{ wp.work_package_name }}
 								</option>
 							</DeskSelect>
 						</DeskField>
 						<DeskField
-							label="Activity Type"
-							hint="Optional — provides default labour mix and productivity baseline."
+							:label="__('Activity Type')"
+							:hint="__('Optional — provides default labour mix and productivity baseline.')"
 						>
 							<DeskSelect v-model="form.activityType">
-								<option :value="null">— None —</option>
+								<option :value="null">{{ __("— None —") }}</option>
 								<option
 									v-for="at in availableActivityTypes"
 									:key="at.id"
@@ -289,11 +294,11 @@ async function save() {
 						</DeskField>
 					</DeskSection>
 
-					<DeskSection title="Schedule">
-						<DeskField label="Start date">
+					<DeskSection :title="__('Schedule')">
+						<DeskField :label="__('Start date')">
 							<DeskInput v-model="form.startDate" type="date" />
 						</DeskField>
-						<DeskField label="End date" :error="errors.endDate">
+						<DeskField :label="__('End date')" :error="errors.endDate">
 							<DeskInput
 								v-model="form.endDate"
 								type="date"
@@ -302,12 +307,12 @@ async function save() {
 						</DeskField>
 					</DeskSection>
 
-					<DeskSection title="Assignment & status">
-						<DeskField label="Assignee">
+					<DeskSection :title="__('Assignment & status')">
+						<DeskField :label="__('Assignee')">
 							<DeskLinkPicker
 								v-model="form.assignee"
 								doctype="User"
-								placeholder="Select assignee"
+								:placeholder="__('Select assignee')"
 								label-field="full_name"
 								value-field="name"
 								:search-fields="['full_name', 'name', 'email']"
@@ -316,20 +321,21 @@ async function save() {
 								:page-length="20"
 							/>
 						</DeskField>
-						<DeskField label="Status">
+						<DeskField :label="__('Status')">
+							<!-- Option values stay the stored English Select values; only labels are translated. -->
 							<DeskSelect v-model="form.status">
-								<option>Yet To Start</option>
-								<option>In Progress</option>
-								<option>In Delay</option>
-								<option>Completed</option>
-								<option>Blocked</option>
+								<option value="Yet To Start">{{ __("Yet To Start") }}</option>
+								<option value="In Progress">{{ __("In Progress") }}</option>
+								<option value="In Delay">{{ __("In Delay") }}</option>
+								<option value="Completed">{{ __("Completed") }}</option>
+								<option value="Blocked">{{ __("Blocked", null, "Status") }}</option>
 							</DeskSelect>
 						</DeskField>
-						<DeskField label="Priority">
+						<DeskField :label="__('Priority')">
 							<DeskSelect v-model="form.priority">
-								<option>Low</option>
-								<option>Medium</option>
-								<option>High</option>
+								<option value="Low">{{ __("Low") }}</option>
+								<option value="Medium">{{ __("Medium") }}</option>
+								<option value="High">{{ __("High") }}</option>
 							</DeskSelect>
 						</DeskField>
 					</DeskSection>
@@ -345,10 +351,10 @@ async function save() {
 						style="border-radius: 6px"
 						@click="close"
 					>
-						Cancel
+						{{ __("Cancel") }}
 					</button>
 					<button type="button" class="desk-save-btn" :disabled="saving" @click="save">
-						{{ saving ? "Creating…" : "Create task" }}
+						{{ saving ? __("Creating…") : __("Create task") }}
 					</button>
 				</footer>
 			</div>

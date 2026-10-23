@@ -2,6 +2,12 @@ import { createRouter, createWebHistory } from "vue-router";
 import { useSessionStore } from "@/stores/session";
 import { getLoginUrl } from "@/utils/session";
 import { APP_ROUTE } from "@/utils/appRoute";
+import { __ } from "@/utils/translate";
+
+// Placeholder pages take their title and description as route props. Those are
+// functions rather than objects so `__()` runs on navigation, not when this
+// module is imported — in dev that import happens before main.js has copied
+// the boot (and with it the translation catalogue) onto window.
 
 const routes = [
 	{
@@ -152,89 +158,89 @@ const routes = [
 				path: "estimation",
 				name: "estimation",
 				component: () => import("@/views/PlaceholderView.vue"),
-				props: {
-					title: "Estimation",
+				props: () => ({
+					title: __("Estimation"),
 					icon: "📐",
-					desc: "Bills of quantities, rate master, revision compare and tendering.",
+					desc: __("Bills of quantities, rate master, revision compare and tendering."),
 					links: [
 						{
-							label: "BOQ",
+							label: __("BOQ"),
 							to: "/boq",
 							icon: "📊",
-							desc: "Bills of quantities · revisions",
+							desc: __("Bills of quantities · revisions"),
 						},
 						{
-							label: "Rate Master",
+							label: __("Rate Master"),
 							to: "/rate-master",
 							icon: "₹",
-							desc: "Construction rate price book",
+							desc: __("Construction rate price book"),
 						},
 					],
-				},
+				}),
 			},
 			{
 				path: "procurement",
 				name: "procurement",
 				component: () => import("@/views/PlaceholderView.vue"),
-				props: {
-					title: "Procurement",
+				props: () => ({
+					title: __("Procurement"),
 					icon: "🛒",
-					desc: "Material requests, supplier follow-up and goods receipt.",
-				},
+					desc: __("Material requests, supplier follow-up and goods receipt."),
+				}),
 			},
 			{
 				path: "subcontract",
 				name: "subcontract",
 				component: () => import("@/views/PlaceholderView.vue"),
-				props: {
-					title: "Subcontract",
+				props: () => ({
+					title: __("Subcontract"),
 					icon: "🤝",
-					desc: "Vendors, work orders, measurement books, RA bills and retention.",
-				},
+					desc: __("Vendors, work orders, measurement books, RA bills and retention."),
+				}),
 			},
 			{
 				path: "workforce",
 				name: "workforce",
 				component: () => import("@/views/PlaceholderView.vue"),
-				props: {
-					title: "Workforce",
+				props: () => ({
+					title: __("Workforce"),
 					icon: "👷",
-					desc: "Crew assignment, overtime and wages-to-contractor.",
-				},
+					desc: __("Crew assignment, overtime and wages-to-contractor."),
+				}),
 			},
 			{
 				path: "scope-change",
 				name: "scope-change",
 				component: () => import("@/views/PlaceholderView.vue"),
-				props: {
-					title: "Scope Change",
+				props: () => ({
+					title: __("Scope Change"),
 					icon: "🔁",
-					desc: "Scope change orders live under Site Execution.",
+					desc: __("Scope change orders live under Site Execution."),
 					links: [
 						{
-							label: "Site Execution",
+							label: __("Site Execution"),
 							to: "/site-execution",
 							icon: "🏗️",
-							desc: "Go to the workspace where SCOs now live",
+							desc: __("Go to the workspace where SCOs now live"),
 						},
 						{
-							label: "Scope Change Orders",
+							label: __("Scope Change Orders"),
 							to: "/sco",
 							icon: "🔁",
-							desc: "Direct link to the SCO register",
+							desc: __("Direct link to the SCO register"),
 						},
 					],
-				},
+				}),
 			},
 			{
 				path: "project-finance",
 				name: "project-finance",
 				component: () => import("@/views/PlaceholderView.vue"),
-				props: {
-					title: "Project Finance",
+				props: () => ({
+					title: __("Project Finance"),
 					icon: "💵",
-					desc: "Petty cash, cost summary, project P&L and variance reports.",
-				},
+					desc: __("Petty cash, cost summary, project P&L and variance reports."),
+				}),
 			},
 
 			{
@@ -246,74 +252,82 @@ const routes = [
 				path: "buying",
 				name: "buying",
 				component: () => import("@/views/PlaceholderView.vue"),
-				props: {
-					title: "Buying",
+				props: () => ({
+					title: __("Buying"),
 					icon: "📥",
-					desc: "Suppliers, purchase orders and request-for-quotation flows.",
-				},
+					desc: __("Suppliers, purchase orders and request-for-quotation flows."),
+				}),
 			},
 			{
 				path: "stock",
 				name: "stock",
 				component: () => import("@/views/PlaceholderView.vue"),
-				props: {
-					title: "Stock",
+				props: () => ({
+					title: __("Stock"),
 					icon: "📦",
-					desc: "Items, stock entries, warehouses and inventory.",
-				},
+					desc: __("Items, stock entries, warehouses and inventory."),
+				}),
 			},
 			{
 				path: "assets",
 				name: "assets",
 				component: () => import("@/views/PlaceholderView.vue"),
-				props: {
-					title: "Assets",
+				props: () => ({
+					title: __("Assets"),
 					icon: "🏭",
-					desc: "Plant, machinery and asset register.",
-				},
+					desc: __("Plant, machinery and asset register."),
+				}),
 			},
 			{
 				path: "hr",
 				name: "hr",
 				component: () => import("@/views/PlaceholderView.vue"),
-				props: {
-					title: "HR",
+				props: () => ({
+					title: __("HR"),
 					icon: "👤",
-					desc: "Office staff records, leaves and salary.",
-				},
+					desc: __("Office staff records, leaves and salary."),
+				}),
 			},
 
 			{
 				path: "subcontractor",
 				name: "subcontractor",
 				component: () => import("@/views/PlaceholderView.vue"),
-				props: {
-					title: "Subcontractor",
+				props: () => ({
+					title: __("Subcontractor"),
 					icon: "🤝",
-					desc: "Vendors, RA Bills, retention, payments.",
-				},
+					desc: __("Vendors, RA Bills, retention, payments."),
+				}),
 			},
 			{
 				path: "labour",
 				name: "labour",
 				component: () => import("@/views/PlaceholderView.vue"),
-				props: { title: "Labour", icon: "👷", desc: "Attendance and overtime." },
+				props: () => ({
+					title: __("Labour"),
+					icon: "👷",
+					desc: __("Attendance and overtime."),
+				}),
 			},
 			{
 				path: "financials",
 				name: "financials",
 				component: () => import("@/views/PlaceholderView.vue"),
-				props: {
-					title: "Financials",
+				props: () => ({
+					title: __("Financials"),
 					icon: "💵",
-					desc: "Petty cash, cost summary, variance reports.",
-				},
+					desc: __("Petty cash, cost summary, variance reports."),
+				}),
 			},
 			{
 				path: "reports",
 				name: "reports",
 				component: () => import("@/views/PlaceholderView.vue"),
-				props: { title: "Reports", icon: "📑", desc: "Project intelligence reports." },
+				props: () => ({
+					title: __("Reports"),
+					icon: "📑",
+					desc: __("Project intelligence reports."),
+				}),
 			},
 
 			{

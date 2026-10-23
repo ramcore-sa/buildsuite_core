@@ -30,6 +30,7 @@ Run:
 """
 
 import frappe
+from frappe import _
 
 # Stage names are GLOBAL (Stage Plan Template autonames on stage_name), so they are
 # prefixed with the type to stay unique across templates. The instantiated Stage
@@ -186,11 +187,11 @@ def seed_template(type_name):
 	"""Create (idempotently) one BuildSuite Project Template for the given type."""
 	spec = TEMPLATES.get(type_name)
 	if not spec:
-		frappe.throw(f"No seed template defined for type '{type_name}'")
+		frappe.throw(_("No seed template defined for type '{0}'").format(type_name))
 
 	project_type = spec["project_type"]
 	if not frappe.db.exists("Project Type", project_type):
-		frappe.throw(f"Project Type '{project_type}' does not exist — create it first")
+		frappe.throw(_("Project Type '{0}' does not exist — create it first").format(project_type))
 
 	# Build the Stage Plan Templates (prefixed names keep them globally unique).
 	stage_plan_names = []

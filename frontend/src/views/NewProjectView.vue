@@ -20,6 +20,7 @@ import DeskSelect from "@/components/desk/DeskSelect.vue";
 import DeskTextarea from "@/components/desk/DeskTextarea.vue";
 import DeskLinkPicker from "@/components/desk/DeskLinkPicker.vue";
 import CustomerCreateModal from "@/components/CustomerCreateModal.vue";
+import { __ } from "@/utils/translate";
 
 const router = useRouter();
 const route = useRoute();
@@ -173,10 +174,10 @@ watch(
 
 function validate() {
 	const e = {};
-	if (!form.name) e.name = "Project name is required";
-	if (!form.code) e.code = "Project ID is required";
+	if (!form.name) e.name = __("Project name is required");
+	if (!form.code) e.code = __("Project ID is required");
 	if (form.endDate && form.startDate && form.endDate < form.startDate)
-		e.endDate = "End must be after start";
+		e.endDate = __("End must be after start");
 	setErrors(e);
 	return Object.keys(e).length === 0;
 }
@@ -208,10 +209,10 @@ async function save() {
 			custom_seed_default_stages: form.seedDefaultStages ? 1 : 0,
 			custom_seed_default_tasks: form.seedDefaultTasks ? 1 : 0,
 		});
-		showToast("Project created");
+		showToast(__("Project created"));
 		router.push(`/projects/${res.name}`);
 	} catch (err) {
-		showToast(applyServerErrors(err) ?? "Failed to create project", "error");
+		showToast(applyServerErrors(err) ?? __("Failed to create project"), "error");
 	} finally {
 		saving.value = false;
 	}
@@ -221,34 +222,36 @@ function cancel() {
 }
 
 const subtitle = computed(() =>
-	parentProject.value ? `Subproject under ${parentProject.value.name}` : "Top-level project"
+	parentProject.value
+		? __("Subproject under {0}", [parentProject.value.name])
+		: __("Top-level project")
 );
 
 const breadcrumbs = computed(() => {
 	const out = [
 		{ label: "BuildSuite Core", to: "/" },
-		{ label: "Project", to: "/projects" },
+		{ label: __("Project"), to: "/projects" },
 	];
 	if (parentProject.value)
 		out.push({ label: parentProject.value.name, to: `/projects/${parentProject.value.id}` });
-	out.push({ label: "New" });
+	out.push({ label: __("New") });
 	return out;
 });
 </script>
 
 <template>
-	<DeskPage title="New Project" :subtitle="subtitle" :breadcrumbs="breadcrumbs">
+	<DeskPage :title="__('New Project')" :subtitle="subtitle" :breadcrumbs="breadcrumbs">
 		<div
 			v-if="!canCreate('project')"
 			class="px-3 py-2 bg-warning-50 border border-warning-100 text-xs text-warning-700 dark:bg-ink-800 dark:border-ink-700"
 			style="border-radius: 6px"
 		>
-			You don't have permission to create a project.
+			{{ __("You don't have permission to create a project.") }}
 		</div>
 		<DeskForm v-else>
 			<template #action-bar>
 				<DeskActionBar
-					:save-label="saving ? 'Creating…' : 'Create project'"
+					:save-label="saving ? __('Creating…') : __('Create project')"
 					:saving="saving"
 					@save="save"
 					@cancel="cancel"
@@ -259,24 +262,24 @@ const breadcrumbs = computed(() => {
            above stays full-width (matches Frappe Desk's form layout). Same
            pattern as NewTaskView and NewTaskProgressEntryView. -->
 			<div class="max-w-3xl mx-auto">
-				<DeskSection title="Basic information">
-					<DeskField label="Project name" required :error="errors.name">
+				<DeskSection :title="__('Basic information')">
+					<DeskField :label="__('Project name')" required :error="errors.name">
 						<DeskInput
 							v-model="form.name"
 							data-test="field-name"
-							placeholder="e.g. Bangalore Tech Park Phase 2"
+							:placeholder="__('e.g. Bangalore Tech Park Phase 2')"
 						/>
 					</DeskField>
 					<DeskField
-						label="Project ID"
+						:label="__('Project ID')"
 						required
 						:error="errors.code"
-						hint="Short unique identifier — used as a code in lists and URLs."
+						:hint="__('Short unique identifier — used as a code in lists and URLs.')"
 					>
 						<DeskInput
 							v-model="form.code"
 							data-test="field-code"
-							placeholder="e.g. BTP-P2"
+							:placeholder="__('e.g. BTP-P2')"
 						/>
 					</DeskField>
 					<!-- Session 40: Client is now a Link field onto the Customer master
@@ -284,9 +287,9 @@ const breadcrumbs = computed(() => {
              customer's `name` so existing project records (whose client was
              plain text) still resolve. -->
 					<DeskField
-						label="Client"
+						:label="__('Client')"
 						:error="errors.client"
-						:hint="errors.client ? '' : 'Pick a customer, or create one inline.'"
+						:hint="errors.client ? '' : __('Pick a customer, or create one inline.')"
 					>
 						<div class="flex items-center gap-2">
 							<div class="flex-1 min-w-0">
@@ -295,7 +298,7 @@ const breadcrumbs = computed(() => {
 									v-model="form.client"
 									data-test="pick-customer"
 									doctype="Customer"
-									placeholder="Select customer"
+									:placeholder="__('Select customer')"
 									label-field="customer_name"
 									value-field="name"
 									:search-fields="['customer_name', 'name']"
@@ -311,16 +314,16 @@ const breadcrumbs = computed(() => {
 								style="border-radius: 6px"
 								@click="customerModalOpen = true"
 							>
-								+ New
+								+ {{ __("New") }}
 							</button>
 						</div>
 					</DeskField>
-					<DeskField label="Project type" :error="errors.type">
+					<DeskField :label="__('Project type')" :error="errors.type">
 						<DeskLinkPicker
 							v-model="form.type"
 							data-test="pick-project-type"
 							doctype="Project Type"
-							placeholder="Select project type"
+							:placeholder="__('Select project type')"
 							label-field="name"
 							value-field="name"
 							:search-fields="['name']"
@@ -336,7 +339,7 @@ const breadcrumbs = computed(() => {
 							class="mt-1.5 px-2 py-1.5 bg-ink-50 border border-ink-200 text-[11px] text-ink-500 italic"
 							style="border-radius: 6px"
 						>
-							Loading template…
+							{{ __("Loading template…") }}
 						</div>
 						<div
 							v-else-if="templateSummary"
@@ -345,9 +348,9 @@ const breadcrumbs = computed(() => {
 						>
 							<div class="flex items-center justify-between gap-2 flex-wrap">
 								<div>
-									Template seeds
+									{{ __("Template seeds") }}
 									<span class="font-medium text-ink-900"
-										>{{ templateStageNames.length }} default stages</span
+										>{{ __("{0} default stages", [templateStageNames.length]) }}</span
 									>:
 									<span class="text-ink-600">{{
 										templateStageNames.join(" → ")
@@ -361,7 +364,7 @@ const breadcrumbs = computed(() => {
 										v-model="form.seedDefaultStages"
 										class="accent-brand-600"
 									/>
-									<span class="text-ink-700">Seed default stages</span>
+									<span class="text-ink-700">{{ __("Seed default stages") }}</span>
 								</label>
 							</div>
 							<div
@@ -370,9 +373,9 @@ const breadcrumbs = computed(() => {
 							>
 								<div>
 									<span class="font-medium text-ink-900"
-										>{{ templateTaskCount }} tasks</span
+										>{{ __("{0} tasks", [templateTaskCount]) }}</span
 									>
-									from this template can also be imported.
+									{{ __("from this template can also be imported.") }}
 								</div>
 								<label
 									class="inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
@@ -382,12 +385,11 @@ const breadcrumbs = computed(() => {
 										v-model="form.seedDefaultTasks"
 										class="accent-brand-600"
 									/>
-									<span class="text-ink-700">Import default tasks</span>
+									<span class="text-ink-700">{{ __("Import default tasks") }}</span>
 								</label>
 							</div>
 							<div v-if="parentProject" class="text-[10px] text-ink-500 italic">
-								Subproject — stage and task defaults are off; the parent project
-								owns the timeline.
+								{{ __("Subproject — stage and task defaults are off; the parent project owns the timeline.") }}
 							</div>
 						</div>
 						<div
@@ -395,9 +397,9 @@ const breadcrumbs = computed(() => {
 							class="mt-1.5 px-2 py-1.5 bg-ink-50 border border-ink-200 text-[11px] text-ink-500 italic"
 							style="border-radius: 6px"
 						>
-							No template configured for
+							{{ __("No template configured for") }}
 							<span class="font-medium text-ink-700">{{ form.type }}</span
-							>. You'll plan stages manually after create.
+							>. {{ __("You'll plan stages manually after create.") }}
 						</div>
 					</DeskField>
 					<!-- §14 — Company is chosen once on create (defaults to the site's default
@@ -405,19 +407,21 @@ const breadcrumbs = computed(() => {
              Locked after create (enforced server-side). -->
 					<DeskField
 						v-if="!route.query.parentId"
-						label="Company"
+						:label="__('Company')"
 						:error="errors.company"
 						:hint="
 							errors.company
 								? ''
-								: 'Defaults to your default company. This is locked after the project is created.'
+								: __(
+										'Defaults to your default company. This is locked after the project is created.'
+								  )
 						"
 					>
 						<DeskLinkPicker
 							v-model="form.company"
 							data-test="pick-company"
 							doctype="Company"
-							placeholder="Select company"
+							:placeholder="__('Select company')"
 							label-field="company_name"
 							value-field="name"
 							:search-fields="['company_name', 'abbr', 'name']"
@@ -427,20 +431,20 @@ const breadcrumbs = computed(() => {
 							@change="clearError('company')"
 						/>
 					</DeskField>
-					<DeskField label="Location">
-						<DeskInput v-model="form.location" placeholder="Site address" />
+					<DeskField :label="__('Location')">
+						<DeskInput v-model="form.location" :placeholder="__('Site address')" />
 					</DeskField>
-					<DeskField label="Description">
+					<DeskField :label="__('Description')">
 						<DeskTextarea
 							v-model="form.description"
 							:rows="3"
-							placeholder="Brief description of project scope"
+							:placeholder="__('Brief description of project scope')"
 						/>
 					</DeskField>
 					<DeskField
 						v-if="!route.query.parentId"
-						label="Subprojects"
-						hint="Turn on to break this project into subprojects (e.g. Block A / Block B / Tower 1)."
+						:label="__('Subprojects')"
+						:hint="__('Turn on to break this project into subprojects (e.g. Block A / Block B / Tower 1).')"
 					>
 						<label class="inline-flex items-center gap-2 cursor-pointer select-none">
 							<input
@@ -449,37 +453,37 @@ const breadcrumbs = computed(() => {
 								class="accent-brand-600"
 							/>
 							<span class="text-sm text-ink-700"
-								>Allow subprojects under this project</span
+								>{{ __("Allow subprojects under this project") }}</span
 							>
 						</label>
 					</DeskField>
 				</DeskSection>
 
-				<DeskSection title="Schedule &amp; cost">
-					<DeskField label="Start date">
+				<DeskSection :title="__('Schedule & cost')">
+					<DeskField :label="__('Start date')">
 						<DeskInput v-model="form.startDate" type="date" />
 					</DeskField>
-					<DeskField label="Expected end date" :error="errors.endDate">
+					<DeskField :label="__('Expected end date')" :error="errors.endDate">
 						<DeskInput v-model="form.endDate" type="date" />
 					</DeskField>
-					<DeskField label="Project budget (₹)">
+					<DeskField :label="__('Project budget (₹)')">
 						<DeskInput v-model="form.budget" type="number" placeholder="0" />
 					</DeskField>
-					<DeskField label="Priority">
+					<DeskField :label="__('Priority')">
 						<DeskSelect v-model="form.priority">
-							<option>Low</option>
-							<option>Medium</option>
-							<option>High</option>
+							<option value="Low">{{ __("Low") }}</option>
+							<option value="Medium">{{ __("Medium") }}</option>
+							<option value="High">{{ __("High") }}</option>
 						</DeskSelect>
 					</DeskField>
 				</DeskSection>
 
-				<DeskSection title="Team &amp; status">
-					<DeskField label="Project Manager" :error="errors.pm">
+				<DeskSection :title="__('Team & status')">
+					<DeskField :label="__('Project Manager')" :error="errors.pm">
 						<DeskLinkPicker
 							v-model="form.pm"
 							doctype="User"
-							placeholder="Select project manager"
+							:placeholder="__('Select project manager')"
 							label-field="full_name"
 							value-field="name"
 							:search-fields="['full_name', 'name', 'email']"
@@ -490,12 +494,12 @@ const breadcrumbs = computed(() => {
 							@change="clearError('pm')"
 						/>
 					</DeskField>
-					<DeskField label="Initial status">
+					<DeskField :label="__('Initial status')">
 						<DeskSelect v-model="form.status">
-							<option>New</option>
-							<option>Ongoing</option>
-							<option>Delayed</option>
-							<option>Completed</option>
+							<option value="New">{{ __("New") }}</option>
+							<option value="Ongoing">{{ __("Ongoing") }}</option>
+							<option value="Delayed">{{ __("Delayed", null, "Status") }}</option>
+							<option value="Completed">{{ __("Completed") }}</option>
 						</DeskSelect>
 					</DeskField>
 				</DeskSection>

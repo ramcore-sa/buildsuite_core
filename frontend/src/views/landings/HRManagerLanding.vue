@@ -5,6 +5,7 @@ import { ROLES } from "@/data/roles";
 import { WORKSPACE_META, ACCESS_LABEL, workspaceMetric } from "@/data/workspaces";
 import { useDataStore } from "@/stores";
 import LandingShell from "@/layouts/LandingShell.vue";
+import { __ } from "@/utils/translate";
 
 const ROLE_ID = "hr-manager";
 const role = ROLES.find((r) => r.id === ROLE_ID);
@@ -22,20 +23,20 @@ const todayLabel = today.toLocaleDateString("en-IN", {
 // is not wired in the prototype (CLAUDE.md §12.2 inherits it; §12.5 confirms attendance
 // is out of scope here). Replace with live reads once HR is hooked up.
 const ILLUSTRATIVE_KPIS = [
-	{ label: "Active employees", value: "47", sub: "On the rolls" },
-	{ label: "On leave today", value: "3", sub: "Approved leave today" },
-	{ label: "Pending leave approvals", value: "5", sub: "Awaiting manager" },
-	{ label: "Expiring documents", value: "2", sub: "Licences / contracts this month" },
+	{ label: __("Active employees"), value: "47", sub: __("On the rolls") },
+	{ label: __("On leave today"), value: "3", sub: __("Approved leave today") },
+	{ label: __("Pending leave approvals"), value: "5", sub: __("Awaiting manager") },
+	{ label: __("Expiring documents"), value: "2", sub: __("Licences / contracts this month") },
 ];
 
 // Office staff vs site labour split — these are two different populations and
 // each is managed through a different workspace.
 const populations = [
-	{ label: "Office staff", value: "47", context: "Managed in HR", tone: "info" },
+	{ label: __("Office staff"), value: "47", context: __("Managed in HR"), tone: "info" },
 	{
-		label: "Site labour",
-		value: "142 across 5 projects",
-		context: "Managed in Workforce",
+		label: __("Site labour"),
+		value: __("{0} across {1} projects", [142, 5]),
+		context: __("Managed in Workforce"),
 		tone: "success",
 	},
 ];
@@ -57,13 +58,13 @@ const tiles = computed(() =>
 			<div class="flex items-center gap-3 mb-2">
 				<span :class="role.color" class="w-2.5 h-2.5 rounded-full"></span>
 				<p class="text-xs text-ink-500 uppercase tracking-wider font-medium">
-					{{ role.shortName }} · People operations
+					{{ role.shortName }} · {{ __("People operations") }}
 				</p>
 			</div>
-			<h1 class="text-2xl font-semibold text-ink-900 tracking-tight">HR overview today</h1>
+			<h1 class="text-2xl font-semibold text-ink-900 tracking-tight">{{ __("HR overview today") }}</h1>
 			<p class="text-sm text-ink-500 mt-1">
 				{{ todayLabel }} ·
-				<span class="text-ink-700 font-medium">5 pending approvals</span>
+				<span class="text-ink-700 font-medium">{{ __("{0} pending approvals", [5]) }}</span>
 			</p>
 
 			<!-- KPIs -->
@@ -82,13 +83,16 @@ const tiles = computed(() =>
 			</div>
 
 			<!-- Labour vs office staff -->
-			<h2 class="text-sm font-semibold text-ink-900 mt-10 mb-3">Labour vs office staff</h2>
+			<h2 class="text-sm font-semibold text-ink-900 mt-10 mb-3">{{ __("Labour vs office staff") }}</h2>
 			<div class="bg-white border border-ink-200 rounded-xl overflow-hidden">
 				<div
 					class="px-4 py-3 bg-ink-50 border-b border-ink-200 text-xs text-ink-600 leading-snug"
 				>
-					Two different populations. Office staff are managed in HR; site labour is
-					managed in Workforce.
+					{{
+						__(
+							"Two different populations. Office staff are managed in HR; site labour is managed in Workforce."
+						)
+					}}
 				</div>
 				<div class="divide-y divide-ink-100">
 					<div
@@ -114,7 +118,7 @@ const tiles = computed(() =>
 			</div>
 
 			<!-- Your workspaces -->
-			<h2 class="text-sm font-semibold text-ink-900 mt-10 mb-3">Your workspaces</h2>
+			<h2 class="text-sm font-semibold text-ink-900 mt-10 mb-3">{{ __("Your workspaces") }}</h2>
 			<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 				<RouterLink
 					v-for="t in tiles"

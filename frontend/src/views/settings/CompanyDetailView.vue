@@ -17,6 +17,7 @@ import DeskField from "@/components/desk/DeskField.vue";
 import DeskInput from "@/components/desk/DeskInput.vue";
 import DeskTextarea from "@/components/desk/DeskTextarea.vue";
 import DeskLink from "@/components/desk/DeskLink.vue";
+import { __ } from "@/utils/translate";
 
 const props = defineProps({ id: String });
 const router = useRouter();
@@ -24,14 +25,14 @@ const store = useDataStore();
 const confirmDialog = useConfirm();
 
 const COLOR_OPTIONS = [
-	{ value: "bg-brand-600", label: "Green" },
-	{ value: "bg-blue-600", label: "Blue" },
-	{ value: "bg-violet-600", label: "Violet" },
-	{ value: "bg-amber-600", label: "Amber" },
-	{ value: "bg-emerald-600", label: "Emerald" },
-	{ value: "bg-rose-600", label: "Rose" },
-	{ value: "bg-cyan-600", label: "Cyan" },
-	{ value: "bg-ink-600", label: "Slate" },
+	{ value: "bg-brand-600", label: __("Green") },
+	{ value: "bg-blue-600", label: __("Blue") },
+	{ value: "bg-violet-600", label: __("Violet") },
+	{ value: "bg-amber-600", label: __("Amber") },
+	{ value: "bg-emerald-600", label: __("Emerald") },
+	{ value: "bg-rose-600", label: __("Rose") },
+	{ value: "bg-cyan-600", label: __("Cyan") },
+	{ value: "bg-ink-600", label: __("Slate") },
 ];
 
 const company = computed(() => store.companyById(props.id));
@@ -81,18 +82,29 @@ async function deleteCompany() {
 			.join("\n");
 		const more =
 			linkedProjects.value.length > 5
-				? `\n…and ${linkedProjects.value.length - 5} more`
+				? `\n${__("…and {0} more", [linkedProjects.value.length - 5])}`
 				: "";
+		// One catalogue entry per paragraph, so no message key carries a newline.
 		alert(
-			`Cannot delete "${company.value.name}".\n\n${linkedProjects.value.length} project(s) reference this company:\n\n${sample}${more}\n\nReassign or delete those projects first.`
+			[
+				__('Cannot delete "{0}".', [company.value.name]),
+				__("{0} project(s) reference this company:", [linkedProjects.value.length]),
+				`${sample}${more}`,
+				__("Reassign or delete those projects first."),
+			].join("\n\n")
 		);
 		return;
 	}
 	if (
 		!(await confirmDialog({
-			title: "Delete company",
-			message: `Delete company "${company.value.name}"?\n\nThis is permanent. No project references this company so the delete is safe.`,
-			confirmLabel: "Delete",
+			title: __("Delete company"),
+			message: [
+				__('Delete company "{0}"?', [company.value.name]),
+				__(
+					"This is permanent. No project references this company so the delete is safe."
+				),
+			].join("\n\n"),
+			confirmLabel: __("Delete"),
 			destructive: true,
 		}))
 	)
@@ -102,14 +114,14 @@ async function deleteCompany() {
 		router.push("/settings/companies");
 	} else {
 		// Defensive — shouldn't happen since we pre-checked, but in case of a race.
-		alert(`Delete refused: ${result.reason}`);
+		alert(__("Delete refused: {0}", [result.reason]));
 	}
 }
 
 const breadcrumbs = computed(() => [
 	{ label: "BuildSuite Core", to: "/" },
-	{ label: "Settings", to: "/settings" },
-	{ label: "Companies", to: "/settings/companies" },
+	{ label: __("Settings"), to: "/settings" },
+	{ label: __("Companies"), to: "/settings/companies" },
 ]);
 
 const titleStatus = computed(() => {
@@ -131,21 +143,24 @@ const titleStatus = computed(() => {
 			<template #action-bar>
 				<DeskActionBar
 					v-if="store.isAdmin"
-					:save-label="editing ? 'Save' : 'Edit'"
+					:save-label="editing ? __('Save') : __('Edit')"
 					:show-cancel="editing"
-					cancel-label="Cancel"
+					:cancel-label="__('Cancel')"
 					@save="onPrimary"
 					@cancel="cancelEdit"
 				>
 					<template #left>
 						<span v-if="linkedProjects.length" class="text-[11px] text-ink-500">
-							{{ linkedProjects.length }} project{{
-								linkedProjects.length === 1 ? "" : "s"
+							{{
+								linkedProjects.length === 1
+									? __("1 project references this company")
+									: __("{0} projects reference this company", [
+											linkedProjects.length,
+									  ])
 							}}
-							reference this company
 						</span>
 						<span v-else class="text-[11px] text-ink-400"
-							>No projects reference this company · safe to delete</span
+							>{{ __("No projects reference this company · safe to delete") }}</span
 						>
 					</template>
 					<template #menu>
@@ -155,7 +170,7 @@ const titleStatus = computed(() => {
 							style="border-radius: 2px; color: #b91c1c"
 							@click="deleteCompany"
 						>
-							Delete
+							{{ __("Delete") }}
 						</button>
 					</template>
 				</DeskActionBar>
@@ -164,49 +179,49 @@ const titleStatus = computed(() => {
 					v-else
 					class="px-3 py-2 bg-warning-50 border-b border-warning-100 text-xs text-warning-700"
 				>
-					Read-only view. Editing requires the System Manager role.
+					{{ __("Read-only view. Editing requires the System Manager role.") }}
 				</div>
 			</template>
 
 			<div class="max-w-3xl mx-auto">
 				<!-- Identity -->
-				<DeskSection title="Identity" v-if="!editing">
-					<DeskField label="Name">
+				<DeskSection :title="__('Identity')" v-if="!editing">
+					<DeskField :label="__('Name')">
 						<div class="text-sm text-ink-900 py-1">{{ company.name }}</div>
 					</DeskField>
-					<DeskField label="Short name" hint="Topbar pill text.">
+					<DeskField :label="__('Short name')" :hint="__('Topbar pill text.')">
 						<div class="text-sm text-ink-900 py-1">{{ company.shortName }}</div>
 					</DeskField>
-					<DeskField label="ID" hint="Stable identifier — locked after create.">
+					<DeskField :label="__('ID')" :hint="__('Stable identifier — locked after create.')">
 						<div class="text-sm text-ink-500 py-1 font-mono">{{ company.id }}</div>
 					</DeskField>
-					<DeskField label="Description">
+					<DeskField :label="__('Description')">
 						<div class="text-sm text-ink-700 py-1">
 							{{ company.description || "—" }}
 						</div>
 					</DeskField>
 				</DeskSection>
-				<DeskSection title="Identity" v-else>
-					<DeskField label="Name" required>
+				<DeskSection :title="__('Identity')" v-else>
+					<DeskField :label="__('Name')" required>
 						<DeskInput v-model="form.name" />
 					</DeskField>
-					<DeskField label="Short name" required hint="Topbar pill text.">
+					<DeskField :label="__('Short name')" required :hint="__('Topbar pill text.')">
 						<DeskInput v-model="form.shortName" />
 					</DeskField>
 					<DeskField
-						label="ID"
-						hint="Locked after create per Frappe Naming Series convention."
+						:label="__('ID')"
+						:hint="__('Locked after create per Frappe Naming Series convention.')"
 					>
 						<DeskInput :model-value="company.id" disabled class="font-mono" />
 					</DeskField>
-					<DeskField label="Description">
+					<DeskField :label="__('Description')">
 						<DeskTextarea v-model="form.description" :rows="2" />
 					</DeskField>
 				</DeskSection>
 
 				<!-- Brand colour -->
-				<DeskSection title="Brand colour" v-if="!editing" :cols="2">
-					<DeskField label="Pill colour">
+				<DeskSection :title="__('Brand colour')" v-if="!editing" :cols="2">
+					<DeskField :label="__('Pill colour')">
 						<div class="flex items-center gap-2 py-1">
 							<span
 								:class="company.color"
@@ -217,7 +232,7 @@ const titleStatus = computed(() => {
 						</div>
 					</DeskField>
 				</DeskSection>
-				<DeskSection title="Brand colour" v-else>
+				<DeskSection :title="__('Brand colour')" v-else>
 					<div class="md:col-span-2">
 						<div class="flex flex-wrap gap-2">
 							<label
@@ -249,7 +264,7 @@ const titleStatus = computed(() => {
 				</DeskSection>
 
 				<!-- Linked projects (always visible — informs delete safety) -->
-				<DeskSection title="Linked projects">
+				<DeskSection :title="__('Linked projects')">
 					<div class="md:col-span-2">
 						<div
 							v-if="linkedProjects.length"
@@ -260,9 +275,9 @@ const titleStatus = computed(() => {
 								class="grid bg-ink-50 border-b border-ink-200 text-[10px] uppercase tracking-wider text-ink-500 font-medium"
 								style="grid-template-columns: 140px 1fr 100px"
 							>
-								<div class="px-3 py-1.5">Code</div>
-								<div class="px-3 py-1.5">Project</div>
-								<div class="px-3 py-1.5">Status</div>
+								<div class="px-3 py-1.5">{{ __("Code") }}</div>
+								<div class="px-3 py-1.5">{{ __("Project") }}</div>
+								<div class="px-3 py-1.5">{{ __("Status") }}</div>
 							</div>
 							<div
 								v-for="p in linkedProjects"
@@ -276,15 +291,18 @@ const titleStatus = computed(() => {
 								<div class="px-3 py-1.5">
 									<DeskLink :to="`/projects/${p.id}`">{{ p.name }}</DeskLink>
 								</div>
-								<div class="px-3 py-1.5 text-xs text-ink-500">{{ p.status }}</div>
+								<div class="px-3 py-1.5 text-xs text-ink-500">{{ __(p.status) }}</div>
 							</div>
 						</div>
 						<div v-else class="text-xs text-ink-400 italic">
-							No projects reference this company. Safe to delete.
+							{{ __("No projects reference this company. Safe to delete.") }}
 						</div>
 						<div class="text-[11px] text-ink-500 mt-2">
-							Delete is refused while any project links to this company
-							(Frappe-standard LinkExistsError pattern).
+							{{
+								__(
+									"Delete is refused while any project links to this company (Frappe-standard LinkExistsError pattern)."
+								)
+							}}
 						</div>
 					</div>
 				</DeskSection>
@@ -293,7 +311,7 @@ const titleStatus = computed(() => {
 	</DeskPage>
 
 	<div v-else class="px-6 py-20 text-center text-sm text-ink-400">
-		Company not found ·
-		<RouterLink to="/settings/companies" class="desk-link">Back to list →</RouterLink>
+		{{ __("Company not found") }} ·
+		<RouterLink to="/settings/companies" class="desk-link">{{ __("Back to list →") }}</RouterLink>
 	</div>
 </template>

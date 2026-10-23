@@ -15,6 +15,7 @@ import DeskField from "@/components/desk/DeskField.vue";
 import DeskInput from "@/components/desk/DeskInput.vue";
 import DeskSelect from "@/components/desk/DeskSelect.vue";
 import DeskTextarea from "@/components/desk/DeskTextarea.vue";
+import { __ } from "@/utils/translate";
 
 const router = useRouter();
 const store = useDataStore();
@@ -57,8 +58,8 @@ function toggleProjectType(t) {
 
 function validate() {
 	const e = {};
-	if (!form.name.trim()) e.name = "Name is required";
-	if (!form.category) e.category = "Category is required";
+	if (!form.name.trim()) e.name = __("Name is required");
+	if (!form.category) e.category = __("Category is required");
 	errors.value = e;
 	return Object.keys(e).length === 0;
 }
@@ -74,45 +75,45 @@ function cancel() {
 
 const breadcrumbs = [
 	{ label: "BuildSuite Core", to: "/" },
-	{ label: "Activity Type", to: "/activity-types" },
-	{ label: "New" },
+	{ label: __("Activity Type"), to: "/activity-types" },
+	{ label: __("New") },
 ];
 </script>
 
 <template>
 	<DeskPage
-		title="New Activity Type"
-		subtitle="Master record · default checklist, labour mix, productivity"
+		:title="__('New Activity Type')"
+		:subtitle="__('Master record · default checklist, labour mix, productivity')"
 		:breadcrumbs="breadcrumbs"
 	>
 		<DeskForm>
 			<template #action-bar>
-				<DeskActionBar save-label="Create Activity Type" @save="save" @cancel="cancel" />
+				<DeskActionBar :save-label="__('Create Activity Type')" @save="save" @cancel="cancel" />
 			</template>
 
 			<div class="max-w-3xl mx-auto">
-				<DeskSection title="Basic">
-					<DeskField label="Name" required :error="errors.name">
-						<DeskInput v-model="form.name" placeholder="e.g. RCC Beam Casting" />
+				<DeskSection :title="__('Basic')">
+					<DeskField :label="__('Name')" required :error="errors.name">
+						<DeskInput v-model="form.name" :placeholder="__('e.g. RCC Beam Casting')" />
 					</DeskField>
-					<DeskField label="Category" required :error="errors.category">
+					<DeskField :label="__('Category')" required :error="errors.category">
 						<DeskSelect v-model="form.category">
-							<option v-for="c in CATEGORIES" :key="c">{{ c }}</option>
+							<option v-for="c in CATEGORIES" :key="c" :value="c">{{ __(c) }}</option>
 						</DeskSelect>
 					</DeskField>
-					<DeskField label="Description">
+					<DeskField :label="__('Description')">
 						<DeskTextarea
 							v-model="form.description"
 							:rows="3"
-							placeholder="Brief description of the work covered…"
+							:placeholder="__('Brief description of the work covered…')"
 						/>
 					</DeskField>
 				</DeskSection>
 
-				<DeskSection title="Default labour mix" :cols="2">
+				<DeskSection :title="__('Default labour mix')" :cols="2">
 					<DeskField
-						label="Skilled ratio (0–1)"
-						hint="0.3 = 30% skilled. Unskilled auto-fills."
+						:label="__('Skilled ratio (0–1)')"
+						:hint="__('0.3 = 30% skilled. Unskilled auto-fills.')"
 					>
 						<DeskInput
 							v-model="form.defaultSkilledRatio"
@@ -124,15 +125,15 @@ const breadcrumbs = [
 							@blur="onSkilledChange"
 						/>
 					</DeskField>
-					<DeskField label="Unskilled ratio" hint="Read-only · auto-computed.">
+					<DeskField :label="__('Unskilled ratio')" :hint="__('Read-only · auto-computed.')">
 						<DeskInput :model-value="form.defaultUnskilledRatio" disabled />
 					</DeskField>
 				</DeskSection>
 
-				<DeskSection title="Default productivity" :cols="2">
+				<DeskSection :title="__('Default productivity')" :cols="2">
 					<DeskField
-						label="Expected per man-day"
-						hint="Quantity one worker is expected to complete in one day."
+						:label="__('Expected per man-day')"
+						:hint="__('Quantity one worker is expected to complete in one day.')"
 					>
 						<DeskInput
 							v-model="form.expectedProductivityPerManDay"
@@ -141,12 +142,12 @@ const breadcrumbs = [
 							min="0"
 						/>
 					</DeskField>
-					<DeskField label="Productivity unit" hint="e.g. m³, m², ton, m, nos">
+					<DeskField :label="__('Productivity unit')" :hint="__('e.g. m³, m², ton, m, nos')">
 						<DeskInput v-model="form.productivityUnit" placeholder="m³" />
 					</DeskField>
 				</DeskSection>
 
-				<DeskSection title="Default checklist">
+				<DeskSection :title="__('Default checklist')">
 					<div class="md:col-span-2">
 						<ol class="space-y-1.5" v-if="form.defaultChecklist.length">
 							<li
@@ -159,7 +160,7 @@ const breadcrumbs = [
 								>
 								<DeskInput
 									v-model="c.item"
-									placeholder="Checklist item…"
+									:placeholder="__('Checklist item…')"
 									class="flex-1"
 								/>
 								<button
@@ -167,15 +168,18 @@ const breadcrumbs = [
 									class="text-xs px-2 py-1 border border-ink-200 bg-white hover:bg-ink-50"
 									style="border-radius: 2px; color: #b91c1c"
 									@click="removeChecklistRow(i)"
-									title="Remove row"
+									:title="__('Remove row')"
 								>
 									✕
 								</button>
 							</li>
 						</ol>
 						<div v-else class="text-[11px] text-ink-500 italic mb-2">
-							No rows yet · add checklist items workers will tick off when doing this
-							kind of activity.
+							{{
+								__(
+									"No rows yet · add checklist items workers will tick off when doing this kind of activity."
+								)
+							}}
 						</div>
 						<button
 							type="button"
@@ -183,12 +187,12 @@ const breadcrumbs = [
 							style="border-radius: 2px"
 							@click="addChecklistRow"
 						>
-							+ Add row
+							{{ __("+ Add row") }}
 						</button>
 					</div>
 				</DeskSection>
 
-				<DeskSection title="Applicable project types">
+				<DeskSection :title="__('Applicable project types')">
 					<div class="md:col-span-2">
 						<div class="flex flex-wrap gap-2">
 							<label
@@ -203,12 +207,15 @@ const breadcrumbs = [
 									class="accent-brand-600"
 									@change="toggleProjectType(t)"
 								/>
-								{{ t }}
+								{{ __(t) }}
 							</label>
 						</div>
 						<div class="text-[11px] text-ink-500 mt-1.5">
-							Leave all unchecked to mark as universal (applies to every project
-							type).
+							{{
+								__(
+									"Leave all unchecked to mark as universal (applies to every project type)."
+								)
+							}}
 						</div>
 					</div>
 				</DeskSection>

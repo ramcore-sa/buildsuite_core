@@ -17,6 +17,7 @@ import DeskSection from "@/components/desk/DeskSection.vue";
 import DeskField from "@/components/desk/DeskField.vue";
 import DeskInput from "@/components/desk/DeskInput.vue";
 import DeskTextarea from "@/components/desk/DeskTextarea.vue";
+import { __ } from "@/utils/translate";
 
 const router = useRouter();
 const store = useDataStore();
@@ -24,14 +25,14 @@ const store = useDataStore();
 // Palette options for the company switcher pill. Same Tailwind classes used by
 // roles.js and the existing seed companies — keeps the topbar pill consistent.
 const COLOR_OPTIONS = [
-	{ value: "bg-brand-600", label: "Green" },
-	{ value: "bg-blue-600", label: "Blue" },
-	{ value: "bg-violet-600", label: "Violet" },
-	{ value: "bg-amber-600", label: "Amber" },
-	{ value: "bg-emerald-600", label: "Emerald" },
-	{ value: "bg-rose-600", label: "Rose" },
-	{ value: "bg-cyan-600", label: "Cyan" },
-	{ value: "bg-ink-600", label: "Slate" },
+	{ value: "bg-brand-600", label: __("Green") },
+	{ value: "bg-blue-600", label: __("Blue") },
+	{ value: "bg-violet-600", label: __("Violet") },
+	{ value: "bg-amber-600", label: __("Amber") },
+	{ value: "bg-emerald-600", label: __("Emerald") },
+	{ value: "bg-rose-600", label: __("Rose") },
+	{ value: "bg-cyan-600", label: __("Cyan") },
+	{ value: "bg-ink-600", label: __("Slate") },
 ];
 
 const form = reactive({
@@ -73,17 +74,17 @@ const idCollision = computed(
 
 function validate() {
 	const e = {};
-	if (!form.name.trim()) e.name = "Company name is required";
+	if (!form.name.trim()) e.name = __("Company name is required");
 	if (!form.shortName.trim())
-		e.shortName = "Short name is required (shown in topbar switcher pill)";
-	if (!form.id.trim()) e.id = "ID is required";
+		e.shortName = __("Short name is required (shown in topbar switcher pill)");
+	if (!form.id.trim()) e.id = __("ID is required");
 	errors.value = e;
 	return Object.keys(e).length === 0;
 }
 
 function save() {
 	if (!store.isAdmin) {
-		alert("Only the System Manager role can create companies.");
+		alert(__("Only the System Manager role can create companies."));
 		return;
 	}
 	if (!validate()) return;
@@ -98,22 +99,22 @@ function cancel() {
 
 const breadcrumbs = [
 	{ label: "BuildSuite Core", to: "/" },
-	{ label: "Settings", to: "/settings" },
-	{ label: "Companies", to: "/settings/companies" },
-	{ label: "New" },
+	{ label: __("Settings"), to: "/settings" },
+	{ label: __("Companies"), to: "/settings/companies" },
+	{ label: __("New") },
 ];
 </script>
 
 <template>
 	<DeskPage
-		title="New Company"
-		subtitle="Legal entity for project / accounting segregation (§14)"
+		:title="__('New Company')"
+		:subtitle="__('Legal entity for project / accounting segregation (§14)')"
 		:breadcrumbs="breadcrumbs"
 	>
 		<DeskForm>
 			<template #action-bar>
 				<DeskActionBar
-					:save-label="saving ? 'Creating…' : 'Create company'"
+					:save-label="saving ? __('Creating…') : __('Create company')"
 					:saving="saving"
 					@save="save"
 					@cancel="cancel"
@@ -127,36 +128,44 @@ const breadcrumbs = [
 					class="mb-3 px-3 py-2 bg-warning-50 border border-warning-100 text-xs text-warning-700"
 					style="border-radius: 2px"
 				>
-					You're viewing this form as
+					{{ __("You're viewing this form as") }}
 					<span class="font-medium">{{ store.currentRole?.name }}</span
-					>. Saving requires the System Manager role.
+					>. {{ __("Saving requires the System Manager role.") }}
 				</div>
 
-				<DeskSection title="Identity">
+				<DeskSection :title="__('Identity')">
 					<DeskField
-						label="Company name"
+						:label="__('Company name')"
 						required
 						:error="errors.name"
-						hint="Legal entity name. Will appear on invoices / contracts in production."
+						:hint="__('Legal entity name. Will appear on invoices / contracts in production.')"
 					>
-						<DeskInput v-model="form.name" placeholder="e.g. Acme Realty Pvt Ltd" />
+						<DeskInput v-model="form.name" :placeholder="__('e.g. Acme Realty Pvt Ltd')" />
 					</DeskField>
 					<DeskField
-						label="Short name"
+						:label="__('Short name')"
 						required
 						:error="errors.shortName"
-						hint="Displayed in the topbar company switcher and lists. Keep it under ~16 characters."
+						:hint="
+							__(
+								'Displayed in the topbar company switcher and lists. Keep it under ~16 characters.'
+							)
+						"
 					>
-						<DeskInput v-model="form.shortName" placeholder="e.g. Acme Realty" />
+						<DeskInput v-model="form.shortName" :placeholder="__('e.g. Acme Realty')" />
 					</DeskField>
 					<DeskField
-						label="ID"
+						:label="__('ID')"
 						required
 						:error="errors.id"
 						:hint="
 							idCollision
-								? 'An existing company already uses this ID — addCompany() will append a numeric suffix on save.'
-								: 'Auto-derived from short name. Stable identifier — locked after create (Frappe Naming Series convention).'
+								? __(
+										'An existing company already uses this ID — addCompany() will append a numeric suffix on save.'
+								  )
+								: __(
+										'Auto-derived from short name. Stable identifier — locked after create (Frappe Naming Series convention).'
+								  )
 						"
 					>
 						<DeskInput
@@ -167,18 +176,22 @@ const breadcrumbs = [
 						/>
 					</DeskField>
 					<DeskField
-						label="Description"
-						hint="What this entity builds — used as a hint in the company switcher dropdown."
+						:label="__('Description')"
+						:hint="
+							__(
+								'What this entity builds — used as a hint in the company switcher dropdown.'
+							)
+						"
 					>
 						<DeskTextarea
 							v-model="form.description"
 							:rows="2"
-							placeholder="e.g. Residential towers · apartments · gated communities"
+							:placeholder="__('e.g. Residential towers · apartments · gated communities')"
 						/>
 					</DeskField>
 				</DeskSection>
 
-				<DeskSection title="Brand colour">
+				<DeskSection :title="__('Brand colour')">
 					<div class="md:col-span-2">
 						<div class="flex flex-wrap gap-2">
 							<label
@@ -207,8 +220,11 @@ const breadcrumbs = [
 							</label>
 						</div>
 						<div class="text-[11px] text-ink-500 mt-2">
-							Used for the topbar switcher pill, the Projects-list Company column
-							badge, and any future per-company tag.
+							{{
+								__(
+									"Used for the topbar switcher pill, the Projects-list Company column badge, and any future per-company tag."
+								)
+							}}
 						</div>
 					</div>
 				</DeskSection>

@@ -6,6 +6,7 @@ import { WORKSPACE_META, ACCESS_LABEL, workspaceMetric } from "@/data/workspaces
 import { useDataStore } from "@/stores";
 import LandingShell from "@/layouts/LandingShell.vue";
 import { fmtCompactINR } from "@/utils/format";
+import { __ } from "@/utils/translate";
 
 const ROLE_ID = "accountant";
 const role = ROLES.find((r) => r.id === ROLE_ID);
@@ -29,14 +30,14 @@ const todayLabel = today.toLocaleDateString("en-IN", {
 const orderBookCompact = computed(() => fmtCompactINR(store.totalOrderBook));
 
 const ILLUSTRATIVE_KPIS = computed(() => [
-	{ label: "Petty cash open", value: "₹4.8 L", sub: "Project Finance" },
-	{ label: "RA bills to pay", value: "11", sub: "Subcontract" },
+	{ label: __("Petty cash open"), value: "₹4.8 L", sub: __("Project Finance") },
+	{ label: __("RA bills to pay"), value: "11", sub: __("Subcontract") },
 	{
-		label: "Project P&L (month)",
-		value: orderBookCompact.value + " booked",
-		sub: "Order book booked",
+		label: __("Project P&L (month)"),
+		value: __("{0} booked", [orderBookCompact.value]),
+		sub: __("Order book booked"),
 	},
-	{ label: "Variance flags", value: "3", sub: "Projects > 10% off plan" },
+	{ label: __("Variance flags"), value: "3", sub: __("Projects > 10% off plan") },
 ]);
 
 // Illustrative pending vendor payments list — would come from ERPNext Purchase Invoice +
@@ -91,14 +92,14 @@ const tiles = computed(() =>
 			<div class="flex items-center gap-3 mb-2">
 				<span :class="role.color" class="w-2.5 h-2.5 rounded-full"></span>
 				<p class="text-xs text-ink-500 uppercase tracking-wider font-medium">
-					{{ role.shortName }} · Books & ledgers
+					{{ role.shortName }} · {{ __("Books & ledgers") }}
 				</p>
 			</div>
-			<h1 class="text-2xl font-semibold text-ink-900 tracking-tight">Financial position</h1>
+			<h1 class="text-2xl font-semibold text-ink-900 tracking-tight">{{ __("Financial position") }}</h1>
 			<p class="text-sm text-ink-500 mt-1">
 				{{ todayLabel }} ·
 				<span class="text-ink-700 font-medium"
-					>{{ pendingPayments.length }} vendor payments pending</span
+					>{{ __("{0} vendor payments pending", [pendingPayments.length]) }}</span
 				>
 			</p>
 
@@ -118,7 +119,7 @@ const tiles = computed(() =>
 			</div>
 
 			<!-- Pending vendor payments -->
-			<h2 class="text-sm font-semibold text-ink-900 mt-10 mb-3">Pending vendor payments</h2>
+			<h2 class="text-sm font-semibold text-ink-900 mt-10 mb-3">{{ __("Pending vendor payments") }}</h2>
 			<div class="bg-white border border-ink-200 rounded-xl overflow-hidden">
 				<div class="divide-y divide-ink-100">
 					<RouterLink
@@ -142,7 +143,7 @@ const tiles = computed(() =>
 								{{ p.vendor }}
 							</div>
 							<div class="text-xs text-ink-500 mt-0.5 font-mono">
-								{{ p.id }} · {{ p.category }}
+								{{ p.id }} · {{ __(p.category) }}
 							</div>
 						</div>
 						<div class="text-right flex-shrink-0">
@@ -153,7 +154,7 @@ const tiles = computed(() =>
 								class="text-[11px]"
 								:class="p.dueIn <= 7 ? 'text-warning-700' : 'text-ink-500'"
 							>
-								due in {{ p.dueIn }}d
+								{{ __("due in {0}d", [p.dueIn]) }}
 							</div>
 						</div>
 					</RouterLink>
@@ -161,7 +162,7 @@ const tiles = computed(() =>
 			</div>
 
 			<!-- Your workspaces -->
-			<h2 class="text-sm font-semibold text-ink-900 mt-10 mb-3">Your workspaces</h2>
+			<h2 class="text-sm font-semibold text-ink-900 mt-10 mb-3">{{ __("Your workspaces") }}</h2>
 			<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
 				<RouterLink
 					v-for="t in tiles"

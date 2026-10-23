@@ -27,7 +27,7 @@ const skipLink = computed(() => {
 				<span class="font-semibold text-ink-900">BuildSuite</span>
 				<span
 					class="ml-2 text-[10px] px-1.5 py-0.5 bg-ink-100 text-ink-600 rounded font-medium tracking-wide"
-					>PROTOTYPE</span
+					>{{ __("PROTOTYPE") }}</span
 				>
 			</RouterLink>
 			<div class="ml-auto flex items-center gap-4">
@@ -35,7 +35,7 @@ const skipLink = computed(() => {
 					:to="skipLink"
 					class="text-xs text-ink-500 hover:text-ink-900 hidden sm:inline-flex items-center gap-1"
 				>
-					Browse all workspaces
+					{{ __("Browse all workspaces") }}
 					<span aria-hidden="true">→</span>
 				</RouterLink>
 				<RoleSwitcher />
@@ -47,7 +47,7 @@ const skipLink = computed(() => {
 		</main>
 
 		<footer class="border-t border-ink-200 bg-white py-4 text-center text-[11px] text-ink-400">
-			BuildSuite Core · Open Source MIT · Frappe v16 prototype · Browser storage backend
+			{{ __("BuildSuite Core · Open Source MIT · Frappe v16 prototype · Browser storage backend") }}
 		</footer>
 	</div>
 </template>

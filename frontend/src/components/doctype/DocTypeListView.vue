@@ -5,6 +5,7 @@ import StatusBadge from "@/components/StatusBadge.vue";
 import { fmtDate } from "@/utils/format";
 import { useDocTypeList } from "@/composables/useDocTypeList";
 import { getWorkspaceIconPath } from "@/utils/workspaceIcons";
+import { __ } from "@/utils/translate";
 
 const props = defineProps({
 	doctype: { type: String, required: true },
@@ -21,8 +22,10 @@ const props = defineProps({
 	cacheKey: { type: [String, Array], default: null },
 	initialOrderBy: { type: String, default: "" },
 	rowKey: { type: String, default: "name" },
-	searchPlaceholder: { type: String, default: "Search" },
-	emptyMessage: { type: String, default: "No records found" },
+	// Factories so the defaults are translated per instance; callers translate
+	// the text they pass in.
+	searchPlaceholder: { type: String, default: () => __("Search") },
+	emptyMessage: { type: String, default: () => __("No records found") },
 	compact: { type: Boolean, default: false },
 });
 
@@ -79,6 +82,8 @@ async function loadMeta() {
 	}
 }
 
+// Labels here, like the ones from doctype meta, stay English and are translated
+// where a column or sort option is built, the way desk translates field labels.
 const systemFields = [
 	{ fieldname: "name", label: "ID", fieldtype: "Data" },
 	{ fieldname: "owner", label: "Owner", fieldtype: "Link" },
@@ -121,7 +126,7 @@ function defaultColumnLabel(column) {
 	const fallbackField =
 		Array.isArray(column.fields) && column.fields.length ? column.fields[0] : column.key;
 	const metaField = fieldMetaMap.value.get(fallbackField);
-	return metaField?.label || column.key;
+	return metaField?.label ? __(metaField.label) : column.key;
 }
 
 function defaultColumnAlign(column) {
@@ -157,7 +162,7 @@ const resolvedColumns = computed(() => {
 		const numericTypes = ["Currency", "Float", "Int", "Percent"];
 		return {
 			key: fieldname,
-			label: metaField.label || fieldname,
+			label: metaField.label ? __(metaField.label) : fieldname,
 			align: numericTypes.includes(metaField.fieldtype) ? "right" : "left",
 		};
 	});
@@ -223,7 +228,7 @@ const sortableFields = computed(() => {
 		const field = fieldMetaMap.value.get(fieldname);
 		return {
 			value: fieldname,
-			label: field?.label || fieldname,
+			label: field?.label ? __(field.label) : fieldname,
 		};
 	});
 });
@@ -409,7 +414,7 @@ function formatValue(row, fieldname, column = null) {
 		return fmtDate(value);
 	}
 	if (fieldtype === "Check") {
-		return value ? "Yes" : "No";
+		return value ? __("Yes") : __("No");
 	}
 	if (
 		fieldtype === "Currency" ||
@@ -522,14 +527,18 @@ const effectiveTotalRows = computed(() =>
 
 const listCountText = computed(() => {
 	if (!props.paginated) {
-		return `${filteredRows.value.length} of ${resource.data?.length ?? 0}`;
+		return __("{0} of {1}", [filteredRows.value.length, resource.data?.length ?? 0]);
 	}
 
-	if (!filteredRows.value.length) return "0 records";
+	if (!filteredRows.value.length) return __("0 records");
 	if (totalCount.value != null) {
-		return `${backendRangeStart.value}-${backendRangeEnd.value} of ${totalCount.value} records`;
+		return __("{0}-{1} of {2} records", [
+			backendRangeStart.value,
+			backendRangeEnd.value,
+			totalCount.value,
+		]);
 	}
-	return `${backendRangeStart.value}-${backendRangeEnd.value} records`;
+	return __("{0}-{1} records", [backendRangeStart.value, backendRangeEnd.value]);
 });
 
 function onPageChange(page) {
@@ -551,7 +560,7 @@ function onPageSizeChange(value) {
 <template>
 	<div>
 		<div v-if="metaError" class="mb-2 text-xs text-danger-600">
-			Failed to load {{ doctype }} metadata.
+			{{ __("Failed to load {0} metadata.", [__(doctype)]) }}
 		</div>
 
 		<DeskList

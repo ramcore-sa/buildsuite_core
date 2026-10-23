@@ -4,6 +4,7 @@ import { RouterLink } from "vue-router";
 import { ROLES } from "@/data/roles";
 import { useDataStore } from "@/stores";
 import LandingShell from "@/layouts/LandingShell.vue";
+import { __ } from "@/utils/translate";
 
 const ROLE_ID = "site-engineer";
 const role = ROLES.find((r) => r.id === ROLE_ID);
@@ -24,7 +25,7 @@ const todayLabel = today.toLocaleDateString("en-IN", {
 });
 
 const me = computed(() => store.teamMember(SITE_ENGINEER_USER_ID));
-const firstName = computed(() => (me.value?.name || "").split(" ")[0] || "there");
+const firstName = computed(() => (me.value?.name || "").split(" ")[0] || __("there"));
 
 const myTasks = computed(() => store.tasks.filter((t) => t.assignee === SITE_ENGINEER_USER_ID));
 
@@ -75,22 +76,30 @@ const todaysTasks = computed(() =>
 );
 
 const quickActions = computed(() => [
-	{ icon: "👷", label: "Mark attendance", to: "/workforce", sub: "Open Workforce" },
+	{ icon: "👷", label: __("Mark attendance"), to: "/workforce", sub: __("Open Workforce") },
 	{
 		icon: "📸",
-		label: "Daily progress",
+		label: __("Daily progress"),
 		to: "/tasks",
-		sub: `${inProgressCount.value} task${inProgressCount.value === 1 ? "" : "s"} in progress`,
+		sub:
+			inProgressCount.value === 1
+				? __("{0} task in progress", [inProgressCount.value])
+				: __("{0} tasks in progress", [inProgressCount.value]),
 	},
-	{ icon: "🧾", label: "Raise material request", to: "/procurement", sub: "Open Procurement" },
+	{
+		icon: "🧾",
+		label: __("Raise material request"),
+		to: "/procurement",
+		sub: __("Open Procurement"),
+	},
 	{
 		icon: "⚠️",
-		label: "Report issue / SCO",
+		label: __("Report issue / SCO"),
 		to: "/sco",
 		sub:
 			pendingScosOnPrimary.value === 0
-				? "No SCOs pending on this project"
-				: `${pendingScosOnPrimary.value} pending on this project`,
+				? __("No SCOs pending on this project")
+				: __("{0} pending on this project", [pendingScosOnPrimary.value]),
 	},
 ]);
 
@@ -105,8 +114,8 @@ const alerts = computed(() => {
 			out.push({
 				key: `overdue-${t.id}`,
 				severity: "danger",
-				title: `Overdue: ${t.name}`,
-				sub: `${daysOver}d past due · ${t.progress}% complete`,
+				title: __("Overdue: {0}", [t.name]),
+				sub: __("{0}d past due · {1}% complete", [daysOver, t.progress]),
 				to: `/tasks/${t.id}`,
 			});
 		}
@@ -127,8 +136,11 @@ const alerts = computed(() => {
 			out.push({
 				key: `wp-${wp.id}`,
 				severity: "warning",
-				title: `${wp.name} behind schedule`,
-				sub: `${wp.progress}% complete · ${timeElapsedPct.toFixed(0)}% of time elapsed`,
+				title: __("{0} behind schedule", [wp.name]),
+				sub: __("{0}% complete · {1}% of time elapsed", [
+					wp.progress,
+					timeElapsedPct.toFixed(0),
+				]),
 				to: `/work-packages/${wp.id}`,
 			});
 		}
@@ -152,17 +164,17 @@ const alerts = computed(() => {
 					{{ role.shortName }}
 				</div>
 				<h1 class="text-2xl font-semibold tracking-tight mt-1">
-					Good morning, {{ firstName }}
+					{{ __("Good morning, {0}", [firstName]) }}
 				</h1>
 				<p class="text-sm opacity-90 mt-1">{{ todayLabel }}</p>
 				<div v-if="primaryProject" class="mt-3 pt-3 border-t border-white/20 text-sm">
-					<div class="opacity-75 text-xs uppercase tracking-wider">Today's project</div>
+					<div class="opacity-75 text-xs uppercase tracking-wider">{{ __("Today's project") }}</div>
 					<div class="font-medium mt-0.5">{{ primaryProject.name }}</div>
 				</div>
 			</div>
 
 			<!-- Quick actions -->
-			<h2 class="text-sm font-semibold text-ink-900 mt-8 mb-3">Today's quick actions</h2>
+			<h2 class="text-sm font-semibold text-ink-900 mt-8 mb-3">{{ __("Today's quick actions") }}</h2>
 			<div class="grid grid-cols-2 gap-3">
 				<RouterLink
 					v-for="a in quickActions"
@@ -177,7 +189,7 @@ const alerts = computed(() => {
 			</div>
 
 			<!-- My tasks today -->
-			<h2 class="text-sm font-semibold text-ink-900 mt-8 mb-3">My tasks today</h2>
+			<h2 class="text-sm font-semibold text-ink-900 mt-8 mb-3">{{ __("My tasks today") }}</h2>
 			<div class="bg-white border border-ink-200 rounded-xl overflow-hidden">
 				<div class="divide-y divide-ink-100">
 					<RouterLink
@@ -201,7 +213,7 @@ const alerts = computed(() => {
 								{{ t.progress }}%
 							</div>
 							<div class="text-[10px] text-ink-500 uppercase tracking-wider">
-								{{ t.priority }}
+								{{ __(t.priority) }}
 							</div>
 						</div>
 					</RouterLink>
@@ -209,13 +221,13 @@ const alerts = computed(() => {
 						v-if="!todaysTasks.length"
 						class="px-4 py-8 text-center text-sm text-ink-400"
 					>
-						No open tasks assigned to you. Nice.
+						{{ __("No open tasks assigned to you. Nice.") }}
 					</div>
 				</div>
 			</div>
 
 			<!-- Alerts -->
-			<h2 class="text-sm font-semibold text-ink-900 mt-8 mb-3">Alerts</h2>
+			<h2 class="text-sm font-semibold text-ink-900 mt-8 mb-3">{{ __("Alerts") }}</h2>
 			<div v-if="alerts.length" class="space-y-2">
 				<RouterLink
 					v-for="a in alerts"
@@ -261,9 +273,9 @@ const alerts = computed(() => {
 				v-else
 				class="bg-success-50 border border-success-200 rounded-xl px-4 py-3 text-success-800 text-sm"
 			>
-				<span class="font-medium">All clear ✓</span>
+				<span class="font-medium">{{ __("All clear") }} ✓</span>
 				<span class="text-success-700 ml-1"
-					>· No overdue tasks or behind-schedule work packages.</span
+					>· {{ __("No overdue tasks or behind-schedule work packages.") }}</span
 				>
 			</div>
 		</div>

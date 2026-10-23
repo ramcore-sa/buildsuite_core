@@ -18,13 +18,16 @@
 
 import { computed, ref, watch } from "vue";
 import DeskSortControl from "@/components/desk/DeskSortControl.vue";
+import { __ } from "@/utils/translate";
 
 const props = defineProps({
 	rows: { type: Array, required: true },
 	columns: { type: Array, required: true },
 	rowKey: { type: [String, Function], default: "id" },
 	modelValue: { type: String, default: "" }, // search v-model
-	searchPlaceholder: { type: String, default: "Search" },
+	// A factory so the default is translated per instance; callers translate
+	// the placeholders they pass in.
+	searchPlaceholder: { type: String, default: () => __("Search") },
 	bulkSelect: { type: Boolean, default: false },
 	selected: { type: Array, default: () => [] }, // selected row keys for bulk-select
 	showSort: { type: Boolean, default: true },
@@ -251,6 +254,24 @@ function setPageSize(size) {
 	currentPage.value = 1;
 }
 
+// The range and page indicators are whole sentences with the numbers as
+// placeholders, so a translation can reorder them; the numbers are wrapped in
+// the emphasis span here rather than splitting the sentence around markup.
+// Only integers are interpolated, which is what makes v-html safe below.
+function emphasis(value) {
+	return `<span class="text-ink-800 font-medium">${Number(value) || 0}</span>`;
+}
+const rangeText = computed(() =>
+	__("Showing {0}–{1} of {2}", [
+		emphasis(rangeStart.value),
+		emphasis(rangeEnd.value),
+		emphasis(totalRowsValue.value),
+	])
+);
+const pageText = computed(() =>
+	__("Page {0} of {1}", [emphasis(pageValue.value), emphasis(totalPages.value)])
+);
+
 const showPagination = computed(() => {
 	if (!props.paginated) return false;
 	if (props.serverPaginated) return true;
@@ -296,7 +317,7 @@ const showPagination = computed(() => {
 				class="desk-link text-xs px-1.5"
 				@click="emit('add-filter')"
 			>
-				+ Add filter
+				{{ __("+ Add filter") }}
 			</button>
 
 			<div class="ml-auto flex items-center gap-1">
@@ -316,7 +337,7 @@ const showPagination = computed(() => {
 					style="border-radius: 6px"
 					@click="emit('toggle-columns')"
 				>
-					Columns ▾
+					{{ __("Columns") }} ▾
 				</button>
 				<!-- Consumer-supplied action button(s) sit at the far right, after
              Sort + Columns. Convention: primary "+ New / + Add" CTAs go here. -->
@@ -333,7 +354,7 @@ const showPagination = computed(() => {
 							<input
 								type="checkbox"
 								:checked="allSelected"
-								aria-label="Select all rows"
+								:aria-label="__('Select all rows')"
 								@change="toggleAll"
 							/>
 						</th>
@@ -364,7 +385,7 @@ const showPagination = computed(() => {
 							<input
 								type="checkbox"
 								:checked="isSelected(row)"
-								:aria-label="`Select row ${keyFor(row)}`"
+								:aria-label="__('Select row {0}', [keyFor(row)])"
 								@change="toggleRow(row)"
 							/>
 						</td>
@@ -389,7 +410,7 @@ const showPagination = computed(() => {
 							class="px-3 py-12 text-center"
 						>
 							<slot name="empty">
-								<div class="text-sm text-ink-500">No records found</div>
+								<div class="text-sm text-ink-500">{{ __("No records found") }}</div>
 							</slot>
 						</td>
 					</tr>
@@ -403,7 +424,7 @@ const showPagination = computed(() => {
 			class="border-t border-ink-200 px-3 py-2 flex items-center gap-3 flex-wrap text-xs text-ink-600"
 		>
 			<div class="flex items-center gap-2">
-				<span class="text-ink-500">Rows per page</span>
+				<span class="text-ink-500">{{ __("Rows per page") }}</span>
 				<select
 					data-test="pager-size"
 					:value="pageSizeValue"
@@ -417,11 +438,7 @@ const showPagination = computed(() => {
 				</select>
 			</div>
 
-			<div class="text-ink-500 tabular-nums">
-				Showing
-				<span class="text-ink-800 font-medium">{{ rangeStart }}–{{ rangeEnd }}</span> of
-				<span class="text-ink-800 font-medium">{{ totalRowsValue }}</span>
-			</div>
+			<div class="text-ink-500 tabular-nums" v-html="rangeText"></div>
 
 			<div class="ml-auto flex items-center gap-1">
 				<button
@@ -432,12 +449,9 @@ const showPagination = computed(() => {
 					:disabled="pageValue <= 1"
 					@click="goPrev"
 				>
-					‹ Prev
+					‹ {{ __("Prev") }}
 				</button>
-				<span class="text-ink-500 tabular-nums px-2">
-					Page <span class="text-ink-800 font-medium">{{ pageValue }}</span> of
-					<span class="text-ink-800 font-medium">{{ totalPages }}</span>
-				</span>
+				<span class="text-ink-500 tabular-nums px-2" v-html="pageText"></span>
 				<button
 					type="button"
 					data-test="pager-next"
@@ -446,7 +460,7 @@ const showPagination = computed(() => {
 					:disabled="pageValue >= totalPages"
 					@click="goNext"
 				>
-					Next ›
+					{{ __("Next") }} ›
 				</button>
 			</div>
 		</div>

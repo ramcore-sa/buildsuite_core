@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
 import { useDataStore } from "@/stores";
+import { __ } from "@/utils/translate";
 
 const store = useDataStore();
 
@@ -10,15 +11,15 @@ const todayISO = now.toISOString().slice(0, 10);
 
 const greeting = computed(() => {
 	const hour = now.getHours();
-	if (hour < 12) return "Good morning";
-	if (hour < 18) return "Good afternoon";
-	return "Good evening";
+	if (hour < 12) return __("Good morning");
+	if (hour < 18) return __("Good afternoon");
+	return __("Good evening");
 });
 
-const userName = computed(() => store.user?.name || "Admin User");
+const userName = computed(() => store.user?.name || __("Admin User"));
 
 const roleLabel = computed(() =>
-	store.isAdmin ? "System Manager (Admin)" : store.currentRole?.name || "User"
+	store.isAdmin ? __("System Manager (Admin)") : store.currentRole?.name || __("User")
 );
 
 const dateLabel = computed(() =>
@@ -63,16 +64,16 @@ const progressTodayCount = computed(
 );
 
 const quickActions = [
-	{ label: "Users", to: "/settings/users", icon: "users" },
-	{ label: "Companies", to: "/settings/companies", icon: "companies" },
-	{ label: "Project Types", to: "/settings/project-types", icon: "project-types" },
+	{ label: __("Users"), to: "/settings/users", icon: "users" },
+	{ label: __("Companies"), to: "/settings/companies", icon: "companies" },
+	{ label: __("Project Types"), to: "/settings/project-types", icon: "project-types" },
 	{
-		label: "Workspace Structure",
+		label: __("Workspace Structure"),
 		to: "/settings/workspace-structure",
 		icon: "workspace-structure",
 	},
-	{ label: "All Projects", to: "/projects", icon: "projects" },
-	{ label: "Data Tools", to: "/settings/data", icon: "data-tools" },
+	{ label: __("All Projects"), to: "/projects", icon: "projects" },
+	{ label: __("Data Tools"), to: "/settings/data", icon: "data-tools" },
 ];
 
 function showCount(value, fallback) {
@@ -94,7 +95,7 @@ function showCount(value, fallback) {
 				<div class="text-sm text-ink-500">{{ greeting }},</div>
 				<h1 class="text-2xl font-semibold text-ink-900 mt-0.5">{{ userName }}</h1>
 				<p class="text-sm text-ink-500 mt-1.5">
-					Here is a snapshot of system activity today.
+					{{ __("Here is a snapshot of system activity today.") }}
 				</p>
 				<div class="text-[11px] text-ink-400 mt-1 flex flex-wrap items-center gap-x-2">
 					<span>{{ roleLabel }}</span>
@@ -111,12 +112,12 @@ function showCount(value, fallback) {
 				<header
 					class="px-5 py-3 bg-gradient-to-r from-brand-50 to-white border-b border-ink-100 flex items-center justify-between"
 				>
-					<h2 class="text-sm font-semibold text-ink-900">Today's snapshot</h2>
+					<h2 class="text-sm font-semibold text-ink-900">{{ __("Today's snapshot") }}</h2>
 					<span
 						class="text-[10px] uppercase tracking-wider font-medium text-success-700 bg-success-50 px-2 py-0.5 rounded-full inline-flex items-center gap-1"
 					>
 						<span class="w-1.5 h-1.5 rounded-full bg-success-500"></span>
-						Live
+						{{ __("Live") }}
 					</span>
 				</header>
 				<div class="p-5">
@@ -154,7 +155,7 @@ function showCount(value, fallback) {
 							<div
 								class="text-[10px] uppercase tracking-wider text-ink-500 font-medium mt-2"
 							>
-								Active projects
+								{{ __("Active projects") }}
 							</div>
 						</div>
 						<div>
@@ -184,7 +185,7 @@ function showCount(value, fallback) {
 							<div
 								class="text-[10px] uppercase tracking-wider text-ink-500 font-medium mt-2"
 							>
-								Open tasks
+								{{ __("Open tasks") }}
 							</div>
 						</div>
 						<div>
@@ -215,7 +216,7 @@ function showCount(value, fallback) {
 							<div
 								class="text-[10px] uppercase tracking-wider text-ink-500 font-medium mt-2"
 							>
-								Users
+								{{ __("Users") }}
 							</div>
 						</div>
 						<div>
@@ -247,7 +248,7 @@ function showCount(value, fallback) {
 							<div
 								class="text-[10px] uppercase tracking-wider text-ink-500 font-medium mt-2"
 							>
-								Workspaces
+								{{ __("Workspaces") }}
 							</div>
 						</div>
 					</div>
@@ -281,17 +282,17 @@ function showCount(value, fallback) {
 					</div>
 					<div class="min-w-0">
 						<h2 class="text-base font-semibold text-ink-900 leading-tight">
-							Settings
+							{{ __("Settings") }}
 						</h2>
 						<p class="text-xs text-ink-600 mt-1.5 leading-snug">
-							Manage workspaces, users, project types, and data.
+							{{ __("Manage workspaces, users, project types, and data.") }}
 						</p>
 					</div>
 				</div>
 				<div
 					class="mt-4 inline-flex items-center gap-1.5 bg-brand-600 group-hover:bg-brand-700 text-white text-xs font-medium px-2.5 py-1.5 rounded-md self-start transition-colors"
 				>
-					Open Settings <span aria-hidden="true">→</span>
+					{{ __("Open Settings") }} <span aria-hidden="true">→</span>
 				</div>
 			</RouterLink>
 		</div>
@@ -322,15 +323,15 @@ function showCount(value, fallback) {
 					</svg>
 				</div>
 				<div class="flex-1 min-w-0">
-					<div class="text-sm font-semibold text-ink-900">Pending SCOs</div>
+					<div class="text-sm font-semibold text-ink-900">{{ __("Pending SCOs") }}</div>
 					<div class="text-xs text-ink-500 mt-0.5 truncate">
-						{{ showCount(pendingScosCount, 2) }} awaiting approval
+						{{ __("{0} awaiting approval", [showCount(pendingScosCount, 2)]) }}
 					</div>
 				</div>
 				<div
 					class="text-xs text-brand-700 group-hover:text-brand-800 font-medium flex-shrink-0"
 				>
-					View →
+					{{ __("View") }} →
 				</div>
 			</RouterLink>
 
@@ -357,15 +358,15 @@ function showCount(value, fallback) {
 					</svg>
 				</div>
 				<div class="flex-1 min-w-0">
-					<div class="text-sm font-semibold text-ink-900">Overdue tasks</div>
+					<div class="text-sm font-semibold text-ink-900">{{ __("Overdue tasks") }}</div>
 					<div class="text-xs text-ink-500 mt-0.5 truncate">
-						{{ showCount(overdueTasksCount, 4) }} past their end date
+						{{ __("{0} past their end date", [showCount(overdueTasksCount, 4)]) }}
 					</div>
 				</div>
 				<div
 					class="text-xs text-brand-700 group-hover:text-brand-800 font-medium flex-shrink-0"
 				>
-					View →
+					{{ __("View") }} →
 				</div>
 			</RouterLink>
 
@@ -397,25 +398,25 @@ function showCount(value, fallback) {
 					</svg>
 				</div>
 				<div class="flex-1 min-w-0">
-					<div class="text-sm font-semibold text-ink-900">Progress today</div>
+					<div class="text-sm font-semibold text-ink-900">{{ __("Progress today") }}</div>
 					<div class="text-xs text-ink-500 mt-0.5 truncate">
 						{{
 							progressTodayCount
-								? `${progressTodayCount} entries filed`
-								: "No entries filed yet"
+								? __("{0} entries filed", [progressTodayCount])
+								: __("No entries filed yet")
 						}}
 					</div>
 				</div>
 				<div
 					class="text-xs text-brand-700 group-hover:text-brand-800 font-medium flex-shrink-0"
 				>
-					View →
+					{{ __("View") }} →
 				</div>
 			</RouterLink>
 		</div>
 
 		<div class="mb-6">
-			<h2 class="text-sm font-semibold text-ink-900 mb-3">Quick actions</h2>
+			<h2 class="text-sm font-semibold text-ink-900 mb-3">{{ __("Quick actions") }}</h2>
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
 				<RouterLink
 					v-for="action in quickActions"

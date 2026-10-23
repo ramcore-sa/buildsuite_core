@@ -10,6 +10,7 @@ import CompanySwitcher from "@/components/CompanySwitcher.vue";
 import UserAvatar from "@/components/UserAvatar.vue";
 import { getWorkspaceIconPath } from "@/utils/workspaceIcons";
 import { getDeskUrl, logout, getSessionUser } from "@/utils/session";
+import { __ } from "@/utils/translate";
 
 const route = useRoute();
 const store = useDataStore();
@@ -52,7 +53,7 @@ const profileUser = computed(() => {
 	const u = session.user;
 	return u && u !== "Guest" ? u : getSessionUser();
 });
-const profileName = computed(() => userName(profileUser.value) || profileUser.value || "User");
+const profileName = computed(() => userName(profileUser.value) || profileUser.value || __("User"));
 const profileRole = computed(() => {
 	const persona = session.access?.persona;
 	if (persona) return persona;
@@ -69,48 +70,48 @@ const profileRole = computed(() => {
 // table is the UI-side mapping from slug → presentation.
 const WORKSPACES = {
 	"site-execution": {
-		name: "Site Execution",
+		name: __("Site Execution"),
 		to: "/site-execution",
 		icon: "🏗️",
 		group: "buildsuite",
 	},
-	estimation: { name: "Estimation", to: "/estimation", icon: "📐", group: "buildsuite" },
-	procurement: { name: "Procurement", to: "/procurement", icon: "🛒", group: "buildsuite" },
-	subcontract: { name: "Subcontract", to: "/subcontract", icon: "🤝", group: "buildsuite" },
-	workforce: { name: "Workforce", to: "/workforce", icon: "👷", group: "buildsuite" },
+	estimation: { name: __("Estimation"), to: "/estimation", icon: "📐", group: "buildsuite" },
+	procurement: { name: __("Procurement"), to: "/procurement", icon: "🛒", group: "buildsuite" },
+	subcontract: { name: __("Subcontract"), to: "/subcontract", icon: "🤝", group: "buildsuite" },
+	workforce: { name: __("Workforce"), to: "/workforce", icon: "👷", group: "buildsuite" },
 	// 'scope-change' removed Session 33 — merged into Site Execution. The
 	// /app/scope-change route stays registered as a legacy redirect target but
 	// doesn't appear in the sidebar anymore.
 	"project-finance": {
-		name: "Project Finance",
+		name: __("Project Finance"),
 		to: "/project-finance",
 		icon: "💵",
 		group: "buildsuite",
 	},
-	accounting: { name: "Accounting", to: "/accounting", icon: "📊", group: "erpnext" },
-	buying: { name: "Buying", to: "/buying", icon: "📥", group: "erpnext" },
-	stock: { name: "Stock", to: "/stock", icon: "📦", group: "erpnext" },
-	assets: { name: "Assets", to: "/assets", icon: "🏭", group: "erpnext" },
-	hr: { name: "HR", to: "/hr", icon: "👤", group: "erpnext" },
+	accounting: { name: __("Accounting"), to: "/accounting", icon: "📊", group: "erpnext" },
+	buying: { name: __("Buying"), to: "/buying", icon: "📥", group: "erpnext" },
+	stock: { name: __("Stock"), to: "/stock", icon: "📦", group: "erpnext" },
+	assets: { name: __("Assets"), to: "/assets", icon: "🏭", group: "erpnext" },
+	hr: { name: __("HR"), to: "/hr", icon: "👤", group: "erpnext" },
 };
 
 // Access-level hint pills (CLAUDE.md §12.3). Shown next to a workspace link when
 // the active role has restricted access (anything other than 'full').
 const ACCESS_HINTS = {
-	read: { label: "R", title: "Read-only access" },
-	approve: { label: "A", title: "Approve-only access" },
-	"create-own": { label: "C", title: "Create own work only" },
-	"self-service": { label: "SS", title: "Self-service only" },
-	"team-only": { label: "T", title: "Team-only (direct reports)" },
-	"pay-only": { label: "P", title: "Pay-only view" },
-	"mr-only": { label: "MR", title: "Material-request raise only" },
+	read: { label: "R", title: __("Read-only access") },
+	approve: { label: "A", title: __("Approve-only access") },
+	"create-own": { label: "C", title: __("Create own work only") },
+	"self-service": { label: "SS", title: __("Self-service only") },
+	"team-only": { label: "T", title: __("Team-only (direct reports)") },
+	"pay-only": { label: "P", title: __("Pay-only view") },
+	"mr-only": { label: "MR", title: __("Material-request raise only") },
 };
 
 // Sidebar groups for the active role.
 // Home is synthesized as the first BuildSuite item and Site Execution is pinned
 // second when visible because it is the highest-frequency workspace.
 const navGroups = computed(() => {
-	const HOME_ITEM = { slug: "home", name: "Home", to: "/home", group: "buildsuite", hint: null };
+	const HOME_ITEM = { slug: "home", name: __("Home"), to: "/home", group: "buildsuite", hint: null };
 	const buildsuiteItems = [HOME_ITEM];
 	const erpnextItems = [];
 	const otherBuildsuiteItems = [];
@@ -213,7 +214,7 @@ const navGroups = computed(() => {
 				>
 					<div class="px-3 py-2 border-b border-ink-100">
 						<div class="text-xs font-semibold text-ink-900">BuildSuite</div>
-						<div class="text-[10px] text-brand-700 mt-0.5">Core edition</div>
+						<div class="text-[10px] text-brand-700 mt-0.5">{{ __("Core edition") }}</div>
 					</div>
 					<button
 						type="button"
@@ -233,7 +234,7 @@ const navGroups = computed(() => {
 								d="M4 5a1 1 0 011-1h5a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM13 5a1 1 0 011-1h5a1 1 0 011 1v5a1 1 0 01-1 1h-5a1 1 0 01-1-1V5zM4 14a1 1 0 011-1h5a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1v-5zM13 14a1 1 0 011-1h5a1 1 0 011 1v5a1 1 0 01-1 1h-5a1 1 0 01-1-1v-5z"
 							/>
 						</svg>
-						<span>Go to Desktop</span>
+						<span>{{ __("Go to Desktop") }}</span>
 					</button>
 					<button
 						type="button"
@@ -253,7 +254,7 @@ const navGroups = computed(() => {
 								d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
 							/>
 						</svg>
-						<span>Logout</span>
+						<span>{{ __("Logout") }}</span>
 					</button>
 				</div>
 			</div>
@@ -271,7 +272,7 @@ const navGroups = computed(() => {
 							d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
 						/>
 					</svg>
-					Search or jump to...
+					{{ __("Search or jump to...") }}
 					<span
 						class="ml-auto text-[10px] text-ink-400 font-mono bg-white px-1.5 py-0.5 rounded border border-ink-200"
 						>⌘K</span
@@ -346,13 +347,15 @@ const navGroups = computed(() => {
 				<button
 					type="button"
 					class="w-full flex items-center gap-2 px-2 py-1.5 text-xs text-ink-700 hover:bg-ink-50 rounded"
-					title="Profile"
+					:title="__('Profile')"
 					@click="closeSidebar"
 				>
 					<UserAvatar :user-id="profileUser" size="sm" />
 					<div class="flex-1 min-w-0 text-left">
 						<div class="truncate font-medium text-ink-900">{{ profileName }}</div>
-						<div class="truncate text-[10px] text-ink-500">{{ profileRole }}</div>
+						<!-- profileRole is a persona / role name kept in English for the checks
+							     above; it is translated only here, where it is shown. -->
+						<div class="truncate text-[10px] text-ink-500">{{ __(profileRole) }}</div>
 					</div>
 				</button>
 			</div>
@@ -367,7 +370,7 @@ const navGroups = computed(() => {
 				<button
 					type="button"
 					class="lg:hidden p-1.5 text-ink-600 hover:text-ink-900 hover:bg-ink-50 rounded"
-					aria-label="Open menu"
+					:aria-label="__('Open menu')"
 					@click="sidebarOpen = true"
 				>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -386,13 +389,13 @@ const navGroups = computed(() => {
 						class="text-ink-500 hover:text-ink-900 hover:bg-ink-50 p-1.5 rounded"
 						:aria-label="
 							store.theme === 'dark'
-								? 'Switch to light theme'
-								: 'Switch to dark theme'
+								? __('Switch to light theme')
+								: __('Switch to dark theme')
 						"
 						:title="
 							store.theme === 'dark'
-								? 'Switch to light theme'
-								: 'Switch to dark theme'
+								? __('Switch to light theme')
+								: __('Switch to dark theme')
 						"
 						@click="toggleTheme"
 					>
@@ -456,7 +459,7 @@ const navGroups = computed(() => {
 								? 'text-brand-700 bg-brand-50'
 								: 'text-ink-400 hover:text-ink-700'
 						"
-						title="Settings"
+						:title="__('Settings')"
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
@@ -500,12 +503,12 @@ const navGroups = computed(() => {
 				<div class="p-3 border-b border-ink-200">
 					<input
 						autofocus
-						placeholder="Type to search projects, tasks, work packages..."
+						:placeholder="__('Type to search projects, tasks, work packages...')"
 						class="w-full px-3 py-2 text-sm focus:outline-none"
 					/>
 				</div>
 				<div class="p-3 text-xs text-ink-500">
-					Quick search across all data · ESC to close
+					{{ __("Quick search across all data · ESC to close") }}
 				</div>
 			</div>
 		</div>

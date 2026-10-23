@@ -24,6 +24,7 @@ import DeskActionBar from "@/components/desk/DeskActionBar.vue";
 import DeskSection from "@/components/desk/DeskSection.vue";
 import DeskField from "@/components/desk/DeskField.vue";
 import DeskInput from "@/components/desk/DeskInput.vue";
+import { __ } from "@/utils/translate";
 
 const store = useDataStore();
 
@@ -122,8 +123,8 @@ function toggleRole(target, roleId) {
 
 const breadcrumbs = [
 	{ label: "BuildSuite Core", to: "/" },
-	{ label: "Settings", to: "/settings" },
-	{ label: "Workspace Structure" },
+	{ label: __("Settings"), to: "/settings" },
+	{ label: __("Workspace Structure") },
 ];
 
 const totalShortcuts = computed(() =>
@@ -133,27 +134,29 @@ const totalShortcuts = computed(() =>
 
 <template>
 	<DeskPage
-		title="Workspace Structure"
-		subtitle="Configure workspace shortcut grids"
+		:title="__('Workspace Structure')"
+		:subtitle="__('Configure workspace shortcut grids')"
 		:breadcrumbs="breadcrumbs"
 	>
 		<DeskForm>
 			<template #action-bar>
 				<DeskActionBar
 					v-if="store.isBSA || store.isAdmin"
-					:save-label="editing ? (saving ? 'Saving…' : 'Save') : 'Edit'"
+					:save-label="editing ? (saving ? __('Saving…') : __('Save')) : __('Edit')"
 					:show-cancel="editing"
 					:saving="saving"
-					cancel-label="Cancel"
+					:cancel-label="__('Cancel')"
 					@save="onPrimary"
 					@cancel="cancelEdit"
 				>
 					<template #left>
 						<span class="text-[11px] text-ink-500">
-							{{ form.workspace_definitions.length }} workspace{{
-								form.workspace_definitions.length === 1 ? "" : "s"
+							{{
+								form.workspace_definitions.length === 1
+									? __("1 workspace")
+									: __("{0} workspaces", [form.workspace_definitions.length])
 							}}
-							· {{ totalShortcuts }} shortcuts
+							· {{ __("{0} shortcuts", [totalShortcuts]) }}
 						</span>
 					</template>
 				</DeskActionBar>
@@ -161,7 +164,7 @@ const totalShortcuts = computed(() =>
 					v-else
 					class="px-3 py-2 bg-warning-50 border-b border-warning-100 text-xs text-warning-700"
 				>
-					Read-only. Editing requires the BuildSuite Administrator role.
+					{{ __("Read-only. Editing requires the BuildSuite Administrator role.") }}
 				</div>
 			</template>
 
@@ -171,7 +174,7 @@ const totalShortcuts = computed(() =>
 						? form.workspace_definitions
 						: store.workspaceStructure.workspace_definitions"
 					:key="def.id"
-					:title="def.display_name || 'Untitled workspace'"
+					:title="def.display_name || __('Untitled workspace')"
 				>
 					<div class="md:col-span-2">
 						<!-- Workspace definition meta row -->
@@ -187,7 +190,7 @@ const totalShortcuts = computed(() =>
 								<div
 									class="text-[10px] uppercase tracking-wider text-ink-500 font-medium"
 								>
-									Slug
+									{{ __("Slug") }}
 								</div>
 								<div class="text-xs font-mono text-ink-700">
 									{{ def.workspace_slug }}
@@ -197,7 +200,7 @@ const totalShortcuts = computed(() =>
 								<div
 									class="text-[10px] uppercase tracking-wider text-ink-500 font-medium"
 								>
-									Display name
+									{{ __("Display name") }}
 								</div>
 								<DeskInput
 									v-if="editing"
@@ -212,7 +215,7 @@ const totalShortcuts = computed(() =>
 								<div
 									class="text-[10px] uppercase tracking-wider text-ink-500 font-medium"
 								>
-									Enabled
+									{{ __("Enabled") }}
 								</div>
 								<div v-if="editing" class="py-1">
 									<input
@@ -224,7 +227,7 @@ const totalShortcuts = computed(() =>
 								<div v-else class="text-xs">
 									<span
 										:class="def.enabled ? 'text-success-700' : 'text-ink-500'"
-										>{{ def.enabled ? "On" : "Off" }}</span
+										>{{ def.enabled ? __("On") : __("Off") }}</span
 									>
 								</div>
 							</div>
@@ -232,7 +235,7 @@ const totalShortcuts = computed(() =>
 								<div
 									class="text-[10px] uppercase tracking-wider text-ink-500 font-medium"
 								>
-									Shortcuts
+									{{ __("Shortcuts") }}
 								</div>
 								<div class="text-xs tabular-nums text-ink-700">
 									{{ def.shortcuts?.length || 0 }}
@@ -255,10 +258,10 @@ const totalShortcuts = computed(() =>
 								"
 							>
 								<div v-if="editing"></div>
-								<div class="px-2 py-1.5">Icon</div>
-								<div class="px-2 py-1.5">Label</div>
-								<div class="px-2 py-1.5">Route</div>
-								<div class="px-2 py-1.5">Visible to</div>
+								<div class="px-2 py-1.5">{{ __("Icon") }}</div>
+								<div class="px-2 py-1.5">{{ __("Label") }}</div>
+								<div class="px-2 py-1.5">{{ __("Route") }}</div>
+								<div class="px-2 py-1.5">{{ __("Visible to") }}</div>
 								<div v-if="editing" class="px-2 py-1.5"></div>
 							</div>
 							<div
@@ -283,7 +286,7 @@ const totalShortcuts = computed(() =>
 										:disabled="scIdx === 0"
 										:class="scIdx === 0 ? 'opacity-30 cursor-not-allowed' : ''"
 										@click="moveShortcut(defIdx, scIdx, -1)"
-										title="Move up"
+										:title="__('Move up')"
 									>
 										▲
 									</button>
@@ -298,7 +301,7 @@ const totalShortcuts = computed(() =>
 												: ''
 										"
 										@click="moveShortcut(defIdx, scIdx, +1)"
-										title="Move down"
+										:title="__('Move down')"
 									>
 										▼
 									</button>
@@ -319,7 +322,7 @@ const totalShortcuts = computed(() =>
 									<DeskInput
 										v-if="editing"
 										v-model="sc.label"
-										placeholder="e.g. Projects"
+										:placeholder="__('e.g. Projects')"
 										class="!text-xs"
 									/>
 									<div v-else class="text-sm text-ink-900">{{ sc.label }}</div>
@@ -344,21 +347,28 @@ const totalShortcuts = computed(() =>
 										<span
 											v-if="!sc.visible_to_roles"
 											class="italic text-ink-400"
-											>All roles</span
+											>{{ __("All roles") }}</span
 										>
-										<span v-else
-											>{{ sc.visible_to_roles.length }} of
-											{{ ROLES.length }} roles</span
-										>
+										<span v-else>{{
+											__("{0} of {1} roles", [
+												sc.visible_to_roles.length,
+												ROLES.length,
+											])
+										}}</span>
 									</div>
 									<details v-else class="text-[10px] text-ink-700">
 										<summary class="cursor-pointer hover:text-ink-900">
 											<span v-if="!sc.visible_to_roles" class="italic"
-												>All roles</span
+												>{{ __("All roles") }}</span
 											>
 											<span v-else
-												>{{ sc.visible_to_roles.length }} of
-												{{ ROLES.length }} roles ▾</span
+												>{{
+													__("{0} of {1} roles", [
+														sc.visible_to_roles.length,
+														ROLES.length,
+													])
+												}}
+												▾</span
 											>
 										</summary>
 										<div class="mt-1 grid grid-cols-2 gap-x-2 gap-y-0.5">
@@ -389,7 +399,7 @@ const totalShortcuts = computed(() =>
 										class="text-xs px-1.5 py-0.5 border border-ink-200 bg-white hover:bg-ink-50"
 										style="border-radius: 2px; color: #b91c1c"
 										@click="removeShortcut(defIdx, scIdx)"
-										title="Remove shortcut"
+										:title="__('Remove shortcut')"
 									>
 										✕
 									</button>
@@ -397,7 +407,7 @@ const totalShortcuts = computed(() =>
 							</div>
 						</div>
 						<div v-else class="text-xs text-ink-400 italic py-2">
-							No shortcuts on this workspace yet.
+							{{ __("No shortcuts on this workspace yet.") }}
 						</div>
 
 						<button
@@ -407,7 +417,7 @@ const totalShortcuts = computed(() =>
 							style="border-radius: 2px"
 							@click="addShortcut(defIdx)"
 						>
-							+ Add shortcut
+							{{ __("+ Add shortcut") }}
 						</button>
 					</div>
 				</DeskSection>

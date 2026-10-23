@@ -14,6 +14,7 @@ import DocTypeListView from "@/components/doctype/DocTypeListView.vue";
 import StatusBadge from "@/components/StatusBadge.vue";
 import { usePermissions } from "@/composables/usePermissions";
 import { fmtDate } from "@/utils/format";
+import { __ } from "@/utils/translate";
 
 const store = useDataStore();
 const router = useRouter();
@@ -89,7 +90,7 @@ const dateBaseFilters = computed(() => {
 	return filters;
 });
 
-const breadcrumbs = [{ label: "BuildSuite Core", to: "/" }, { label: "Stage Planning" }];
+const breadcrumbs = [{ label: "BuildSuite Core", to: "/" }, { label: __("Stage Planning") }];
 
 function onRowClick(row) {
 	router.push(`/stage-plannings/${row.name}`);
@@ -97,13 +98,13 @@ function onRowClick(row) {
 </script>
 
 <template>
-	<DeskPage title="Stage Planning" :breadcrumbs="breadcrumbs">
+	<DeskPage :title="__('Stage Planning')" :breadcrumbs="breadcrumbs">
 		<template #actions>
 			<RouterLink
 				v-if="canCreate('stagePlanning')"
 				to="/stage-plannings/new"
 				class="desk-save-btn"
-				>+ New Stage</RouterLink
+				>{{ __("+ New Stage") }}</RouterLink
 			>
 		</template>
 
@@ -113,7 +114,7 @@ function onRowClick(row) {
 			class="px-3 py-2 bg-warning-50 border border-warning-100 text-xs text-warning-700 dark:bg-ink-800 dark:border-ink-700"
 			style="border-radius: 6px"
 		>
-			You don't have access to Stage Planning.
+			{{ __("You don't have access to Stage Planning.") }}
 		</div>
 
 		<DocTypeListView
@@ -130,14 +131,14 @@ function onRowClick(row) {
 				'stage_planning_tasks',
 			]"
 			:columns="[
-				{ key: 'name', label: 'ID' },
-				{ key: 'stage_name', label: 'Stage', fields: ['stage_name', 'description'] },
-				{ key: 'project', label: 'Project' },
-				{ key: 'planned_start', label: 'Planned Start' },
-				{ key: 'planned_end', label: 'Planned End' },
-				{ key: 'planned_task_count', label: 'Tasks', align: 'right' },
-				{ key: 'workflow_state', label: 'State' },
-				{ key: '_status', label: 'Status', fields: ['planned_start', 'planned_end'] },
+				{ key: 'name', label: __('ID') },
+				{ key: 'stage_name', label: __('Stage'), fields: ['stage_name', 'description'] },
+				{ key: 'project', label: __('Project') },
+				{ key: 'planned_start', label: __('Planned Start') },
+				{ key: 'planned_end', label: __('Planned End') },
+				{ key: 'planned_task_count', label: __('Tasks'), align: 'right' },
+				{ key: 'workflow_state', label: __('State') },
+				{ key: '_status', label: __('Status'), fields: ['planned_start', 'planned_end'] },
 			]"
 			:search-fields="['stage_name', 'name', 'description']"
 			:filter-values="filterValues"
@@ -146,7 +147,7 @@ function onRowClick(row) {
 			cache-key="buildsuite-stage-planning-list-generic"
 			row-key="name"
 			initial-order-by="planned_start asc"
-			search-placeholder="Search stages, projects, descriptions…"
+			:search-placeholder="__('Search stages, projects, descriptions…')"
 			@row-click="onRowClick"
 		>
 			<template #filter-chips>
@@ -159,11 +160,11 @@ function onRowClick(row) {
 					value-field="name"
 					:search-fields="['project_name', 'custom_project_id', 'name']"
 					:page-length="10"
-					placeholder="Project: Any"
+					:placeholder="__('Project: Any')"
 				/>
 				<DeskFilterChip
 					v-else
-					label="Project"
+					:label="__('Project')"
 					:value="projectName(projectFilter)"
 					@remove="projectFilter = ''"
 				/>
@@ -174,38 +175,38 @@ function onRowClick(row) {
 					v-model="workflowStateFilter"
 					class="!w-44"
 				>
-					<option value="">State: Any</option>
-					<option>Draft</option>
-					<option>Pending Approval</option>
-					<option>Approved</option>
-					<option>Rejected</option>
-					<option>Cancelled</option>
+					<option value="">{{ __("State: Any") }}</option>
+					<option value="Draft">{{ __("Draft") }}</option>
+					<option value="Pending Approval">{{ __("Pending Approval") }}</option>
+					<option value="Approved">{{ __("Approved") }}</option>
+					<option value="Rejected">{{ __("Rejected") }}</option>
+					<option value="Cancelled">{{ __("Cancelled") }}</option>
 				</DeskSelect>
 				<DeskFilterChip
 					v-else
-					label="State"
-					:value="workflowStateFilter"
+					:label="__('State')"
+					:value="__(workflowStateFilter)"
 					@remove="workflowStateFilter = ''"
 				/>
 
 				<label class="text-[11px] text-ink-500 flex items-center gap-1">
-					From
+					{{ __("From") }}
 					<input v-model="fromDate" type="date" class="desk-input !w-36 !text-xs" />
 				</label>
 				<DeskFilterChip
 					v-if="fromDate"
-					label="From"
+					:label="__('From')"
 					:value="fmtDate(fromDate)"
 					@remove="fromDate = ''"
 				/>
 
 				<label class="text-[11px] text-ink-500 flex items-center gap-1">
-					To
+					{{ __("To") }}
 					<input v-model="toDate" type="date" class="desk-input !w-36 !text-xs" />
 				</label>
 				<DeskFilterChip
 					v-if="toDate"
-					label="To"
+					:label="__('To')"
 					:value="fmtDate(toDate)"
 					@remove="toDate = ''"
 				/>
@@ -222,7 +223,7 @@ function onRowClick(row) {
 			</template>
 			<template #cell-stage_name="{ row }">
 				<div class="text-sm font-medium text-ink-900">
-					{{ row.stage_name || "Untitled stage" }}
+					{{ row.stage_name || __("Untitled stage") }}
 				</div>
 				<div v-if="row.description" class="text-[11px] text-ink-500 truncate max-w-md">
 					{{ row.description }}
@@ -255,18 +256,18 @@ function onRowClick(row) {
 				<span
 					class="text-[10px] px-1.5 py-0.5 font-medium rounded-full"
 					:class="statusClass(stageStatus(row))"
-					>{{ stageStatus(row) }}</span
+					>{{ __(stageStatus(row)) }}</span
 				>
 			</template>
 
 			<template #empty>
 				<div class="text-sm text-ink-500">
-					No stages match these filters ·
+					{{ __("No stages match these filters") }} ·
 					<RouterLink
 						v-if="canCreate('stagePlanning')"
 						to="/stage-plannings/new"
 						class="desk-link"
-						>Plan a stage →</RouterLink
+						>{{ __("Plan a stage →") }}</RouterLink
 					>
 				</div>
 			</template>

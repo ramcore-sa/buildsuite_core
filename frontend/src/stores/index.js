@@ -7,6 +7,7 @@ import { seedData } from "@/data/seed";
 import { ROLES, WORKSPACE_VISIBILITY, WORKSPACE_ORDER } from "@/data/roles";
 import { PROJECT_TYPE_TEMPLATES, templateForType } from "@/data/projectTypeTemplates";
 import { COMPANIES, DEFAULT_COMPANY_ID } from "@/data/companies";
+import { __ } from "@/utils/translate";
 
 const STORAGE_KEY = "buildsuite:data:v1";
 // Role is persisted under its own key so resetAll() (which wipes domain data)
@@ -267,7 +268,7 @@ export const useDataStore = defineStore("data", {
 					? s.coreSettings?.workPackageLabelPlural
 					: s.coreSettings?.workPackageLabel;
 				if (siteV) return siteV;
-				return plural ? "Work Packages" : "Work Package";
+				return plural ? __("Work Packages") : __("Work Package");
 			},
 
 		// ===== Attachments (§13.3 items 13 + 26) =====
@@ -791,7 +792,7 @@ export const useDataStore = defineStore("data", {
 			const nextOrder = existing.reduce((max, s) => Math.max(max, s.sort_order || 0), 0) + 1;
 			const row = {
 				id: uid("WSST"),
-				label: rowData.label || "New shortcut",
+				label: rowData.label || __("New shortcut"),
 				icon: rowData.icon || "🔗",
 				route_path: rowData.route_path || "/",
 				visible_to_roles: rowData.visible_to_roles || null,
@@ -858,7 +859,7 @@ export const useDataStore = defineStore("data", {
 			const company = {
 				id,
 				name: (data.name || "Untitled Company").trim(),
-				shortName: (data.shortName || data.name || "Company").trim(),
+				shortName: (data.shortName || data.name || __("Company")).trim(),
 				description: (data.description || "").trim(),
 				color: data.color || "bg-ink-600",
 			};
@@ -1278,7 +1279,7 @@ export const useDataStore = defineStore("data", {
 			const parentProject = this.projects.find((p) => p.id === data.project);
 			const stage = {
 				id,
-				stageName: data.stageName || "Untitled stage",
+				stageName: data.stageName || __("Untitled stage"),
 				project: data.project,
 				company: parentProject?.company || this.activeCompany,
 				plannedStart: data.plannedStart || "",
@@ -1433,7 +1434,7 @@ export const useDataStore = defineStore("data", {
 				this.projectTypes.reduce((max, pt) => Math.max(max, pt.sort_order || 0), 0) + 1;
 			const record = {
 				id,
-				name: data.name || "New type",
+				name: data.name || __("New type"),
 				workPackageLabel: data.workPackageLabel || "",
 				workPackageLabelPlural: data.workPackageLabelPlural || "",
 				defaultTemplate: data.defaultTemplate || data.name || "",
@@ -1782,7 +1783,7 @@ export const useDataStore = defineStore("data", {
 				baseRevisionId: data.baseRevisionId || null,
 				status: data.status || "Draft",
 				sourceScoId: data.sourceScoId || null,
-				title: data.title || `BOQ Revision ${data.revision || 1}`,
+				title: data.title || __("BOQ Revision {0}", [data.revision || 1]),
 				preparedBy: data.preparedBy || this.user?.id,
 				preparedDate: new Date().toISOString().slice(0, 10),
 				approvedBy: null,
@@ -1955,7 +1956,9 @@ export const useDataStore = defineStore("data", {
 				sourceScoId: opts.sourceScoId || null,
 				title:
 					opts.title ||
-					`Revision ${nextRev}${opts.sourceScoId ? ` (from ${opts.sourceScoId})` : ""}`,
+					(opts.sourceScoId
+						? __("Revision {0} (from {1})", [nextRev, opts.sourceScoId])
+						: __("Revision {0}", [nextRev])),
 			});
 
 			// Clone groups

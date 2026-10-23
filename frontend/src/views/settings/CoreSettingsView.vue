@@ -15,6 +15,7 @@ import DeskActionBar from "@/components/desk/DeskActionBar.vue";
 import DeskSection from "@/components/desk/DeskSection.vue";
 import DeskField from "@/components/desk/DeskField.vue";
 import DeskSelect from "@/components/desk/DeskSelect.vue";
+import { __ } from "@/utils/translate";
 
 const router = useRouter();
 const store = useDataStore();
@@ -52,27 +53,32 @@ function onPrimary() {
 
 const breadcrumbs = [
 	{ label: "BuildSuite Core", to: "/" },
-	{ label: "Settings", to: "/settings" },
-	{ label: "BuildSuite Core Settings" },
+	{ label: __("Settings"), to: "/settings" },
+	{ label: __("BuildSuite Core Settings") },
 ];
+
+// Kept in script: the apostrophe cannot sit inside a quoted template attribute.
+const defaultCompanyHint = __(
+	"The company pre-selected on Project create when the user doesn't pick one explicitly. Must exist in the Companies fixture."
+);
 
 const PROJECT_TYPES = ["Commercial", "Residential", "Infrastructure", "Industrial", "Renovation"];
 </script>
 
 <template>
 	<DeskPage
-		title="BuildSuite Core Settings"
-		subtitle="Org-wide BuildSuite toggles"
+		:title="__('BuildSuite Core Settings')"
+		:subtitle="__('Org-wide BuildSuite toggles')"
 		:breadcrumbs="breadcrumbs"
 	>
 		<DeskForm>
 			<template #action-bar>
 				<DeskActionBar
 					v-if="store.isAdmin"
-					:save-label="editing ? (saving ? 'Saving…' : 'Save') : 'Edit'"
+					:save-label="editing ? (saving ? __('Saving…') : __('Save')) : __('Edit')"
 					:show-cancel="editing"
 					:saving="saving"
-					cancel-label="Cancel"
+					:cancel-label="__('Cancel')"
 					@save="onPrimary"
 					@cancel="cancelEdit"
 				/>
@@ -80,21 +86,25 @@ const PROJECT_TYPES = ["Commercial", "Residential", "Infrastructure", "Industria
 					v-else
 					class="px-3 py-2 bg-warning-50 border-b border-warning-100 text-xs text-warning-700"
 				>
-					Read-only. Editing requires Admin or BuildSuite Administrator role.
+					{{ __("Read-only. Editing requires Admin or BuildSuite Administrator role.") }}
 				</div>
 			</template>
 
 			<div class="max-w-3xl mx-auto">
-				<DeskSection title="Multi-company">
+				<DeskSection :title="__('Multi-company')">
 					<DeskField
-						label="Enable company segregation"
-						hint="Master switch for multi-company segregation. Off → single-company UX (switcher and column auto-hide). On → multi-company users see segregation controls."
+						:label="__('Enable company segregation')"
+						:hint="
+							__(
+								'Master switch for multi-company segregation. Off → single-company UX (switcher and column auto-hide). On → multi-company users see segregation controls.'
+							)
+						"
 					>
 						<div v-if="!editing" class="text-sm text-ink-900 py-1">
 							{{
 								store.coreSettings.enable_company_segregation
-									? "Enabled"
-									: "Disabled"
+									? __("Enabled")
+									: __("Disabled")
 							}}
 						</div>
 						<label v-else class="flex items-center gap-2 py-1 text-sm cursor-pointer">
@@ -104,13 +114,13 @@ const PROJECT_TYPES = ["Commercial", "Residential", "Infrastructure", "Industria
 								class="accent-brand-600"
 							/>
 							<span>{{
-								form.enable_company_segregation ? "Enabled" : "Disabled"
+								form.enable_company_segregation ? __("Enabled") : __("Disabled")
 							}}</span>
 						</label>
 					</DeskField>
 					<DeskField
-						label="Default company"
-						hint="The company pre-selected on Project create when the user doesn't pick one explicitly. Must exist in the Companies fixture."
+						:label="__('Default company')"
+						:hint="defaultCompanyHint"
 					>
 						<div v-if="!editing" class="text-sm text-ink-900 py-1">
 							{{
@@ -126,16 +136,16 @@ const PROJECT_TYPES = ["Commercial", "Residential", "Infrastructure", "Industria
 					</DeskField>
 				</DeskSection>
 
-				<DeskSection title="Project defaults">
+				<DeskSection :title="__('Project defaults')">
 					<DeskField
-						label="Default project type"
-						hint="Pre-fills the Project type field on new projects."
+						:label="__('Default project type')"
+						:hint="__('Pre-fills the Project type field on new projects.')"
 					>
 						<div v-if="!editing" class="text-sm text-ink-900 py-1">
-							{{ store.coreSettings.default_project_type }}
+							{{ __(store.coreSettings.default_project_type) }}
 						</div>
 						<DeskSelect v-else v-model="form.default_project_type">
-							<option v-for="t in PROJECT_TYPES" :key="t">{{ t }}</option>
+							<option v-for="t in PROJECT_TYPES" :key="t" :value="t">{{ __(t) }}</option>
 						</DeskSelect>
 					</DeskField>
 				</DeskSection>

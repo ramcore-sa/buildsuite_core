@@ -29,7 +29,7 @@ defineEmits(["remove"]);
 			type="button"
 			class="text-brand-700 hover:text-brand-800 leading-none"
 			style="font-size: 14px"
-			aria-label="Remove filter"
+			:aria-label="__('Remove filter')"
 			@click="$emit('remove')"
 		>
 			×

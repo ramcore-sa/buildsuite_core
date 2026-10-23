@@ -11,12 +11,13 @@
 // promise as false.
 
 import { reactive } from "vue";
+import { __ } from "@/utils/translate";
 
 const state = reactive({
 	open: false,
-	title: "Are you sure?",
+	title: __("Are you sure?"),
 	message: "",
-	confirmLabel: "Confirm",
+	confirmLabel: __("Confirm"),
 	destructive: false,
 });
 
@@ -49,9 +50,9 @@ export function useConfirmState() {
 export function useConfirm() {
 	return function confirm(opts = {}) {
 		settle(false); // resolve any previous pending dialog as cancelled
-		state.title = opts.title || "Are you sure?";
+		state.title = opts.title || __("Are you sure?");
 		state.message = opts.message || "";
-		state.confirmLabel = opts.confirmLabel || "Confirm";
+		state.confirmLabel = opts.confirmLabel || __("Confirm");
 		state.destructive = !!opts.destructive;
 		state.open = true;
 		return new Promise((resolve) => {

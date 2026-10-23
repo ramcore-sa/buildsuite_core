@@ -10,6 +10,7 @@ import { WORKSPACE_META } from "@/data/workspaces";
 import LogoIcon from "@/components/LogoIcon.vue";
 import RoleSwitcher from "@/components/RoleSwitcher.vue";
 import { getWorkspaceIconPath } from "@/utils/workspaceIcons";
+import { __ } from "@/utils/translate";
 
 const store = useDataStore();
 const router = useRouter();
@@ -48,7 +49,7 @@ const tiles = computed(() => {
 	if (store.isAdmin) {
 		out.push({
 			key: "settings",
-			label: "Settings",
+			label: __("Settings"),
 			to: "/settings",
 			style: TILE_STYLE.settings,
 			isLogo: false,
@@ -68,7 +69,7 @@ function onSearchSubmit() {
 <template>
 	<div class="min-h-screen bg-white flex flex-col">
 		<header class="h-14 border-b border-ink-200 px-4 sm:px-6 flex items-center gap-3 sm:gap-4">
-			<RouterLink to="/" class="flex items-center flex-shrink-0" title="Home">
+			<RouterLink to="/" class="flex items-center flex-shrink-0" :title="__('Home')">
 				<LogoIcon :size="28" />
 			</RouterLink>
 
@@ -92,7 +93,7 @@ function onSearchSubmit() {
 					<input
 						v-model="search"
 						type="text"
-						placeholder="Search"
+						:placeholder="__('Search')"
 						class="w-full bg-ink-50 border border-transparent hover:bg-ink-100 focus:bg-white focus:border-ink-200 text-sm text-ink-700 placeholder:text-ink-400 transition-colors"
 						style="border-radius: 8px; padding: 8px 60px 8px 36px"
 						@keyup.enter="onSearchSubmit"
@@ -108,8 +109,8 @@ function onSearchSubmit() {
 				<button
 					type="button"
 					class="text-ink-400 hover:text-ink-700 hover:bg-ink-50 p-1.5 rounded"
-					aria-label="Notifications"
-					title="Notifications"
+					:aria-label="__('Notifications')"
+					:title="__('Notifications')"
 				>
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path

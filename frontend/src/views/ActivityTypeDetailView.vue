@@ -19,6 +19,7 @@ import DeskInput from "@/components/desk/DeskInput.vue";
 import DeskSelect from "@/components/desk/DeskSelect.vue";
 import DeskTextarea from "@/components/desk/DeskTextarea.vue";
 import DeskLink from "@/components/desk/DeskLink.vue";
+import { __ } from "@/utils/translate";
 
 const props = defineProps({ id: String });
 const router = useRouter();
@@ -92,9 +93,12 @@ function onSkilledChange() {
 
 async function deleteActivityType() {
 	const ok = await confirmDialog({
-		title: "Delete Activity Type",
-		message: `Delete Activity Type "${activityType.value.name}"?\n\nTasks that reference it will keep the link as a dangling reference (treated as no-link by the UI).`,
-		confirmLabel: "Delete",
+		title: __("Delete Activity Type"),
+		message: __(
+			"Delete Activity Type “{0}”?\n\nTasks that reference it will keep the link as a dangling reference (treated as no-link by the UI).",
+			[activityType.value.name]
+		),
+		confirmLabel: __("Delete"),
 		destructive: true,
 	});
 	if (!ok) return;
@@ -108,7 +112,7 @@ const linkedTaskCount = computed(
 
 const breadcrumbs = computed(() => [
 	{ label: "BuildSuite Core", to: "/" },
-	{ label: "Activity Type", to: "/activity-types" },
+	{ label: __("Activity Type"), to: "/activity-types" },
 ]);
 
 function pct(n) {
@@ -120,21 +124,25 @@ function pct(n) {
 	<DeskPage
 		v-if="activityType"
 		:title="activityType.name"
-		:subtitle="`${activityType.id} · ${activityType.category}`"
+		:subtitle="`${activityType.id} · ${__(activityType.category)}`"
 		:breadcrumbs="breadcrumbs"
 	>
 		<DeskForm>
 			<template #action-bar>
 				<DeskActionBar
-					:save-label="editing ? 'Save' : 'Edit'"
+					:save-label="editing ? __('Save') : __('Edit')"
 					:show-cancel="editing"
-					cancel-label="Cancel"
+					:cancel-label="__('Cancel')"
 					@save="onPrimary"
 					@cancel="cancelEdit"
 				>
 					<template #left>
 						<span v-if="linkedTaskCount" class="text-[11px] text-ink-500">
-							{{ linkedTaskCount }} task{{ linkedTaskCount === 1 ? "" : "s" }} linked
+							{{
+								linkedTaskCount === 1
+									? __("1 task linked")
+									: __("{0} tasks linked", [linkedTaskCount])
+							}}
 						</span>
 					</template>
 					<template #menu>
@@ -144,61 +152,61 @@ function pct(n) {
 							style="border-radius: 2px; color: #b91c1c"
 							@click="deleteActivityType"
 						>
-							Delete
+							{{ __("Delete") }}
 						</button>
 					</template>
 				</DeskActionBar>
 			</template>
 
 			<!-- Basic -->
-			<DeskSection title="Basic" v-if="!editing">
-				<DeskField label="Name">
+			<DeskSection :title="__('Basic')" v-if="!editing">
+				<DeskField :label="__('Name')">
 					<div class="text-sm text-ink-900 py-1">{{ activityType.name }}</div>
 				</DeskField>
-				<DeskField label="Category">
-					<div class="text-sm text-ink-900 py-1">{{ activityType.category }}</div>
+				<DeskField :label="__('Category')">
+					<div class="text-sm text-ink-900 py-1">{{ __(activityType.category) }}</div>
 				</DeskField>
-				<DeskField label="Description">
+				<DeskField :label="__('Description')">
 					<div class="text-sm text-ink-700 py-1 whitespace-pre-line">
 						{{ activityType.description || "—" }}
 					</div>
 				</DeskField>
 			</DeskSection>
-			<DeskSection title="Basic" v-else>
-				<DeskField label="Name" required>
+			<DeskSection :title="__('Basic')" v-else>
+				<DeskField :label="__('Name')" required>
 					<DeskInput v-model="form.name" />
 				</DeskField>
-				<DeskField label="Category" required>
+				<DeskField :label="__('Category')" required>
 					<DeskSelect v-model="form.category">
-						<option v-for="c in CATEGORIES" :key="c">{{ c }}</option>
+						<option v-for="c in CATEGORIES" :key="c" :value="c">{{ __(c) }}</option>
 					</DeskSelect>
 				</DeskField>
-				<DeskField label="Description">
+				<DeskField :label="__('Description')">
 					<DeskTextarea v-model="form.description" :rows="3" />
 				</DeskField>
 			</DeskSection>
 
 			<!-- Default labour mix -->
-			<DeskSection title="Default labour mix" v-if="!editing" :cols="2">
+			<DeskSection :title="__('Default labour mix')" v-if="!editing" :cols="2">
 				<DeskField
-					label="Skilled ratio"
-					hint="Of every man-day, this fraction is skilled labour."
+					:label="__('Skilled ratio')"
+					:hint="__('Of every man-day, this fraction is skilled labour.')"
 				>
 					<div class="text-sm text-ink-900 py-1 tabular-nums">
 						{{ pct(activityType.defaultSkilledRatio) }}%
 					</div>
 				</DeskField>
-				<DeskField label="Unskilled ratio" hint="Auto-computed as 100 − skilled.">
+				<DeskField :label="__('Unskilled ratio')" :hint="__('Auto-computed as 100 − skilled.')">
 					<div class="text-sm text-ink-500 py-1 tabular-nums">
 						{{ pct(activityType.defaultUnskilledRatio) }}%
 					</div>
 				</DeskField>
 			</DeskSection>
-			<DeskSection title="Default labour mix" v-else :cols="2">
+			<DeskSection :title="__('Default labour mix')" v-else :cols="2">
 				<DeskField
-					label="Skilled ratio (0–1)"
+					:label="__('Skilled ratio (0–1)')"
 					required
-					hint="0.3 = 30% skilled. Unskilled auto-fills."
+					:hint="__('0.3 = 30% skilled. Unskilled auto-fills.')"
 				>
 					<DeskInput
 						v-model="form.defaultSkilledRatio"
@@ -210,29 +218,29 @@ function pct(n) {
 						@blur="onSkilledChange"
 					/>
 				</DeskField>
-				<DeskField label="Unskilled ratio" hint="Read-only · auto-computed.">
+				<DeskField :label="__('Unskilled ratio')" :hint="__('Read-only · auto-computed.')">
 					<DeskInput :model-value="form.defaultUnskilledRatio" disabled />
 				</DeskField>
 			</DeskSection>
 
 			<!-- Default productivity -->
-			<DeskSection title="Default productivity" v-if="!editing" :cols="2">
-				<DeskField label="Per man-day">
+			<DeskSection :title="__('Default productivity')" v-if="!editing" :cols="2">
+				<DeskField :label="__('Per man-day')">
 					<div class="text-sm text-ink-900 py-1 tabular-nums">
 						{{ activityType.expectedProductivityPerManDay }}
 						{{ activityType.productivityUnit }}
 					</div>
 				</DeskField>
-				<DeskField label="Unit">
+				<DeskField :label="__('Unit')">
 					<div class="text-sm text-ink-700 py-1">
 						{{ activityType.productivityUnit || "—" }}
 					</div>
 				</DeskField>
 			</DeskSection>
-			<DeskSection title="Default productivity" v-else :cols="2">
+			<DeskSection :title="__('Default productivity')" v-else :cols="2">
 				<DeskField
-					label="Expected per man-day"
-					hint="Quantity one worker is expected to complete in one day."
+					:label="__('Expected per man-day')"
+					:hint="__('Quantity one worker is expected to complete in one day.')"
 				>
 					<DeskInput
 						v-model="form.expectedProductivityPerManDay"
@@ -241,13 +249,13 @@ function pct(n) {
 						min="0"
 					/>
 				</DeskField>
-				<DeskField label="Productivity unit" hint="e.g. m³, m², ton, m, nos">
+				<DeskField :label="__('Productivity unit')" :hint="__('e.g. m³, m², ton, m, nos')">
 					<DeskInput v-model="form.productivityUnit" placeholder="m³" />
 				</DeskField>
 			</DeskSection>
 
 			<!-- Default checklist -->
-			<DeskSection title="Default checklist">
+			<DeskSection :title="__('Default checklist')">
 				<div class="md:col-span-2">
 					<div v-if="!editing">
 						<ol
@@ -269,7 +277,7 @@ function pct(n) {
 							</li>
 						</ol>
 						<div v-else class="text-xs text-ink-400 italic">
-							No checklist items defined.
+							{{ __("No checklist items defined.") }}
 						</div>
 					</div>
 					<div v-else>
@@ -284,7 +292,7 @@ function pct(n) {
 								>
 								<DeskInput
 									v-model="c.item"
-									placeholder="Checklist item…"
+									:placeholder="__('Checklist item…')"
 									class="flex-1"
 								/>
 								<button
@@ -292,7 +300,7 @@ function pct(n) {
 									class="text-xs px-2 py-1 border border-ink-200 bg-white hover:bg-ink-50"
 									style="border-radius: 2px; color: #b91c1c"
 									@click="removeChecklistRow(i)"
-									title="Remove row"
+									:title="__('Remove row')"
 								>
 									✕
 								</button>
@@ -304,14 +312,14 @@ function pct(n) {
 							style="border-radius: 2px"
 							@click="addChecklistRow"
 						>
-							+ Add row
+							{{ __("+ Add row") }}
 						</button>
 					</div>
 				</div>
 			</DeskSection>
 
 			<!-- Applicable project types -->
-			<DeskSection title="Applicable project types">
+			<DeskSection :title="__('Applicable project types')">
 				<div class="md:col-span-2">
 					<div v-if="!editing" class="flex flex-wrap gap-1.5">
 						<span
@@ -319,7 +327,7 @@ function pct(n) {
 							:key="t"
 							class="text-[11px] px-2 py-0.5 bg-brand-50 text-brand-700 font-medium"
 							style="border-radius: 2px"
-							>{{ t }}</span
+							>{{ __(t) }}</span
 						>
 						<span
 							v-if="
@@ -329,7 +337,7 @@ function pct(n) {
 								)
 							"
 							class="text-xs text-ink-400 italic"
-							>Universal · applies to all project types</span
+							>{{ __("Universal · applies to all project types") }}</span
 						>
 					</div>
 					<div v-else>
@@ -346,12 +354,15 @@ function pct(n) {
 									class="accent-brand-600"
 									@change="toggleProjectType(t)"
 								/>
-								{{ t }}
+								{{ __(t) }}
 							</label>
 						</div>
 						<div class="text-[11px] text-ink-500 mt-1.5">
-							Leave all unchecked to mark as universal (applies to every project
-							type).
+							{{
+								__(
+									"Leave all unchecked to mark as universal (applies to every project type)."
+								)
+							}}
 						</div>
 					</div>
 				</div>
@@ -363,7 +374,7 @@ function pct(n) {
 					<div class="flex items-center gap-1.5">
 						<span>🔗</span>
 						<span
-							>Linked tasks —
+							>{{ __("Linked tasks") }} —
 							<span class="font-medium text-ink-700">{{
 								linkedTaskCount
 							}}</span></span
@@ -371,8 +382,8 @@ function pct(n) {
 					</div>
 					<div class="flex items-center gap-1.5">
 						<span>💬</span>
-						<span>Comments — <span class="font-medium text-ink-700">0</span></span>
-						<span class="text-ink-400 italic ml-1">stub</span>
+						<span>{{ __("Comments") }} — <span class="font-medium text-ink-700">0</span></span>
+						<span class="text-ink-400 italic ml-1">{{ __("stub") }}</span>
 					</div>
 				</div>
 			</section>
@@ -380,7 +391,9 @@ function pct(n) {
 	</DeskPage>
 
 	<div v-else class="px-6 py-20 text-center text-sm text-ink-400">
-		Activity Type not found ·
-		<RouterLink to="/activity-types" class="desk-link">Back to list →</RouterLink>
+		{{ __("Activity Type not found") }} ·
+		<RouterLink to="/activity-types" class="desk-link">{{
+			__("Back to list →")
+		}}</RouterLink>
 	</div>
 </template>

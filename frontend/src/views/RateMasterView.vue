@@ -15,6 +15,7 @@ import DeskField from "@/components/desk/DeskField.vue";
 import DeskLink from "@/components/desk/DeskLink.vue";
 import DeskFilterChip from "@/components/desk/DeskFilterChip.vue";
 import { fmtINR, fmtDate } from "@/utils/format";
+import { __ } from "@/utils/translate";
 
 const store = useDataStore();
 
@@ -59,7 +60,7 @@ function cancel() {
 }
 function save() {
 	if (!form.value.code || !form.value.description || !form.value.unit) {
-		alert("Code, description, and unit are required.");
+		alert(__("Code, description, and unit are required."));
 		return;
 	}
 	if (editing.value === "new") store.addRate(form.value);
@@ -69,9 +70,9 @@ function save() {
 const confirmDialog = useConfirm();
 async function remove(r) {
 	const ok = await confirmDialog({
-		title: "Delete rate",
-		message: `Delete rate ${r.code}? This will also delete its history entries.`,
-		confirmLabel: "Delete",
+		title: __("Delete rate"),
+		message: __("Delete rate {0}? This will also delete its history entries.", [r.code]),
+		confirmLabel: __("Delete"),
 		destructive: true,
 	});
 	if (!ok) return;
@@ -141,23 +142,23 @@ function categoryColor(c) {
 }
 
 const columns = [
-	{ key: "code", label: "Code" },
-	{ key: "description", label: "Description" },
-	{ key: "category", label: "Category" },
-	{ key: "unit", label: "UOM" },
-	{ key: "currentRate", label: "Current Rate", align: "right" },
-	{ key: "trend", label: "Trend", align: "center" },
-	{ key: "updatedAt", label: "Last Updated" },
+	{ key: "code", label: __("Code") },
+	{ key: "description", label: __("Description") },
+	{ key: "category", label: __("Category") },
+	{ key: "unit", label: __("UOM") },
+	{ key: "currentRate", label: __("Current Rate"), align: "right" },
+	{ key: "trend", label: __("Trend"), align: "center" },
+	{ key: "updatedAt", label: __("Last Updated") },
 ];
 
 const breadcrumbs = [
 	{ label: "BuildSuite Core", to: "/" },
-	{ label: "Estimation", to: "/estimation" },
-	{ label: "Rate Master" },
+	{ label: __("Estimation"), to: "/estimation" },
+	{ label: __("Rate Master") },
 ];
 
 const subtitle = computed(
-	() => `${rows.value.length} of ${store.rateMaster.length} · M3 · QS price book`
+	() => __("{0} of {1} · M3 · QS price book", [rows.value.length, store.rateMaster.length])
 );
 
 function onRowClick(row) {
@@ -166,34 +167,34 @@ function onRowClick(row) {
 </script>
 
 <template>
-	<DeskPage title="Construction Rate Master" :subtitle="subtitle" :breadcrumbs="breadcrumbs">
+	<DeskPage :title="__('Construction Rate Master')" :subtitle="subtitle" :breadcrumbs="breadcrumbs">
 		<template #actions>
-			<button type="button" class="desk-save-btn" @click="startAdd">+ New rate</button>
+			<button type="button" class="desk-save-btn" @click="startAdd">{{ __("+ New rate") }}</button>
 		</template>
 
 		<!-- KPI strip — Desk density -->
 		<div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
 			<div class="bg-white border border-ink-200 px-3 py-2" style="border-radius: 2px">
 				<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-					Total rates
+					{{ __("Total rates") }}
 				</div>
 				<div class="text-base font-semibold text-ink-900 mt-0.5">{{ kpis.total }}</div>
 			</div>
 			<div class="bg-white border border-ink-200 px-3 py-2" style="border-radius: 2px">
 				<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-					Materials
+					{{ __("Materials") }}
 				</div>
 				<div class="text-base font-semibold text-blue-700 mt-0.5">{{ kpis.Material }}</div>
 			</div>
 			<div class="bg-white border border-ink-200 px-3 py-2" style="border-radius: 2px">
 				<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-					Labour
+					{{ __("Labour") }}
 				</div>
 				<div class="text-base font-semibold text-amber-700 mt-0.5">{{ kpis.Labour }}</div>
 			</div>
 			<div class="bg-white border border-ink-200 px-3 py-2" style="border-radius: 2px">
 				<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-					Equipment
+					{{ __("Equipment") }}
 				</div>
 				<div class="text-base font-semibold text-violet-700 mt-0.5">
 					{{ kpis.Equipment }}
@@ -201,13 +202,13 @@ function onRowClick(row) {
 			</div>
 			<div class="bg-white border border-ink-200 px-3 py-2" style="border-radius: 2px">
 				<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-					From POs
+					{{ __("From POs") }}
 				</div>
 				<div class="text-base font-semibold text-success-700 mt-0.5">
 					{{ kpis.fromPo }}
 				</div>
 				<div class="text-[10px] text-ink-500 mt-0.5">
-					last update {{ fmtDate(kpis.lastUpdate) }}
+					{{ __("last update {0}", [fmtDate(kpis.lastUpdate)]) }}
 				</div>
 			</div>
 		</div>
@@ -217,20 +218,20 @@ function onRowClick(row) {
 			:rows="rows"
 			:columns="columns"
 			row-key="id"
-			search-placeholder="Search code or description…"
+			:search-placeholder="__('Search code or description…')"
 			@row-click="onRowClick"
 		>
 			<template #filter-chips>
 				<DeskSelect v-if="!categoryFilter" v-model="categoryFilter" class="!w-40">
-					<option value="">Category: Any</option>
-					<option>Material</option>
-					<option>Labour</option>
-					<option>Equipment</option>
+					<option value="">{{ __("Category: Any") }}</option>
+					<option value="Material">{{ __("Material") }}</option>
+					<option value="Labour">{{ __("Labour") }}</option>
+					<option value="Equipment">{{ __("Equipment") }}</option>
 				</DeskSelect>
 				<DeskFilterChip
 					v-else
-					label="Category"
-					:value="categoryFilter"
+					:label="__('Category')"
+					:value="__(categoryFilter)"
 					@remove="categoryFilter = ''"
 				/>
 			</template>
@@ -247,7 +248,7 @@ function onRowClick(row) {
 				<span
 					:class="['text-[10px] px-1.5 py-0.5 font-medium', categoryColor(row.category)]"
 					style="border-radius: 2px"
-					>{{ row.category }}</span
+					>{{ __(row.category) }}</span
 				>
 			</template>
 			<template #cell-unit="{ row }">
@@ -304,7 +305,7 @@ function onRowClick(row) {
 			</template>
 
 			<template #empty>
-				<div class="text-sm text-ink-500">No rates match your filters.</div>
+				<div class="text-sm text-ink-500">{{ __("No rates match your filters.") }}</div>
 			</template>
 		</DeskList>
 
@@ -321,49 +322,49 @@ function onRowClick(row) {
 			>
 				<div class="px-4 py-3 border-b border-ink-200 flex items-center">
 					<h2 class="text-sm font-semibold text-ink-900">
-						{{ editing === "new" ? "New rate" : `Edit rate · ${editing.code}` }}
+						{{ editing === "new" ? __("New rate") : __("Edit rate · {0}", [editing.code]) }}
 					</h2>
 					<button
 						type="button"
 						@click="cancel"
 						class="ml-auto text-ink-400 hover:text-ink-900"
-						aria-label="Close"
+						:aria-label="__('Close')"
 					>
 						✕
 					</button>
 				</div>
 				<div class="p-4 space-y-3">
 					<div class="grid grid-cols-2 gap-3">
-						<DeskField label="Code" required>
+						<DeskField :label="__('Code')" required>
 							<DeskInput v-model="form.code" placeholder="e.g. CEM-OPC53" />
 						</DeskField>
-						<DeskField label="Category">
+						<DeskField :label="__('Category')">
 							<DeskSelect v-model="form.category">
-								<option>Material</option>
-								<option>Labour</option>
-								<option>Equipment</option>
+								<option value="Material">{{ __("Material") }}</option>
+								<option value="Labour">{{ __("Labour") }}</option>
+								<option value="Equipment">{{ __("Equipment") }}</option>
 							</DeskSelect>
 						</DeskField>
 					</div>
-					<DeskField label="Description" required>
+					<DeskField :label="__('Description')" required>
 						<DeskInput
 							v-model="form.description"
-							placeholder="Cement — OPC 53 Grade"
+							:placeholder="__('Cement — OPC 53 Grade')"
 						/>
 					</DeskField>
 					<div class="grid grid-cols-2 gap-3">
-						<DeskField label="Unit" required>
-							<DeskInput v-model="form.unit" placeholder="bag, m³, kg, day…" />
+						<DeskField :label="__('Unit')" required>
+							<DeskInput v-model="form.unit" :placeholder="__('bag, m³, kg, day…')" />
 						</DeskField>
-						<DeskField label="Current rate (₹)">
+						<DeskField :label="__('Current rate (₹)')">
 							<DeskInput v-model.number="form.currentRate" type="number" />
 						</DeskField>
 					</div>
 					<DeskField
-						label="Source"
-						hint="Updating rate auto-archives the previous value to history."
+						:label="__('Source')"
+						:hint="__('Updating rate auto-archives the previous value to history.')"
 					>
-						<DeskInput v-model="form.source" placeholder="Manual or PO-2026-xxxx" />
+						<DeskInput v-model="form.source" :placeholder="__('Manual or PO-2026-xxxx')" />
 					</DeskField>
 				</div>
 				<div class="px-4 py-2 border-t border-ink-200 flex items-center justify-end gap-2">
@@ -372,10 +373,10 @@ function onRowClick(row) {
 						@click="cancel"
 						class="text-xs text-ink-600 hover:text-ink-900 px-2 py-1"
 					>
-						Cancel
+						{{ __("Cancel") }}
 					</button>
 					<button type="button" @click="save" class="desk-save-btn">
-						{{ editing === "new" ? "Create rate" : "Save changes" }}
+						{{ editing === "new" ? __("Create rate") : __("Save changes") }}
 					</button>
 				</div>
 			</div>
@@ -400,13 +401,13 @@ function onRowClick(row) {
 								categoryColor(drawer.category),
 							]"
 							style="border-radius: 2px"
-							>{{ drawer.category }}</span
+							>{{ __(drawer.category) }}</span
 						>
 						<button
 							type="button"
 							@click="drawer = null"
 							class="ml-auto text-ink-400 hover:text-ink-900"
-							aria-label="Close"
+							:aria-label="__('Close')"
 						>
 							✕
 						</button>
@@ -416,7 +417,7 @@ function onRowClick(row) {
 						<span class="text-xl font-semibold text-ink-900 tabular-nums">{{
 							fmtINR(drawer.currentRate)
 						}}</span>
-						<span class="text-xs text-ink-500">per {{ drawer.unit }}</span>
+						<span class="text-xs text-ink-500">{{ __("per {0}", [drawer.unit]) }}</span>
 					</div>
 				</div>
 
@@ -424,16 +425,16 @@ function onRowClick(row) {
 					<div
 						class="px-4 pt-3 pb-1 text-[10px] uppercase tracking-wider text-ink-500 font-semibold"
 					>
-						Rate history
+						{{ __("Rate history") }}
 					</div>
 					<table class="w-full text-xs">
 						<thead>
 							<tr
 								class="bg-ink-50 border-b border-ink-200 text-[10px] uppercase tracking-wider text-ink-500"
 							>
-								<th class="px-3 py-1.5 text-right font-semibold">Rate</th>
-								<th class="px-3 py-1.5 text-left font-semibold">Effective</th>
-								<th class="px-3 py-1.5 text-left font-semibold">Source</th>
+								<th class="px-3 py-1.5 text-right font-semibold">{{ __("Rate") }}</th>
+								<th class="px-3 py-1.5 text-left font-semibold">{{ __("Effective") }}</th>
+								<th class="px-3 py-1.5 text-left font-semibold">{{ __("Source") }}</th>
 								<th class="px-3 py-1.5"></th>
 							</tr>
 						</thead>
@@ -453,7 +454,7 @@ function onRowClick(row) {
 								</td>
 								<td class="px-3 py-1.5">
 									<span v-if="h.source === 'Manual'" class="text-ink-500"
-										>Manual</span
+										>{{ __("Manual") }}</span
 									>
 									<span v-else class="font-mono text-[#16A34A]">{{
 										h.source
@@ -468,7 +469,7 @@ function onRowClick(row) {
 									colspan="4"
 									class="px-4 py-6 text-center text-xs text-ink-400 italic"
 								>
-									No history recorded yet.
+									{{ __("No history recorded yet.") }}
 								</td>
 							</tr>
 						</tbody>
@@ -479,7 +480,7 @@ function onRowClick(row) {
 					class="px-4 py-2 border-t border-ink-200 flex items-center justify-between gap-2"
 				>
 					<span class="text-[10px] text-ink-500 truncate">
-						By
+						{{ __("By") }}
 						<span class="text-ink-700">{{
 							store.teamMember(drawer.updatedBy)?.name
 						}}</span>
@@ -492,10 +493,10 @@ function onRowClick(row) {
 							style="border-radius: 2px; color: #b91c1c"
 							@click="remove(drawer)"
 						>
-							Delete
+							{{ __("Delete") }}
 						</button>
 						<button type="button" class="desk-save-btn" @click="startEdit(drawer)">
-							Edit
+							{{ __("Edit") }}
 						</button>
 					</div>
 				</div>

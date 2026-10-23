@@ -31,7 +31,8 @@ function status_indicator(status) {
 		Cancelled: "red",
 	};
 	const color = map[status] || "gray";
-	return `<span class="indicator-pill ${color}">${status || "—"}</span>`;
+	// The status stays English for the colour lookup above; only the label is translated.
+	return `<span class="indicator-pill ${color}">${status ? __(status) : "—"}</span>`;
 }
 
 function progress_bar(pct) {
@@ -142,23 +143,23 @@ function render_subprojects(frm) {
 		.then((rows) => {
 			const columns = [
 				{
-					label: "Project ID",
+					label: __("Project ID"),
 					render: (r) =>
 						`<a href="/app/project/${r.name}">${r.custom_project_id || r.name}</a>`,
 				},
-				{ label: "Name", key: "project_name" },
-				{ label: "Status", render: (r) => status_indicator(r.status) },
-				{ label: "Progress", render: (r) => progress_bar(r.percent_complete) },
-				{ label: "End Date", key: "expected_end_date" },
+				{ label: __("Name"), key: "project_name" },
+				{ label: __("Status"), render: (r) => status_indicator(r.status) },
+				{ label: __("Progress"), render: (r) => progress_bar(r.percent_complete) },
+				{ label: __("End Date"), key: "expected_end_date" },
 			];
 			const html = `
 				<div class="d-flex align-items-center justify-content-between" style="margin-bottom:10px;">
-					<span class="text-muted" style="font-size:12px;">${rows.length} sub-project(s)</span>
+					<span class="text-muted" style="font-size:12px;">${__("{0} sub-project(s)", [rows.length])}</span>
 					<button class="btn btn-primary btn-sm bs-add-btn">
-						${frappe.utils.icon("add", "xs")} Sub-project
+						${frappe.utils.icon("add", "xs")} ${__("Sub-project")}
 					</button>
 				</div>
-				${make_table(columns, rows, "No sub-projects linked to this project.")}`;
+				${make_table(columns, rows, __("No sub-projects linked to this project."))}`;
 			set_html_and_bind(frm, "custom_subprojects_html", html, ($w) => {
 				$w.find(".bs-add-btn").on("click", () => {
 					const new_doc = make_new_doc_with_defaults("Project", {
@@ -190,22 +191,22 @@ function render_work_packages(frm) {
 		.then((rows) => {
 			const columns = [
 				{
-					label: "Code",
+					label: __("Code"),
 					render: (r) => `<a href="/app/work-package/${r.name}">${r.code || r.name}</a>`,
 				},
-				{ label: "Work Package", key: "work_package_name" },
-				{ label: "Status", render: (r) => status_indicator(r.status) },
-				{ label: "Progress", render: (r) => progress_bar(r.progress) },
-				{ label: "End Date", key: "end_date" },
+				{ label: __("Work Package"), key: "work_package_name" },
+				{ label: __("Status"), render: (r) => status_indicator(r.status) },
+				{ label: __("Progress"), render: (r) => progress_bar(r.progress) },
+				{ label: __("End Date"), key: "end_date" },
 			];
 			const html = `
 				<div class="d-flex align-items-center justify-content-between" style="margin-bottom:10px;">
-					<span class="text-muted" style="font-size:12px;">${rows.length} work package(s)</span>
+					<span class="text-muted" style="font-size:12px;">${__("{0} work package(s)", [rows.length])}</span>
 					<button class="btn btn-primary btn-sm bs-add-btn">
-						${frappe.utils.icon("add", "xs")} Work Package
+						${frappe.utils.icon("add", "xs")} ${__("Work Package")}
 					</button>
 				</div>
-				${make_table(columns, rows, "No work packages linked to this project.")}`;
+				${make_table(columns, rows, __("No work packages linked to this project."))}`;
 			set_html_and_bind(frm, "custom_work_packages_html", html, ($w) => {
 				$w.find(".bs-add-btn").on("click", () => {
 					const new_doc = make_new_doc_with_defaults("Work Package", {
@@ -249,30 +250,30 @@ function render_tasks(frm) {
 			.then((rows) => {
 				const columns = [
 					{
-						label: "Task",
+						label: __("Task"),
 						render: (r) => `<a href="/app/task/${r.name}">${r.subject || r.name}</a>`,
 					},
 					...(frm.doc.is_group
 						? [
 								{
-									label: "Project",
+									label: __("Project"),
 									render: (r) => project_labels[r.project] || r.project || "-",
 								},
 						  ]
 						: []),
-					{ label: "Status", render: (r) => status_indicator(r.status) },
-					{ label: "Priority", render: (r) => status_indicator(r.priority) },
-					{ label: "Progress", render: (r) => progress_bar(r.progress) },
-					{ label: "Due Date", key: "exp_end_date" },
+					{ label: __("Status"), render: (r) => status_indicator(r.status) },
+					{ label: __("Priority"), render: (r) => status_indicator(r.priority) },
+					{ label: __("Progress"), render: (r) => progress_bar(r.progress) },
+					{ label: __("Due Date"), key: "exp_end_date" },
 				];
 				const html = `
 				<div class="d-flex align-items-center justify-content-between" style="margin-bottom:10px;">
-					<span class="text-muted" style="font-size:12px;">${rows.length} task(s)</span>
+					<span class="text-muted" style="font-size:12px;">${__("{0} task(s)", [rows.length])}</span>
 					<button class="btn btn-primary btn-sm bs-add-btn">
-						${frappe.utils.icon("add", "xs")} Task
+						${frappe.utils.icon("add", "xs")} ${__("Task")}
 					</button>
 				</div>
-				${make_table(columns, rows, "No tasks linked to this project.")}`;
+				${make_table(columns, rows, __("No tasks linked to this project."))}`;
 				set_html_and_bind(frm, "custom_tasks_html", html, ($w) => {
 					$w.find(".bs-add-btn").on("click", () => {
 						const new_doc = make_new_doc_with_defaults("Task", {
@@ -317,34 +318,34 @@ function render_stage_plannings(frm) {
 			.then((rows) => {
 				const columns = [
 					{
-						label: "Stage",
+						label: __("Stage"),
 						render: (r) =>
 							`<a href="/app/stage-planning/${r.name}">${r.stage_name}</a>`,
 					},
 					...(frm.doc.is_group
 						? [
 								{
-									label: "Project",
+									label: __("Project"),
 									render: (r) => project_labels[r.project] || r.project || "-",
 								},
 						  ]
 						: []),
-					{ label: "Planned Start", key: "planned_start" },
-					{ label: "Planned End", key: "planned_end" },
-					{ label: "Tasks", key: "planned_task_count" },
+					{ label: __("Planned Start"), key: "planned_start" },
+					{ label: __("Planned End"), key: "planned_end" },
+					{ label: __("Tasks"), key: "planned_task_count" },
 					{
-						label: "Planned Completion",
+						label: __("Planned Completion"),
 						render: (r) => progress_bar(r.planned_completion_pct),
 					},
 				];
 				const html = `
 				<div class="d-flex align-items-center justify-content-between" style="margin-bottom:10px;">
-					<span class="text-muted" style="font-size:12px;">${rows.length} stage(s)</span>
+					<span class="text-muted" style="font-size:12px;">${__("{0} stage(s)", [rows.length])}</span>
 					<button class="btn btn-primary btn-sm bs-add-btn">
-						${frappe.utils.icon("add", "xs")} Stage
+						${frappe.utils.icon("add", "xs")} ${__("Stage")}
 					</button>
 				</div>
-				${make_table(columns, rows, "No stage plans linked to this project.")}`;
+				${make_table(columns, rows, __("No stage plans linked to this project."))}`;
 				set_html_and_bind(frm, "custom_stage_planning_html", html, ($w) => {
 					$w.find(".bs-add-btn").on("click", () => {
 						const new_doc = make_new_doc_with_defaults("Stage Planning", {

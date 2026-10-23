@@ -14,6 +14,7 @@ import DeskSelect from "@/components/desk/DeskSelect.vue";
 import DeskFilterChip from "@/components/desk/DeskFilterChip.vue";
 import DeskLink from "@/components/desk/DeskLink.vue";
 import { fmtINR, fmtCompactINR, fmtDate } from "@/utils/format";
+import { __ } from "@/utils/translate";
 
 const store = useDataStore();
 
@@ -40,33 +41,35 @@ const recoverableTotal = computed(() =>
 );
 
 const columns = [
-	{ key: "id", label: "ID" },
-	{ key: "title", label: "Title" },
-	{ key: "project", label: "Project" },
-	{ key: "type", label: "Type" },
-	{ key: "impact", label: "Impact", align: "right" },
-	{ key: "recoverable", label: "Recoverable" },
-	{ key: "status", label: "Status" },
-	{ key: "raisedBy", label: "Raised by" },
-	{ key: "raisedDate", label: "Date" },
+	{ key: "id", label: __("ID") },
+	{ key: "title", label: __("Title") },
+	{ key: "project", label: __("Project") },
+	{ key: "type", label: __("Type") },
+	{ key: "impact", label: __("Impact"), align: "right" },
+	{ key: "recoverable", label: __("Recoverable") },
+	{ key: "status", label: __("Status") },
+	{ key: "raisedBy", label: __("Raised by") },
+	{ key: "raisedDate", label: __("Date") },
 ];
 
-const breadcrumbs = [{ label: "BuildSuite Core", to: "/" }, { label: "Scope Change" }];
+const breadcrumbs = [{ label: "BuildSuite Core", to: "/" }, { label: __("Scope Change") }];
 
-const subtitle = computed(() => `${items.value.length} of ${store.scos.length} Â· M7 module`);
+const subtitle = computed(() =>
+	__("{0} of {1} Â· M7 module", [items.value.length, store.scos.length])
+);
 </script>
 
 <template>
-	<DeskPage title="Scope Change Order" :subtitle="subtitle" :breadcrumbs="breadcrumbs">
+	<DeskPage :title="__('Scope Change Order')" :subtitle="subtitle" :breadcrumbs="breadcrumbs">
 		<template #actions>
-			<button type="button" class="desk-save-btn">+ Raise SCO</button>
+			<button type="button" class="desk-save-btn">+ {{ __("Raise SCO") }}</button>
 		</template>
 
 		<!-- KPI strip â€” Desk-tight -->
 		<div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
 			<div class="bg-white border border-ink-200 px-3 py-2" style="border-radius: 2px">
 				<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-					Total SCOs
+					{{ __("Total SCOs") }}
 				</div>
 				<div class="text-base font-semibold text-ink-900 mt-0.5">
 					{{ store.scos.length }}
@@ -74,7 +77,7 @@ const subtitle = computed(() => `${items.value.length} of ${store.scos.length} Â
 			</div>
 			<div class="bg-white border border-ink-200 px-3 py-2" style="border-radius: 2px">
 				<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-					Pending approval
+					{{ __("Pending approval") }}
 				</div>
 				<div class="text-base font-semibold text-warning-700 mt-0.5">
 					{{ store.pendingScosCount }}
@@ -82,7 +85,7 @@ const subtitle = computed(() => `${items.value.length} of ${store.scos.length} Â
 			</div>
 			<div class="bg-white border border-ink-200 px-3 py-2" style="border-radius: 2px">
 				<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-					Net cost impact
+					{{ __("Net cost impact") }}
 				</div>
 				<div
 					class="text-base font-semibold mt-0.5 tabular-nums"
@@ -93,7 +96,7 @@ const subtitle = computed(() => `${items.value.length} of ${store.scos.length} Â
 			</div>
 			<div class="bg-white border border-ink-200 px-3 py-2" style="border-radius: 2px">
 				<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-					Client recoverable
+					{{ __("Client recoverable") }}
 				</div>
 				<div class="text-base font-semibold text-success-700 mt-0.5 tabular-nums">
 					{{ fmtCompactINR(recoverableTotal) }}
@@ -106,19 +109,19 @@ const subtitle = computed(() => `${items.value.length} of ${store.scos.length} Â
 			:rows="items"
 			:columns="columns"
 			row-key="id"
-			search-placeholder="Search SCO id or titleâ€¦"
+			:search-placeholder="__('Search SCO id or titleâ€¦')"
 		>
 			<template #filter-chips>
 				<DeskSelect v-if="!statusFilter" v-model="statusFilter" class="!w-44">
-					<option value="">Status: Any</option>
-					<option>Pending Approval</option>
-					<option>Approved</option>
-					<option>Rejected</option>
+					<option value="">{{ __("Status: Any") }}</option>
+					<option value="Pending Approval">{{ __("Pending Approval") }}</option>
+					<option value="Approved">{{ __("Approved") }}</option>
+					<option value="Rejected">{{ __("Rejected") }}</option>
 				</DeskSelect>
 				<DeskFilterChip
 					v-else
-					label="Status"
-					:value="statusFilter"
+					:label="__('Status')"
+					:value="__(statusFilter)"
 					@remove="statusFilter = ''"
 				/>
 			</template>
@@ -148,13 +151,13 @@ const subtitle = computed(() => `${items.value.length} of ${store.scos.length} Â
 					v-if="row.recoverable"
 					class="text-[10px] px-1.5 py-0.5 bg-success-50 text-success-700 font-medium"
 					style="border-radius: 2px"
-					>Yes</span
+					>{{ __("Yes") }}</span
 				>
 				<span
 					v-else
 					class="text-[10px] px-1.5 py-0.5 bg-ink-100 text-ink-600 font-medium"
 					style="border-radius: 2px"
-					>Internal</span
+					>{{ __("Internal") }}</span
 				>
 			</template>
 			<template #cell-status="{ row }">
@@ -168,7 +171,7 @@ const subtitle = computed(() => `${items.value.length} of ${store.scos.length} Â
 			</template>
 
 			<template #empty>
-				<div class="text-sm text-ink-500">No SCOs match your filters.</div>
+				<div class="text-sm text-ink-500">{{ __("No SCOs match your filters.") }}</div>
 			</template>
 		</DeskList>
 	</DeskPage>

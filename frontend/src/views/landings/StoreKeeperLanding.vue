@@ -5,6 +5,7 @@ import { ROLES } from "@/data/roles";
 import { WORKSPACE_META, ACCESS_LABEL, workspaceMetric } from "@/data/workspaces";
 import { useDataStore } from "@/stores";
 import LandingShell from "@/layouts/LandingShell.vue";
+import { __ } from "@/utils/translate";
 
 const ROLE_ID = "store-keeper";
 const role = ROLES.find((r) => r.id === ROLE_ID);
@@ -29,10 +30,10 @@ const todayLabel = today.toLocaleDateString("en-IN", {
 // data. Replace with live store reads once the M4 Procurement + ERPNext Stock screens are
 // wired (see CLAUDE.md §12.2 / §12.6).
 const ILLUSTRATIVE_KPIS = [
-	{ label: "Items below threshold", value: "12", sub: "Stock alerts" },
-	{ label: "GRN today", value: "4", sub: "Goods receipts" },
-	{ label: "Issues to crew", value: "7", sub: "Pending issue" },
-	{ label: "Wastage this week", value: "2.3%", sub: "Reconciled" },
+	{ label: __("Items below threshold"), value: "12", sub: __("Stock alerts") },
+	{ label: __("GRN today"), value: "4", sub: __("Goods receipts") },
+	{ label: __("Issues to crew"), value: "7", sub: __("Pending issue") },
+	{ label: __("Wastage this week"), value: "2.3%", sub: __("Reconciled") },
 ];
 
 // Illustrative GRN list — would come from ERPNext Stock entries with consumption_purpose=
@@ -93,15 +94,18 @@ const tiles = computed(() =>
 			<div class="flex items-center gap-3 mb-2">
 				<span :class="role.color" class="w-2.5 h-2.5 rounded-full"></span>
 				<p class="text-xs text-ink-500 uppercase tracking-wider font-medium">
-					{{ role.shortName }} · Site stores
+					{{ role.shortName }} · {{ __("Site stores") }}
 				</p>
 			</div>
-			<h1 class="text-2xl font-semibold text-ink-900 tracking-tight">Stock status today</h1>
+			<h1 class="text-2xl font-semibold text-ink-900 tracking-tight">{{ __("Stock status today") }}</h1>
 			<p class="text-sm text-ink-500 mt-1">
 				{{ todayLabel }} ·
 				<span class="text-ink-700 font-medium"
-					>{{ todaysGRNs.length }} GRN{{ todaysGRNs.length === 1 ? "" : "s" }} expected
-					today</span
+					>{{
+						todaysGRNs.length === 1
+							? __("{0} GRN expected today", [todaysGRNs.length])
+							: __("{0} GRNs expected today", [todaysGRNs.length])
+					}}</span
 				>
 			</p>
 
@@ -121,7 +125,7 @@ const tiles = computed(() =>
 			</div>
 
 			<!-- Today's GRN list -->
-			<h2 class="text-sm font-semibold text-ink-900 mt-10 mb-3">Today's GRN list</h2>
+			<h2 class="text-sm font-semibold text-ink-900 mt-10 mb-3">{{ __("Today's GRN list") }}</h2>
 			<div class="bg-white border border-ink-200 rounded-xl overflow-hidden">
 				<div class="divide-y divide-ink-100">
 					<RouterLink
@@ -140,7 +144,7 @@ const tiles = computed(() =>
 								{{ g.item }} · {{ g.qty }}
 							</div>
 							<div class="text-xs text-ink-500 mt-0.5 truncate">
-								{{ g.supplier }} · expected {{ g.expectedAt }}
+								{{ g.supplier }} · {{ __("expected {0}", [g.expectedAt]) }}
 							</div>
 						</div>
 						<span class="text-[10px] text-ink-500 font-mono flex-shrink-0">{{
@@ -151,7 +155,7 @@ const tiles = computed(() =>
 			</div>
 
 			<!-- Your workspaces -->
-			<h2 class="text-sm font-semibold text-ink-900 mt-10 mb-3">Your workspaces</h2>
+			<h2 class="text-sm font-semibold text-ink-900 mt-10 mb-3">{{ __("Your workspaces") }}</h2>
 			<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
 				<RouterLink
 					v-for="t in tiles"
