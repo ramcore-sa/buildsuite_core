@@ -3,6 +3,8 @@
 // GET; mutations are POST with the CSRF token. Throws Error(<server message>) so
 // callers can surface the cycle-guard message etc.
 
+import { __ } from "@/utils/translate";
+
 const BASE = "/api/method/buildsuite_core.api.schedule.";
 
 function serverMessage(payload, status) {
@@ -16,7 +18,7 @@ function serverMessage(payload, status) {
 	} catch (_) {
 		/* fall through to generic */
 	}
-	return payload?.exception || `Request failed (${status})`;
+	return payload?.exception || __("Request failed ({0})", [status]);
 }
 
 async function request(method, { params, body } = {}) {

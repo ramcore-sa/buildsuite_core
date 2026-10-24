@@ -1,5 +1,6 @@
 import { frappeRequest } from "frappe-ui-frappe-request";
 import { parseFrappeError } from "@/utils/frappeError";
+import { __ } from "@/utils/translate";
 
 async function call(method, args) {
 	try {
@@ -8,7 +9,7 @@ async function call(method, args) {
 			params: args || {},
 		});
 	} catch (err) {
-		throw new Error(parseFrappeError(err).summary || "Request failed.");
+		throw new Error(parseFrappeError(err).summary || __("Request failed."));
 	}
 }
 

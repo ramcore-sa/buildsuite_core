@@ -17,7 +17,7 @@ const workspaceCount = computed(() => store.visibleWorkspaces.length);
 				<span :class="role.color" class="w-12 h-12 rounded-xl flex-shrink-0"></span>
 				<div>
 					<p class="text-xs text-ink-500 uppercase tracking-wider mb-0.5">
-						Logged in as
+						{{ __("Logged in as") }}
 					</p>
 					<h1 class="text-3xl font-semibold text-ink-900 tracking-tight">
 						{{ role.name }}
@@ -30,7 +30,7 @@ const workspaceCount = computed(() => store.visibleWorkspaces.length);
 			<div class="mt-8 grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-xl">
 				<div class="bg-white border border-ink-200 rounded-xl p-4">
 					<div class="text-[11px] uppercase tracking-wider text-ink-500 font-medium">
-						Workspaces
+						{{ __("Workspaces") }}
 					</div>
 					<div class="text-2xl font-semibold text-ink-900 mt-1">
 						{{ workspaceCount }}
@@ -41,9 +41,13 @@ const workspaceCount = computed(() => store.visibleWorkspaces.length);
 			<div
 				class="mt-10 px-5 py-4 bg-brand-50 border border-brand-200 rounded-lg text-sm text-brand-800 max-w-2xl"
 			>
-				<strong>Detailed landing page coming in Phase 2.x.</strong>
-				This is a stub. The next set of prompts will populate role-specific shortcuts,
-				KPIs, and recent activity tuned to a {{ role.shortName }}'s day.
+				<strong>{{ __("Detailed landing page coming in Phase 2.x.") }}</strong>
+				{{
+					__(
+						"This is a stub. The next set of prompts will populate role-specific shortcuts, KPIs, and recent activity tuned to a {0}'s day.",
+						[role.shortName]
+					)
+				}}
 			</div>
 		</div>
 	</LandingShell>

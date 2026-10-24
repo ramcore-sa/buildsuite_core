@@ -16,6 +16,7 @@ import DeskList from "@/components/desk/DeskList.vue";
 import DeskSelect from "@/components/desk/DeskSelect.vue";
 import DeskFilterChip from "@/components/desk/DeskFilterChip.vue";
 import DeskLink from "@/components/desk/DeskLink.vue";
+import { __ } from "@/utils/translate";
 
 const store = useDataStore();
 const router = useRouter();
@@ -38,19 +39,23 @@ const items = computed(() => {
 });
 
 const columns = [
-	{ key: "id", label: "ID" },
-	{ key: "name", label: "Name" },
-	{ key: "category", label: "Category" },
-	{ key: "skilled", label: "Skilled %", align: "right" },
-	{ key: "unskilled", label: "Unskilled %", align: "right" },
-	{ key: "productivity", label: "Productivity", align: "right" },
-	{ key: "applicableProjects", label: "Applicable types" },
+	{ key: "id", label: __("ID") },
+	{ key: "name", label: __("Name") },
+	{ key: "category", label: __("Category") },
+	{ key: "skilled", label: __("Skilled %"), align: "right" },
+	{ key: "unskilled", label: __("Unskilled %"), align: "right" },
+	{ key: "productivity", label: __("Productivity"), align: "right" },
+	{ key: "applicableProjects", label: __("Applicable types") },
 ];
 
-const breadcrumbs = [{ label: "BuildSuite Core", to: "/" }, { label: "Activity Type" }];
+const breadcrumbs = [{ label: "BuildSuite Core", to: "/" }, { label: __("Activity Type") }];
 
 const subtitle = computed(
-	() => `${items.value.length} of ${store.activityTypes.length} · Master record · §13.3 item 16`
+	() =>
+		__("{0} of {1} · Master record · §13.3 item 16", [
+			items.value.length,
+			store.activityTypes.length,
+		])
 );
 
 function onRowClick(row) {
@@ -62,13 +67,13 @@ function pct(n) {
 </script>
 
 <template>
-	<DeskPage title="Activity Type" :subtitle="subtitle" :breadcrumbs="breadcrumbs">
+	<DeskPage :title="__('Activity Type')" :subtitle="subtitle" :breadcrumbs="breadcrumbs">
 		<template #actions>
 			<RouterLink to="/tasks" class="text-xs text-ink-600 hover:text-ink-900 mr-2"
-				>← Back to Tasks</RouterLink
+				>{{ __("← Back to Tasks") }}</RouterLink
 			>
 			<RouterLink to="/activity-types/new" class="desk-save-btn"
-				>+ New Activity Type</RouterLink
+				>{{ __("+ New Activity Type") }}</RouterLink
 			>
 		</template>
 
@@ -77,18 +82,18 @@ function pct(n) {
 			:rows="items"
 			:columns="columns"
 			row-key="id"
-			search-placeholder="Search activity types…"
+			:search-placeholder="__('Search activity types…')"
 			@row-click="onRowClick"
 		>
 			<template #filter-chips>
 				<DeskSelect v-if="!categoryFilter" v-model="categoryFilter" class="!w-40">
-					<option value="">Category: Any</option>
-					<option v-for="c in CATEGORIES" :key="c">{{ c }}</option>
+					<option value="">{{ __("Category: Any") }}</option>
+					<option v-for="c in CATEGORIES" :key="c" :value="c">{{ __(c) }}</option>
 				</DeskSelect>
 				<DeskFilterChip
 					v-else
-					label="Category"
-					:value="categoryFilter"
+					:label="__('Category')"
+					:value="__(categoryFilter)"
 					@remove="categoryFilter = ''"
 				/>
 			</template>
@@ -111,7 +116,7 @@ function pct(n) {
 				<span
 					class="text-[11px] px-1.5 py-0.5 bg-ink-100 text-ink-700 font-medium"
 					style="border-radius: 2px"
-					>{{ row.category }}</span
+					>{{ __(row.category) }}</span
 				>
 			</template>
 			<template #cell-skilled="{ row }">
@@ -125,7 +130,7 @@ function pct(n) {
 			<template #cell-productivity="{ row }">
 				<span class="text-xs tabular-nums"
 					>{{ row.expectedProductivityPerManDay }}
-					{{ row.productivityUnit }}/man-day</span
+					{{ __("{0}/man-day", [row.productivityUnit]) }}</span
 				>
 			</template>
 			<template #cell-applicableProjects="{ row }">
@@ -135,21 +140,21 @@ function pct(n) {
 						:key="t"
 						class="text-[10px] px-1 py-0.5 bg-brand-50 text-brand-700 font-medium"
 						style="border-radius: 2px"
-						>{{ t }}</span
+						>{{ __(t) }}</span
 					>
 					<span
 						v-if="!(row.applicableProjectTypes && row.applicableProjectTypes.length)"
 						class="text-[10px] text-ink-400 italic"
-						>Universal</span
+						>{{ __("Universal") }}</span
 					>
 				</div>
 			</template>
 
 			<template #empty>
 				<div class="text-sm text-ink-500">
-					No activity types match these filters ·
+					{{ __("No activity types match these filters") }} ·
 					<RouterLink to="/activity-types/new" class="desk-link"
-						>Create one →</RouterLink
+						>{{ __("Create one →") }}</RouterLink
 					>
 				</div>
 			</template>

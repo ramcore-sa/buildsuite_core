@@ -15,6 +15,7 @@ import DeskField from "@/components/desk/DeskField.vue";
 import DeskLink from "@/components/desk/DeskLink.vue";
 import DeskFilterChip from "@/components/desk/DeskFilterChip.vue";
 import { fmtCompactINR, fmtINR } from "@/utils/format";
+import { __ } from "@/utils/translate";
 
 const router = useRouter();
 const store = useDataStore();
@@ -41,9 +42,11 @@ function createBoq() {
 	const boq = store.addBoq({
 		projectId: newForm.value.projectId,
 		revision: nextRev,
-		title: newForm.value.title?.trim() || `${proj?.name || "BOQ"} — Revision ${nextRev}`,
+		title:
+			newForm.value.title?.trim() ||
+			__("{0} — Revision {1}", [proj?.name || __("BOQ"), nextRev]),
 	});
-	store.addBoqGroup({ boqId: boq.id, code: "A", name: "Civil Works — RCC", order: 1 });
+	store.addBoqGroup({ boqId: boq.id, code: "A", name: __("Civil Works — RCC"), order: 1 });
 	showNew.value = false;
 	router.push(`/boq/${boq.id}`);
 }
@@ -109,39 +112,39 @@ function onRowClick(row) {
 }
 
 const columns = [
-	{ key: "id", label: "ID" },
-	{ key: "project", label: "Project" },
-	{ key: "revision", label: "Rev.", align: "center" },
-	{ key: "status", label: "Status" },
-	{ key: "planned", label: "Planned", align: "right" },
-	{ key: "actual", label: "Actual", align: "right" },
-	{ key: "variance", label: "Variance", align: "right" },
+	{ key: "id", label: __("ID") },
+	{ key: "project", label: __("Project") },
+	{ key: "revision", label: __("Rev."), align: "center" },
+	{ key: "status", label: __("Status") },
+	{ key: "planned", label: __("Planned"), align: "right" },
+	{ key: "actual", label: __("Actual"), align: "right" },
+	{ key: "variance", label: __("Variance"), align: "right" },
 ];
 
-const breadcrumbs = [{ label: "BuildSuite Core", to: "/" }, { label: "BOQ" }];
+const breadcrumbs = [{ label: "BuildSuite Core", to: "/" }, { label: __("BOQ") }];
 
 const subtitle = computed(
-	() => `${rows.value.length} of ${store.boqs.length} · M3 estimation engine`
+	() => __("{0} of {1} · M3 estimation engine", [rows.value.length, store.boqs.length])
 );
 </script>
 
 <template>
-	<DeskPage title="Bill of Quantities" :subtitle="subtitle" :breadcrumbs="breadcrumbs">
+	<DeskPage :title="__('Bill of Quantities')" :subtitle="subtitle" :breadcrumbs="breadcrumbs">
 		<template #actions>
 			<DeskLink
 				to="/rate-master"
 				class="text-xs px-2 py-1 border border-ink-200 bg-white hover:bg-ink-50"
 				style="border-radius: 2px"
-				>₹ Rate Master</DeskLink
+				>{{ __("₹ Rate Master") }}</DeskLink
 			>
-			<button type="button" class="desk-save-btn" @click="openNew">+ New BOQ</button>
+			<button type="button" class="desk-save-btn" @click="openNew">{{ __("+ New BOQ") }}</button>
 		</template>
 
 		<!-- KPI strip — Desk-tight: thin border, modest number sizing -->
 		<div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
 			<div class="bg-white border border-ink-200 px-3 py-2" style="border-radius: 2px">
 				<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-					Approved
+					{{ __("Approved") }}
 				</div>
 				<div class="text-base font-semibold text-success-700 mt-0.5">
 					{{ kpis.active }}
@@ -149,13 +152,13 @@ const subtitle = computed(
 			</div>
 			<div class="bg-white border border-ink-200 px-3 py-2" style="border-radius: 2px">
 				<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-					Drafts
+					{{ __("Drafts") }}
 				</div>
 				<div class="text-base font-semibold text-ink-700 mt-0.5">{{ kpis.draft }}</div>
 			</div>
 			<div class="bg-white border border-ink-200 px-3 py-2" style="border-radius: 2px">
 				<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-					Submitted
+					{{ __("Submitted") }}
 				</div>
 				<div class="text-base font-semibold text-warning-700 mt-0.5">
 					{{ kpis.submitted }}
@@ -163,16 +166,16 @@ const subtitle = computed(
 			</div>
 			<div class="bg-white border border-ink-200 px-3 py-2" style="border-radius: 2px">
 				<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-					Total planned
+					{{ __("Total planned") }}
 				</div>
 				<div class="text-base font-semibold text-ink-900 mt-0.5 tabular-nums">
 					{{ fmtCompactINR(kpis.totalPlanned) }}
 				</div>
-				<div class="text-[10px] text-ink-500 mt-0.5">approved BOQs</div>
+				<div class="text-[10px] text-ink-500 mt-0.5">{{ __("approved BOQs") }}</div>
 			</div>
 			<div class="bg-white border border-ink-200 px-3 py-2" style="border-radius: 2px">
 				<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-					Variance
+					{{ __("Variance") }}
 				</div>
 				<div
 					class="text-base font-semibold mt-0.5 tabular-nums"
@@ -181,7 +184,7 @@ const subtitle = computed(
 					{{ kpis.variancePct > 0 ? "+" : "" }}{{ kpis.variancePct.toFixed(1) }}%
 				</div>
 				<div class="text-[10px] text-ink-500 mt-0.5">
-					{{ fmtCompactINR(kpis.variance) }} delta
+					{{ __("{0} delta", [fmtCompactINR(kpis.variance)]) }}
 				</div>
 			</div>
 		</div>
@@ -191,34 +194,34 @@ const subtitle = computed(
 			:rows="rows"
 			:columns="columns"
 			row-key="id"
-			search-placeholder="Search BOQ id or title…"
+			:search-placeholder="__('Search BOQ id or title…')"
 			@row-click="onRowClick"
 		>
 			<template #filter-chips>
 				<DeskSelect v-if="!projectFilter" v-model="projectFilter" class="!w-48">
-					<option value="">Project: Any</option>
+					<option value="">{{ __("Project: Any") }}</option>
 					<option v-for="p in rootProjects" :key="p.id" :value="p.id">
 						{{ p.name }}
 					</option>
 				</DeskSelect>
 				<DeskFilterChip
 					v-else
-					label="Project"
+					:label="__('Project')"
 					:value="projectName(projectFilter)"
 					@remove="projectFilter = ''"
 				/>
 
 				<DeskSelect v-if="!statusFilter" v-model="statusFilter" class="!w-36">
-					<option value="">Status: Any</option>
-					<option>Draft</option>
-					<option>Submitted</option>
-					<option>Approved</option>
-					<option>Superseded</option>
+					<option value="">{{ __("Status: Any") }}</option>
+					<option value="Draft">{{ __("Draft") }}</option>
+					<option value="Submitted">{{ __("Submitted") }}</option>
+					<option value="Approved">{{ __("Approved") }}</option>
+					<option value="Superseded">{{ __("Superseded") }}</option>
 				</DeskSelect>
 				<DeskFilterChip
 					v-else
-					label="Status"
-					:value="statusFilter"
+					:label="__('Status')"
+					:value="__(statusFilter)"
 					@remove="statusFilter = ''"
 				/>
 			</template>
@@ -258,7 +261,7 @@ const subtitle = computed(
 			</template>
 
 			<template #empty>
-				<div class="text-sm text-ink-500">No BOQs match these filters.</div>
+				<div class="text-sm text-ink-500">{{ __("No BOQs match these filters.") }}</div>
 			</template>
 		</DeskList>
 
@@ -274,21 +277,21 @@ const subtitle = computed(
 				@click.stop
 			>
 				<div class="px-4 py-3 border-b border-ink-200 flex items-center">
-					<h2 class="text-sm font-semibold text-ink-900">New BOQ</h2>
+					<h2 class="text-sm font-semibold text-ink-900">{{ __("New BOQ") }}</h2>
 					<button
 						type="button"
 						@click="showNew = false"
 						class="ml-auto text-ink-400 hover:text-ink-900"
-						aria-label="Close"
+						:aria-label="__('Close')"
 					>
 						✕
 					</button>
 				</div>
 				<div class="p-4 space-y-3">
 					<DeskField
-						label="Project"
+						:label="__('Project')"
 						required
-						hint="BOQs live at sub-project level too (per proposal)."
+						:hint="__('BOQs live at sub-project level too (per proposal).')"
 					>
 						<DeskSelect v-model="newForm.projectId">
 							<option v-for="p in boqProjects" :key="p.id" :value="p.id">
@@ -297,12 +300,12 @@ const subtitle = computed(
 						</DeskSelect>
 					</DeskField>
 					<DeskField
-						label="Title"
-						hint="Leave blank to auto-name. Revision number is computed."
+						:label="__('Title')"
+						:hint="__('Leave blank to auto-name. Revision number is computed.')"
 					>
 						<DeskInput
 							v-model="newForm.title"
-							placeholder="e.g. Original BOQ, Tender draft…"
+							:placeholder="__('e.g. Original BOQ, Tender draft…')"
 						/>
 					</DeskField>
 				</div>
@@ -312,10 +315,10 @@ const subtitle = computed(
 						@click="showNew = false"
 						class="text-xs text-ink-600 hover:text-ink-900 px-2 py-1"
 					>
-						Cancel
+						{{ __("Cancel") }}
 					</button>
 					<button type="button" @click="createBoq" class="desk-save-btn">
-						Create draft
+						{{ __("Create draft") }}
 					</button>
 				</div>
 			</div>

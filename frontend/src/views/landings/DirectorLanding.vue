@@ -6,6 +6,7 @@ import { useDataStore } from "@/stores";
 import LandingShell from "@/layouts/LandingShell.vue";
 import StatusBadge from "@/components/StatusBadge.vue";
 import { fmtCompactINR, fmtDate } from "@/utils/format";
+import { __ } from "@/utils/translate";
 
 const ROLE_ID = "director";
 const role = ROLES.find((r) => r.id === ROLE_ID);
@@ -74,8 +75,8 @@ const topRisks = computed(() => {
 			out.push({
 				key: `sched-${p.id}`,
 				dot: "bg-danger-500",
-				kind: "Schedule risk",
-				title: `${p.progress}% complete with ${days} days to deadline`,
+				kind: __("Schedule risk"),
+				title: __("{0}% complete with {1} days to deadline", [p.progress, days]),
 				project: p.name,
 				to: `/projects/${p.id}`,
 			});
@@ -85,8 +86,8 @@ const topRisks = computed(() => {
 			out.push({
 				key: `cost-${p.id}`,
 				dot: "bg-warning-500",
-				kind: "Cost / pace risk",
-				title: `${v.toFixed(1)}% behind expected pace`,
+				kind: __("Cost / pace risk"),
+				title: __("{0}% behind expected pace", [v.toFixed(1)]),
 				project: p.name,
 				to: `/projects/${p.id}`,
 			});
@@ -103,8 +104,8 @@ const topRisks = computed(() => {
 				out.push({
 					key: `sco-${s.id}`,
 					dot: "bg-info-500",
-					kind: "Decision risk",
-					title: `${s.title} — ${daysAgo}d awaiting decision`,
+					kind: __("Decision risk"),
+					title: __("{0} — {1}d awaiting decision", [s.title, daysAgo]),
 					project: proj?.name || "—",
 					to: "/sco",
 				});
@@ -127,17 +128,17 @@ const highValueApprovals = computed(() =>
 			<div class="flex items-center gap-3 mb-2">
 				<span :class="role.color" class="w-2.5 h-2.5 rounded-full"></span>
 				<p class="text-xs text-ink-500 uppercase tracking-wider font-medium">
-					{{ role.shortName }} · Portfolio overview
+					{{ role.shortName }} · {{ __("Portfolio overview") }}
 				</p>
 			</div>
-			<h1 class="text-2xl font-semibold text-ink-900 tracking-tight">Good morning</h1>
+			<h1 class="text-2xl font-semibold text-ink-900 tracking-tight">{{ __("Good morning") }}</h1>
 			<p class="text-sm text-ink-500 mt-1">{{ todayLabel }}</p>
 
 			<!-- KPI strip -->
 			<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-8">
 				<div class="bg-white border border-ink-200 rounded-xl p-4">
 					<div class="text-[11px] uppercase tracking-wider text-ink-500 font-medium">
-						Active projects
+						{{ __("Active projects") }}
 					</div>
 					<div class="text-2xl font-semibold text-ink-900 mt-1">
 						{{ store.activeProjectsCount }}
@@ -145,7 +146,7 @@ const highValueApprovals = computed(() =>
 				</div>
 				<div class="bg-white border border-ink-200 rounded-xl p-4">
 					<div class="text-[11px] uppercase tracking-wider text-ink-500 font-medium">
-						Total order book
+						{{ __("Total order book") }}
 					</div>
 					<div class="text-2xl font-semibold text-ink-900 mt-1">
 						{{ fmtCompactINR(store.totalOrderBook) }}
@@ -153,7 +154,7 @@ const highValueApprovals = computed(() =>
 				</div>
 				<div class="bg-white border border-ink-200 rounded-xl p-4">
 					<div class="text-[11px] uppercase tracking-wider text-ink-500 font-medium">
-						Avg variance
+						{{ __("Avg variance") }}
 					</div>
 					<div
 						class="text-2xl font-semibold mt-1 tabular-nums"
@@ -162,18 +163,22 @@ const highValueApprovals = computed(() =>
 						{{ avgVariancePct > 0 ? "+" : "" }}{{ avgVariancePct.toFixed(1) }}%
 					</div>
 					<div class="text-[11px] text-ink-400 mt-0.5">
-						{{ avgVariancePct > 0 ? "behind" : "ahead of" }} plan, schedule basis
+						{{
+							avgVariancePct > 0
+								? __("behind plan, schedule basis")
+								: __("ahead of plan, schedule basis")
+						}}
 					</div>
 				</div>
 				<div class="bg-white border border-ink-200 rounded-xl p-4">
 					<div class="text-[11px] uppercase tracking-wider text-ink-500 font-medium">
-						Open SCOs · value
+						{{ __("Open SCOs · value") }}
 					</div>
 					<div class="text-2xl font-semibold text-warning-700 mt-1">
 						{{ fmtCompactINR(pendingScosValue) }}
 					</div>
 					<div class="text-[11px] text-ink-400 mt-0.5">
-						{{ store.pendingScosCount }} pending decisions
+						{{ __("{0} pending decisions", [store.pendingScosCount]) }}
 					</div>
 				</div>
 			</div>
@@ -187,12 +192,12 @@ const highValueApprovals = computed(() =>
 					<div
 						class="px-4 py-3 border-b border-ink-200 flex items-center justify-between"
 					>
-						<h2 class="font-semibold text-ink-900 text-sm">Project health</h2>
+						<h2 class="font-semibold text-ink-900 text-sm">{{ __("Project health") }}</h2>
 						<RouterLink
 							v-if="showProjectsMore"
 							to="/projects"
 							class="text-xs text-brand-600 hover:underline"
-							>View all →</RouterLink
+							>{{ __("View all") }} →</RouterLink
 						>
 					</div>
 					<div class="divide-y divide-ink-100">
@@ -214,8 +219,8 @@ const highValueApprovals = computed(() =>
 										{{ p.client }} · {{ fmtCompactINR(p.budget) }} ·
 										{{
 											p.days > 0
-												? `${p.days}d to deadline`
-												: `${-p.days}d overdue`
+												? __("{0}d to deadline", [p.days])
+												: __("{0}d overdue", [-p.days])
 										}}
 									</div>
 								</div>
@@ -245,8 +250,11 @@ const highValueApprovals = computed(() =>
 										class="text-[11px] mt-1 text-right tabular-nums"
 										:class="variancePill(p.variancePct)"
 									>
-										{{ p.variancePct > 0 ? "+" : ""
-										}}{{ p.variancePct.toFixed(1) }}% variance
+										{{
+											__("{0}% variance", [
+												(p.variancePct > 0 ? "+" : "") + p.variancePct.toFixed(1),
+											])
+										}}
 									</div>
 								</div>
 							</div>
@@ -255,9 +263,9 @@ const highValueApprovals = computed(() =>
 							v-if="!projectHealthRows.length"
 							class="px-4 py-8 text-center text-sm text-ink-400"
 						>
-							No projects yet ·
+							{{ __("No projects yet") }} ·
 							<RouterLink to="/projects/new" class="text-brand-600 hover:underline"
-								>Create one →</RouterLink
+								>{{ __("Create one") }} →</RouterLink
 							>
 						</div>
 					</div>
@@ -266,8 +274,8 @@ const highValueApprovals = computed(() =>
 				<!-- Top risks -->
 				<div class="bg-white border border-ink-200 rounded-xl overflow-hidden">
 					<div class="px-4 py-3 border-b border-ink-200">
-						<h2 class="font-semibold text-ink-900 text-sm">Top risks</h2>
-						<p class="text-[11px] text-ink-500 mt-0.5">Schedule · cost · decisions</p>
+						<h2 class="font-semibold text-ink-900 text-sm">{{ __("Top risks") }}</h2>
+						<p class="text-[11px] text-ink-500 mt-0.5">{{ __("Schedule · cost · decisions") }}</p>
 					</div>
 					<div class="divide-y divide-ink-100">
 						<RouterLink
@@ -298,9 +306,9 @@ const highValueApprovals = computed(() =>
 						</RouterLink>
 						<div v-if="!topRisks.length" class="px-4 py-8 text-center">
 							<div class="text-2xl mb-1">✓</div>
-							<div class="text-sm text-ink-700">No critical risks detected</div>
+							<div class="text-sm text-ink-700">{{ __("No critical risks detected") }}</div>
 							<p class="text-xs text-ink-500 mt-1">
-								Schedule, cost, and decisions all within tolerance.
+								{{ __("Schedule, cost, and decisions all within tolerance.") }}
 							</p>
 						</div>
 					</div>
@@ -310,8 +318,8 @@ const highValueApprovals = computed(() =>
 			<!-- High-value approvals -->
 			<div class="bg-white border border-ink-200 rounded-xl overflow-hidden mt-6">
 				<div class="px-4 py-3 border-b border-ink-200 flex items-center justify-between">
-					<h2 class="font-semibold text-ink-900 text-sm">High-value approvals</h2>
-					<span class="text-[11px] text-ink-500">SCO impact &gt; ₹10 L</span>
+					<h2 class="font-semibold text-ink-900 text-sm">{{ __("High-value approvals") }}</h2>
+					<span class="text-[11px] text-ink-500">{{ __("SCO impact > ₹10 L") }}</span>
 				</div>
 				<div class="divide-y divide-ink-100">
 					<RouterLink
@@ -330,7 +338,7 @@ const highValueApprovals = computed(() =>
 								{{ s.title }}
 							</div>
 							<div class="text-xs text-ink-500 mt-0.5 font-mono">
-								{{ s.id }} · raised {{ fmtDate(s.raisedDate) }}
+								{{ s.id }} · {{ __("raised {0}", [fmtDate(s.raisedDate)]) }}
 							</div>
 						</div>
 						<div class="text-right flex-shrink-0">
@@ -338,16 +346,16 @@ const highValueApprovals = computed(() =>
 								{{ fmtCompactINR(s.impact) }}
 							</div>
 							<div class="text-[11px] text-ink-500">
-								{{ s.recoverable ? "recoverable" : "absorbed" }}
+								{{ s.recoverable ? __("recoverable") : __("absorbed") }}
 							</div>
 						</div>
-						<span class="text-brand-600 text-sm flex-shrink-0">Review →</span>
+						<span class="text-brand-600 text-sm flex-shrink-0">{{ __("Review") }} →</span>
 					</RouterLink>
 					<div
 						v-if="!highValueApprovals.length"
 						class="px-4 py-8 text-center text-sm text-ink-400"
 					>
-						No high-value approvals pending.
+						{{ __("No high-value approvals pending.") }}
 					</div>
 				</div>
 			</div>

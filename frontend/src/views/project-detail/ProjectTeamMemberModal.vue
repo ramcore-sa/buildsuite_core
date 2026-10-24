@@ -40,13 +40,13 @@ const pickerFilters = computed(() => {
 					style="border-radius: 12px 12px 0 0"
 				>
 					<div class="min-w-0 flex-1">
-						<h2 class="text-sm font-semibold text-ink-900">Add team member</h2>
+						<h2 class="text-sm font-semibold text-ink-900">{{ __("Add team member") }}</h2>
 						<p class="text-[11px] text-ink-500 mt-0.5 truncate">{{ projectName }}</p>
 					</div>
 					<button
 						type="button"
 						class="text-ink-500 hover:text-ink-900 text-lg leading-none flex-shrink-0 ml-3"
-						aria-label="Close"
+						:aria-label="__('Close')"
 						@click="emit('close')"
 					>
 						x
@@ -54,14 +54,14 @@ const pickerFilters = computed(() => {
 				</header>
 				<div class="p-5">
 					<DeskField
-						label="User"
+						:label="__('User')"
 						:error="error"
-						hint="Pick a user to add to this project's team."
+						:hint="__('Pick a user to add to this project\'s team.')"
 					>
 						<DeskLinkPicker
 							:model-value="modelValue"
 							doctype="User"
-							placeholder="Search users…"
+							:placeholder="__('Search users…')"
 							label-field="full_name"
 							value-field="name"
 							:search-fields="['full_name', 'name', 'email']"
@@ -83,7 +83,7 @@ const pickerFilters = computed(() => {
 						style="border-radius: 6px"
 						@click="emit('close')"
 					>
-						Cancel
+						{{ __("Cancel") }}
 					</button>
 					<button
 						type="button"
@@ -91,7 +91,7 @@ const pickerFilters = computed(() => {
 						:disabled="!modelValue || saving"
 						@click="emit('confirm')"
 					>
-						{{ saving ? "Adding…" : "Add member" }}
+						{{ saving ? __("Adding…") : __("Add member") }}
 					</button>
 				</footer>
 			</div>

@@ -15,6 +15,7 @@ import { useDataStore } from "@/stores";
 import DeskPage from "@/components/desk/DeskPage.vue";
 import DeskList from "@/components/desk/DeskList.vue";
 import DeskLink from "@/components/desk/DeskLink.vue";
+import { __ } from "@/utils/translate";
 
 const store = useDataStore();
 const router = useRouter();
@@ -36,12 +37,12 @@ const rows = computed(() => {
 });
 
 const columns = [
-	{ key: "name", label: "Project Type" },
-	{ key: "workPackageLabel", label: "Work Package label" },
-	{ key: "workPackageLabelPlural", label: "Plural" },
-	{ key: "defaultTemplate", label: "Default template" },
-	{ key: "projectCount", label: "Projects", align: "right" },
-	{ key: "enabled", label: "Status" },
+	{ key: "name", label: __("Project Type") },
+	{ key: "workPackageLabel", label: __("Work Package label") },
+	{ key: "workPackageLabelPlural", label: __("Plural") },
+	{ key: "defaultTemplate", label: __("Default template") },
+	{ key: "projectCount", label: __("Projects"), align: "right" },
+	{ key: "enabled", label: __("Status") },
 ];
 
 function projectCountFor(typeName) {
@@ -50,11 +51,13 @@ function projectCountFor(typeName) {
 
 const breadcrumbs = [
 	{ label: "BuildSuite Core", to: "/" },
-	{ label: "Settings", to: "/settings" },
-	{ label: "Project Types" },
+	{ label: __("Settings"), to: "/settings" },
+	{ label: __("Project Types") },
 ];
 
-const subtitle = computed(() => `${rows.value.length} of ${store.projectTypes.length}`);
+const subtitle = computed(() =>
+	__("{0} of {1}", [rows.value.length, store.projectTypes.length])
+);
 
 function onRowClick(row) {
 	router.push(`/settings/project-types/${row.id}`);
@@ -67,9 +70,11 @@ onMounted(() => {
 </script>
 
 <template>
-	<DeskPage title="Project Types" :subtitle="subtitle" :breadcrumbs="breadcrumbs">
+	<DeskPage :title="__('Project Types')" :subtitle="subtitle" :breadcrumbs="breadcrumbs">
 		<template #actions>
-			<RouterLink to="/settings/project-types/new" class="desk-save-btn">+ New</RouterLink>
+			<RouterLink to="/settings/project-types/new" class="desk-save-btn">{{
+				__("+ New")
+			}}</RouterLink>
 		</template>
 
 		<DeskList
@@ -77,7 +82,7 @@ onMounted(() => {
 			:rows="rows"
 			:columns="columns"
 			row-key="id"
-			search-placeholder="Search by name, label, template…"
+			:search-placeholder="__('Search by name, label, template…')"
 			@row-click="onRowClick"
 		>
 			<template #cell-name="{ row }">
@@ -104,7 +109,7 @@ onMounted(() => {
 					style="border-radius: 9999px"
 					>{{ row.defaultTemplate }}</span
 				>
-				<span v-else class="text-xs text-ink-400 italic">none</span>
+				<span v-else class="text-xs text-ink-400 italic">{{ __("none") }}</span>
 			</template>
 
 			<template #cell-projectCount="{ row }">
@@ -118,14 +123,14 @@ onMounted(() => {
 						row.enabled ? 'bg-success-50 text-success-700' : 'bg-ink-100 text-ink-500'
 					"
 					style="border-radius: 9999px"
-					>{{ row.enabled ? "Enabled" : "Disabled" }}</span
+					>{{ row.enabled ? __("Enabled") : __("Disabled") }}</span
 				>
 			</template>
 
 			<template #empty>
 				<div class="text-sm text-ink-500">
-					No Project Types yet ·
-					<DeskLink to="/settings/project-types/new">Create one →</DeskLink>
+					{{ __("No Project Types yet") }} ·
+					<DeskLink to="/settings/project-types/new">{{ __("Create one →") }}</DeskLink>
 				</div>
 			</template>
 		</DeskList>

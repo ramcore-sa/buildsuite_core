@@ -10,11 +10,15 @@
  *   destructive {Boolean}  When true the confirm button uses danger colours (default false)
  *   loading     {Boolean}  Shows spinner on confirm button and disables both buttons
  */
+import { __ } from "@/utils/translate";
+
+// Defaults are factories so they are translated per instance, after the boot
+// catalogue is on window, rather than once when the module is evaluated.
 defineProps({
 	open: { type: Boolean, required: true },
-	title: { type: String, default: "Are you sure?" },
+	title: { type: String, default: () => __("Are you sure?") },
 	message: { type: String, default: "" },
-	confirmLabel: { type: String, default: "Confirm" },
+	confirmLabel: { type: String, default: () => __("Confirm") },
 	destructive: { type: Boolean, default: false },
 	loading: { type: Boolean, default: false },
 });
@@ -51,7 +55,7 @@ function confirm() {
 					<button
 						type="button"
 						class="text-ink-500 hover:text-ink-900 text-lg leading-none ml-3"
-						aria-label="Close"
+						:aria-label="__('Close')"
 						:disabled="loading"
 						@click="close"
 					>
@@ -77,7 +81,7 @@ function confirm() {
 						:disabled="loading"
 						@click="close"
 					>
-						Cancel
+						{{ __("Cancel") }}
 					</button>
 					<button
 						type="button"

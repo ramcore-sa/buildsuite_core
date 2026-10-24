@@ -59,7 +59,7 @@ function deviationColor(pct) {
 						v-html="getWorkspaceIconPath('building-2')"
 					/>
 					<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-						Client
+						{{ __("Client") }}
 					</div>
 				</div>
 				<div class="text-sm text-ink-900 font-medium mt-1.5 truncate">
@@ -82,7 +82,7 @@ function deviationColor(pct) {
 						v-html="getWorkspaceIconPath('wallet')"
 					/>
 					<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-						Actual vs Planned
+						{{ __("Actual vs Planned") }}
 					</div>
 				</div>
 				<div class="flex items-baseline gap-1 mt-1.5 tabular-nums">
@@ -104,7 +104,7 @@ function deviationColor(pct) {
 						}}{{ costDeviationPct().toFixed(1) }}%)</span
 					>
 					<span class="text-ink-400 ml-0.5">{{
-						costDeviationPct() > 0 ? "over" : "under"
+						costDeviationPct() > 0 ? __("over") : __("under")
 					}}</span>
 				</div>
 			</div>
@@ -124,7 +124,7 @@ function deviationColor(pct) {
 						v-html="getWorkspaceIconPath('chart-line')"
 					/>
 					<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-						Progress
+						{{ __("Progress") }}
 					</div>
 				</div>
 				<div class="flex items-center gap-2 mt-1.5">
@@ -143,15 +143,15 @@ function deviationColor(pct) {
 					>
 				</div>
 				<div v-if="delayedDays > 0" class="text-[11px] text-danger-700 font-medium mt-1">
-					Delayed by {{ delayedDays }}d
+					{{ __("Delayed by {0}d", [delayedDays]) }}
 				</div>
 				<div
 					v-else-if="project.progress >= 100"
 					class="text-[11px] text-success-700 font-medium mt-1"
 				>
-					Completed
+					{{ __("Completed") }}
 				</div>
-				<div v-else class="text-[11px] text-success-700 font-medium mt-1">On track</div>
+				<div v-else class="text-[11px] text-success-700 font-medium mt-1">{{ __("On track") }}</div>
 			</div>
 
 			<!-- Timeline -->
@@ -169,15 +169,19 @@ function deviationColor(pct) {
 						v-html="getWorkspaceIconPath('calendar')"
 					/>
 					<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-						Timeline
+						{{ __("Timeline") }}
 					</div>
 				</div>
 				<div class="text-xs text-ink-900 font-medium mt-1.5 tabular-nums">
 					{{ fmtDate(project.startDate) }} → {{ fmtDate(project.endDate) }}
 				</div>
 				<div v-if="scheduleSummary" class="text-[11px] text-ink-500 mt-1 tabular-nums">
-					{{ scheduleSummary.totalDays }}d total · {{ scheduleSummary.remainingDays }}d
-					remaining
+					{{
+						__("{0}d total · {1}d remaining", [
+							scheduleSummary.totalDays,
+							scheduleSummary.remainingDays,
+						])
+					}}
 				</div>
 			</div>
 		</div>
@@ -204,11 +208,11 @@ function deviationColor(pct) {
 							aria-hidden="true"
 							v-html="getWorkspaceIconPath('clipboard-list')"
 						/>
-						<h3 class="text-sm font-semibold text-ink-900">About this project</h3>
+						<h3 class="text-sm font-semibold text-ink-900">{{ __("About this project") }}</h3>
 					</header>
 					<div class="p-5">
 						<p class="text-sm text-ink-800 leading-relaxed whitespace-pre-wrap">
-							{{ project.description || "No description provided yet." }}
+							{{ project.description || __("No description provided yet.") }}
 						</p>
 					</div>
 				</section>
@@ -231,7 +235,7 @@ function deviationColor(pct) {
 							aria-hidden="true"
 							v-html="getWorkspaceIconPath('chart-line')"
 						/>
-						<h3 class="text-sm font-semibold text-ink-900">Reports</h3>
+						<h3 class="text-sm font-semibold text-ink-900">{{ __("Reports") }}</h3>
 					</header>
 					<div class="p-4">
 						<div class="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -264,7 +268,7 @@ function deviationColor(pct) {
 											<span
 												class="text-[9px] px-1 py-0.5 bg-ink-100 text-ink-600 font-medium uppercase tracking-wider"
 												style="border-radius: 2px"
-												>Report</span
+												>{{ __("Report") }}</span
 											>
 										</div>
 										<div class="text-[11px] text-ink-500 mt-0.5 leading-snug">
@@ -298,7 +302,7 @@ function deviationColor(pct) {
 							aria-hidden="true"
 							v-html="getWorkspaceIconPath('hr')"
 						/>
-						<h3 class="text-sm font-semibold text-ink-900">Project Manager</h3>
+						<h3 class="text-sm font-semibold text-ink-900">{{ __("Project Manager") }}</h3>
 					</header>
 					<div class="p-4 flex items-center gap-3">
 						<template v-if="project.pm">
@@ -314,7 +318,7 @@ function deviationColor(pct) {
 								</div>
 							</div>
 						</template>
-						<div v-else class="text-sm text-ink-500">No project manager assigned.</div>
+						<div v-else class="text-sm text-ink-500">{{ __("No project manager assigned.") }}</div>
 					</div>
 				</section>
 
@@ -336,33 +340,33 @@ function deviationColor(pct) {
 							aria-hidden="true"
 							v-html="getWorkspaceIconPath('tag')"
 						/>
-						<h3 class="text-sm font-semibold text-ink-900">Project details</h3>
+						<h3 class="text-sm font-semibold text-ink-900">{{ __("Project details") }}</h3>
 						<button
 							type="button"
 							class="ml-auto text-[11px] text-brand-700 hover:text-brand-800 font-medium"
 							@click="emit('edit')"
 						>
-							Edit
+							{{ __("Edit") }}
 						</button>
 					</header>
 					<dl class="divide-y divide-ink-100">
 						<div class="flex items-center justify-between px-4 py-2.5 text-xs">
-							<dt class="text-ink-500 font-medium">Status</dt>
+							<dt class="text-ink-500 font-medium">{{ __("Status") }}</dt>
 							<dd><StatusBadge :status="project.status" /></dd>
 						</div>
 						<div class="flex items-center justify-between px-4 py-2.5 text-xs">
-							<dt class="text-ink-500 font-medium">Priority</dt>
+							<dt class="text-ink-500 font-medium">{{ __("Priority") }}</dt>
 							<dd><StatusBadge :status="project.priority" /></dd>
 						</div>
 						<div class="flex items-center justify-between px-4 py-2.5 text-xs">
-							<dt class="text-ink-500 font-medium">Type</dt>
+							<dt class="text-ink-500 font-medium">{{ __("Type") }}</dt>
 							<dd class="text-ink-800">{{ project.type || "—" }}</dd>
 						</div>
 						<div
 							v-if="store.isMultiCompany && project.company"
 							class="flex items-center justify-between px-4 py-2.5 text-xs"
 						>
-							<dt class="text-ink-500 font-medium">Company</dt>
+							<dt class="text-ink-500 font-medium">{{ __("Company") }}</dt>
 							<dd class="flex items-center gap-1.5 text-ink-800 min-w-0">
 								<span
 									v-if="store.companyById(project.company)"
@@ -377,17 +381,17 @@ function deviationColor(pct) {
 							</dd>
 						</div>
 						<div class="flex items-center justify-between px-4 py-2.5 text-xs">
-							<dt class="text-ink-500 font-medium">Location</dt>
+							<dt class="text-ink-500 font-medium">{{ __("Location") }}</dt>
 							<dd class="text-ink-800 truncate ml-2">
 								{{ project.location || "—" }}
 							</dd>
 						</div>
 						<div class="flex items-center justify-between px-4 py-2.5 text-xs">
-							<dt class="text-ink-500 font-medium">Project ID</dt>
+							<dt class="text-ink-500 font-medium">{{ __("Project ID") }}</dt>
 							<dd class="text-ink-800 font-mono">{{ project.code }}</dd>
 						</div>
 						<div class="flex items-center justify-between px-4 py-2.5 text-xs">
-							<dt class="text-ink-500 font-medium">Created</dt>
+							<dt class="text-ink-500 font-medium">{{ __("Created") }}</dt>
 							<dd class="text-ink-700 tabular-nums">
 								{{ fmtDate(project.createdAt) }}
 							</dd>

@@ -9,11 +9,12 @@ import { useDataStore } from "@/stores";
 import DeskPage from "@/components/desk/DeskPage.vue";
 import UserAvatar from "@/components/UserAvatar.vue";
 import { getWorkspaceIconPath } from "@/utils/workspaceIcons";
+import { __ } from "@/utils/translate";
 
 const store = useDataStore();
 const router = useRouter();
 
-const breadcrumbs = [{ label: "BuildSuite Core", to: "/" }, { label: "Settings" }];
+const breadcrumbs = [{ label: "BuildSuite Core", to: "/" }, { label: __("Settings") }];
 
 const isAdmin = computed(() => store.isAdmin);
 const isBSA = computed(() => store.isBSA);
@@ -23,151 +24,151 @@ const isBSA = computed(() => store.isBSA);
 // muted style and disables navigation.
 const groups = computed(() => [
 	{
-		title: "Organisation",
+		title: __("Organisation"),
 		tiles: [
 			{
 				slug: "companies",
 				icon: "building-2",
-				label: "Company",
-				desc: "Companies, addresses, fiscal year per entity.",
+				label: __("Company"),
+				desc: __("Companies, addresses, fiscal year per entity."),
 				to: "/settings/companies",
 				count: store.companies.length,
-				countLabel: store.companies.length === 1 ? "company" : "companies",
+				countLabel: store.companies.length === 1 ? __("company") : __("companies"),
 			},
 			{
 				slug: "users",
 				icon: "users",
-				label: "Users",
-				desc: "People who can log in. Role assignment and enabled status.",
+				label: __("Users"),
+				desc: __("People who can log in. Role assignment and enabled status."),
 				to: "/settings/users",
 				count: store.team.length,
-				countLabel: "users",
+				countLabel: __("users"),
 				adminOnly: true,
 			},
 			{
 				slug: "roles",
 				icon: "shield",
-				label: "Roles & Permissions",
-				desc: "Role definitions, workspace visibility and record-level permissions.",
+				label: __("Roles & Permissions"),
+				desc: __("Role definitions, workspace visibility and record-level permissions."),
 				adminOnly: true,
 				stub: true,
 			},
 			{
 				slug: "naming",
 				icon: "tag",
-				label: "Naming Series",
-				desc: "ID prefixes for Project, Task, BOQ, SCO etc.",
+				label: __("Naming Series"),
+				desc: __("ID prefixes for Project, Task, BOQ, SCO etc."),
 				adminOnly: true,
 				stub: true,
 			},
 		],
 	},
 	{
-		title: "BuildSuite product settings",
+		title: __("BuildSuite product settings"),
 		tiles: [
 			{
 				slug: "core",
 				icon: "puzzle",
-				label: "BuildSuite Core Settings",
-				desc: "Org-wide BuildSuite toggles — company segregation, default project type, default company.",
+				label: __("BuildSuite Core Settings"),
+				desc: __("Org-wide BuildSuite toggles — company segregation, default project type, default company."),
 				to: "/settings/core",
 				adminOnly: true,
 			},
 			{
 				slug: "site-execution-settings",
 				icon: "site-execution",
-				label: "Site Execution Settings",
-				desc: "Module defaults for Projects, Work Packages, Tasks, Progress Entries and Stage Planning.",
+				label: __("Site Execution Settings"),
+				desc: __("Module defaults for Projects, Work Packages, Tasks, Progress Entries and Stage Planning."),
 				to: "/settings/site-execution",
 				adminOnly: true,
 			},
 			{
 				slug: "workspace-structure",
 				icon: "layout-grid",
-				label: "Workspace Structure",
-				desc: "Configure workspaces and per-role shortcut grids.",
+				label: __("Workspace Structure"),
+				desc: __("Configure workspaces and per-role shortcut grids."),
 				to: "/settings/workspace-structure",
 				bsaOnly: true,
 			},
 			{
 				slug: "project-types",
 				icon: "tag",
-				label: "Project Types",
-				desc: "Configurable list of project types. Per-type Work Package label and default template picker.",
+				label: __("Project Types"),
+				desc: __("Configurable list of project types. Per-type Work Package label and default template picker."),
 				to: "/settings/project-types",
 				adminOnly: true,
 			},
 		],
 	},
 	{
-		title: "System",
+		title: __("System"),
 		adminOnly: true,
 		tiles: [
 			{
 				slug: "general",
 				icon: "settings",
-				label: "General Settings",
-				desc: "Date format, currency, time zone, default company, fiscal year.",
+				label: __("General Settings"),
+				desc: __("Date format, currency, time zone, default company, fiscal year."),
 				adminOnly: true,
 				stub: true,
 			},
 			{
 				slug: "email",
 				icon: "mail",
-				label: "Email & Notifications",
-				desc: "SMTP, notification rules, email templates, recipients.",
+				label: __("Email & Notifications"),
+				desc: __("SMTP, notification rules, email templates, recipients."),
 				adminOnly: true,
 				stub: true,
 			},
 			{
 				slug: "workflows",
 				icon: "refresh-ccw",
-				label: "Workflows",
-				desc: "Approval chains for BOQ, SCO, Petty Cash and RA Bills.",
+				label: __("Workflows"),
+				desc: __("Approval chains for BOQ, SCO, Petty Cash and RA Bills."),
 				adminOnly: true,
 				stub: true,
 			},
 			{
 				slug: "custom-fields",
 				icon: "wrench",
-				label: "Custom Fields",
-				desc: "Add fields to existing DocTypes.",
+				label: __("Custom Fields"),
+				desc: __("Add fields to existing DocTypes."),
 				adminOnly: true,
 				stub: true,
 			},
 			{
 				slug: "print",
 				icon: "file",
-				label: "Print Templates",
-				desc: "Letter heads, print formats per DocType, page sizes.",
+				label: __("Print Templates"),
+				desc: __("Letter heads, print formats per DocType, page sizes."),
 				adminOnly: true,
 				stub: true,
 			},
 			{
 				slug: "integrations",
 				icon: "plug",
-				label: "Integrations",
-				desc: "API keys, webhooks, OAuth apps and social login providers.",
+				label: __("Integrations"),
+				desc: __("API keys, webhooks, OAuth apps and social login providers."),
 				adminOnly: true,
 				stub: true,
 			},
 		],
 	},
 	{
-		title: "Data & Diagnostics",
+		title: __("Data & Diagnostics"),
 		tiles: [
 			{
 				slug: "data",
 				icon: "database",
-				label: "Data Tools",
-				desc: "Export the dataset, reset to defaults, inspect local storage.",
+				label: __("Data Tools"),
+				desc: __("Export the dataset, reset to defaults, inspect local storage."),
 				to: "/settings/data",
 			},
 			{
 				slug: "audit",
 				icon: "clipboard-list",
-				label: "Audit Log",
-				desc: "Recent user actions across the system — who changed what when.",
+				label: __("Audit Log"),
+				desc: __("Recent user actions across the system — who changed what when."),
 				adminOnly: true,
 				stub: true,
 			},
@@ -198,8 +199,8 @@ function onTileClick(tile) {
 
 <template>
 	<DeskPage
-		title="Settings"
-		subtitle="Organisation, system, data and diagnostics"
+		:title="__('Settings')"
+		:subtitle="__('Organisation, system, data and diagnostics')"
 		:breadcrumbs="breadcrumbs"
 	>
 		<!-- PRM-005 — Settings is restricted to System Manager + BuildSuite Administrator. -->
@@ -208,7 +209,7 @@ function onTileClick(tile) {
 			class="px-3 py-2 bg-warning-50 border border-warning-100 text-xs text-warning-700 dark:bg-ink-800 dark:border-ink-700"
 			style="border-radius: 6px"
 		>
-			Settings is restricted to administrators.
+			{{ __("Settings is restricted to administrators.") }}
 		</div>
 		<template v-else>
 			<!-- Signed-in chip — shows which role/company is active -->
@@ -219,10 +220,11 @@ function onTileClick(tile) {
 				<UserAvatar :user-id="store.user?.id" size="sm" />
 				<div class="flex-1 min-w-0">
 					<div class="text-sm text-ink-900">
-						Signed in as <span class="font-medium">{{ store.user?.name }}</span> · role
+						{{ __("Signed in as") }}
+						<span class="font-medium">{{ store.user?.name }}</span> · {{ __("role") }}
 						<span class="font-medium text-ink-700">{{ store.currentRole?.name }}</span>
 						<span v-if="store.isMultiCompany && store.currentCompany">
-							· acting on
+							· {{ __("acting on") }}
 							<span class="font-medium text-ink-700">{{
 								store.currentCompany.shortName
 							}}</span></span

@@ -26,6 +26,7 @@ import DeskSection from "@/components/desk/DeskSection.vue";
 import DeskField from "@/components/desk/DeskField.vue";
 import DeskInput from "@/components/desk/DeskInput.vue";
 import DeskSelect from "@/components/desk/DeskSelect.vue";
+import { __ } from "@/utils/translate";
 
 const store = useDataStore();
 const router = useRouter();
@@ -45,7 +46,7 @@ async function loadUsers() {
 	try {
 		users.value = await listBuildsuiteUsers();
 	} catch (err) {
-		loadError.value = err.message || "Could not load users.";
+		loadError.value = err.message || __("Could not load users.");
 	} finally {
 		loading.value = false;
 	}
@@ -71,16 +72,16 @@ const items = computed(() => {
 
 const columns = [
 	{ key: "avatar", label: "" },
-	{ key: "full_name", label: "Name" },
-	{ key: "persona", label: "Persona" },
-	{ key: "email", label: "Email" },
-	{ key: "enabled", label: "Status" },
+	{ key: "full_name", label: __("Name") },
+	{ key: "persona", label: __("Persona") },
+	{ key: "email", label: __("Email") },
+	{ key: "enabled", label: __("Status") },
 ];
 
 const breadcrumbs = [
 	{ label: "BuildSuite Core", to: "/" },
-	{ label: "Settings", to: "/settings" },
-	{ label: "Users" },
+	{ label: __("Settings"), to: "/settings" },
+	{ label: __("Users") },
 ];
 
 // ---- Edit modal ----
@@ -114,8 +115,8 @@ function openEdit(row) {
 
 async function saveEdit() {
 	const e = {};
-	if (!editForm.fullName.trim()) e.fullName = "Full name is required.";
-	if (!editForm.persona) e.persona = "Pick a persona.";
+	if (!editForm.fullName.trim()) e.fullName = __("Full name is required.");
+	if (!editForm.persona) e.persona = __("Pick a persona.");
 	editErrors.value = e;
 	if (Object.keys(e).length) return;
 	editError.value = "";
@@ -127,11 +128,11 @@ async function saveEdit() {
 			persona: editForm.persona,
 			enabled: editForm.enabled ? 1 : 0,
 		});
-		showToast("User updated");
+		showToast(__("User updated"));
 		editOpen.value = false;
 		await loadUsers();
 	} catch (err) {
-		editError.value = err.message || "Could not save.";
+		editError.value = err.message || __("Could not save.");
 	} finally {
 		editSaving.value = false;
 	}
@@ -141,9 +142,9 @@ async function resendWelcome() {
 	emailActing.value = "welcome";
 	try {
 		await sendUserWelcome(editForm.email);
-		showToast("Welcome email queued");
+		showToast(__("Welcome email queued"));
 	} catch (err) {
-		showToast(err.message || "Could not send welcome email", "error");
+		showToast(err.message || __("Could not send welcome email"), "error");
 	} finally {
 		emailActing.value = "";
 	}
@@ -152,9 +153,9 @@ async function sendReset() {
 	emailActing.value = "reset";
 	try {
 		await sendUserPasswordReset(editForm.email);
-		showToast("Password-reset link queued");
+		showToast(__("Password-reset link queued"));
 	} catch (err) {
-		showToast(err.message || "Could not send reset link", "error");
+		showToast(err.message || __("Could not send reset link"), "error");
 	} finally {
 		emailActing.value = "";
 	}
@@ -162,11 +163,11 @@ async function sendReset() {
 
 async function deleteUser() {
 	const ok = await confirmDialog({
-		title: "Delete user",
-		message: `Delete ${
-			editForm.fullName || editForm.email
-		}? They can no longer log in or be assigned new work.`,
-		confirmLabel: "Delete user",
+		title: __("Delete user"),
+		message: __("Delete {0}? They can no longer log in or be assigned new work.", [
+			editForm.fullName || editForm.email,
+		]),
+		confirmLabel: __("Delete user"),
 		destructive: true,
 	});
 	if (!ok) return;
@@ -174,11 +175,11 @@ async function deleteUser() {
 	editSaving.value = true;
 	try {
 		await deleteBuildsuiteUser(editForm.email);
-		showToast("User deleted");
+		showToast(__("User deleted"));
 		editOpen.value = false;
 		await loadUsers();
 	} catch (err) {
-		editError.value = err.message || "Could not delete user.";
+		editError.value = err.message || __("Could not delete user.");
 	} finally {
 		editSaving.value = false;
 	}
@@ -186,10 +187,10 @@ async function deleteUser() {
 </script>
 
 <template>
-	<DeskPage title="Users" :breadcrumbs="breadcrumbs">
+	<DeskPage :title="__('Users')" :breadcrumbs="breadcrumbs">
 		<template #actions>
 			<RouterLink v-if="store.isAdmin" to="/settings/users/new" class="desk-save-btn"
-				>+ New User</RouterLink
+				>{{ __("+ New User") }}</RouterLink
 			>
 		</template>
 
@@ -198,7 +199,7 @@ async function deleteUser() {
 			class="mb-3 px-3 py-2 bg-warning-50 border border-warning-100 text-xs text-warning-700 dark:bg-ink-800 dark:border-ink-700"
 			style="border-radius: 6px"
 		>
-			Users management is restricted to administrators.
+			{{ __("Users management is restricted to administrators.") }}
 		</div>
 
 		<div
@@ -206,7 +207,8 @@ async function deleteUser() {
 			class="mb-3 px-3 py-2 bg-success-50 border border-success-100 text-xs text-success-700 dark:bg-ink-800 dark:border-ink-700"
 			style="border-radius: 6px"
 		>
-			User <span class="font-medium">{{ createdBanner }}</span> created.
+			{{ __("User") }} <span class="font-medium">{{ createdBanner }}</span>
+			{{ __("created.") }}
 		</div>
 
 		<div
@@ -222,7 +224,7 @@ async function deleteUser() {
 			:rows="items"
 			:columns="columns"
 			row-key="name"
-			search-placeholder="Search by name, email, persona…"
+			:search-placeholder="__('Search by name, email, persona…')"
 			@row-click="openEdit"
 		>
 			<template #cell-avatar="{ row }">
@@ -241,7 +243,7 @@ async function deleteUser() {
 					v-if="row.persona"
 					class="text-[10px] px-2 py-0.5 rounded-full font-medium"
 					:class="PERSONA_PILL"
-					>{{ row.persona }}</span
+					>{{ __(row.persona) }}</span
 				>
 				<span v-else class="text-[10px] text-ink-400">—</span>
 			</template>
@@ -251,7 +253,7 @@ async function deleteUser() {
 
 			<template #empty>
 				<div class="text-sm text-ink-500">
-					{{ loading ? "Loading users…" : "No users match this search." }}
+					{{ loading ? __("Loading users…") : __("No users match this search.") }}
 				</div>
 			</template>
 		</DeskList>
@@ -292,7 +294,7 @@ async function deleteUser() {
 						<button
 							type="button"
 							class="text-ink-500 hover:text-ink-900 text-lg leading-none flex-shrink-0 ml-3 dark:text-ink-400 dark:hover:text-ink-200"
-							aria-label="Close"
+							:aria-label="__('Close')"
 							@click="editOpen = false"
 						>
 							×
@@ -307,8 +309,8 @@ async function deleteUser() {
 						>
 							{{ editError }}
 						</div>
-						<DeskSection title="Account">
-							<DeskField label="Full name" required :error="editErrors.fullName">
+						<DeskSection :title="__('Account')">
+							<DeskField :label="__('Full name')" required :error="editErrors.fullName">
 								<DeskInput
 									v-model="editForm.fullName"
 									@input="
@@ -318,14 +320,14 @@ async function deleteUser() {
 								/>
 							</DeskField>
 							<DeskField
-								label="Email"
-								hint="Login id — cannot be changed after the user is created."
+								:label="__('Email')"
+								:hint="__('Login id — cannot be changed after the user is created.')"
 							>
 								<DeskInput :model-value="editForm.email" disabled />
 							</DeskField>
 							<DeskField
-								label="Account status"
-								hint="Disabled users keep their record but cannot log in."
+								:label="__('Account status')"
+								:hint="__('Disabled users keep their record but cannot log in.')"
 							>
 								<label
 									class="inline-flex items-center gap-2 cursor-pointer select-none text-sm text-ink-700 dark:text-ink-200"
@@ -335,17 +337,21 @@ async function deleteUser() {
 										type="checkbox"
 										class="accent-brand-600"
 									/>
-									Enabled
+									{{ __("Enabled") }}
 								</label>
 							</DeskField>
 						</DeskSection>
 
-						<DeskSection title="Persona">
+						<DeskSection :title="__('Persona')">
 							<DeskField
-								label="Persona"
+								:label="__('Persona')"
 								required
 								:error="editErrors.persona"
-								hint="Frappe Roles are auto-assigned from the persona on the production side."
+								:hint="
+									__(
+										'Frappe Roles are auto-assigned from the persona on the production side.'
+									)
+								"
 							>
 								<DeskSelect
 									v-model="editForm.persona"
@@ -354,30 +360,33 @@ async function deleteUser() {
 										editError = '';
 									"
 								>
-									<option value="">— Select persona —</option>
+									<option value="">{{ __("— Select persona —") }}</option>
 									<option v-for="opt in personaOptions" :key="opt" :value="opt">
-										{{ opt }}
+										{{ __(opt) }}
 									</option>
 								</DeskSelect>
 							</DeskField>
 						</DeskSection>
 
-						<DeskSection title="Email actions">
+						<DeskSection :title="__('Email actions')">
 							<div class="md:col-span-2 space-y-2">
 								<div
 									v-if="mailConfigured === false"
 									class="px-3 py-2 bg-warning-50 border border-warning-100 text-[11px] text-warning-700 dark:bg-ink-800 dark:border-ink-700"
 									style="border-radius: 6px"
 								>
-									Outgoing email isn't configured — these emails won't be sent
-									until an outgoing Email Account is set up.
+									{{
+										__(
+											"Outgoing email isn't configured — these emails won't be sent until an outgoing Email Account is set up."
+										)
+									}}
 								</div>
 								<div
 									class="flex items-center justify-between gap-3 px-3 py-2 border border-ink-100 bg-ink-50 dark:bg-ink-800 dark:border-ink-700"
 									style="border-radius: 6px"
 								>
 									<div class="text-sm text-ink-900 dark:text-[#F5F5F5]">
-										Welcome email
+										{{ __("Welcome email") }}
 									</div>
 									<button
 										type="button"
@@ -387,7 +396,7 @@ async function deleteUser() {
 										@click="resendWelcome"
 									>
 										{{
-											emailActing === "welcome" ? "Sending…" : "Send welcome"
+											emailActing === "welcome" ? __("Sending…") : __("Send welcome")
 										}}
 									</button>
 								</div>
@@ -396,7 +405,7 @@ async function deleteUser() {
 									style="border-radius: 6px"
 								>
 									<div class="text-sm text-ink-900 dark:text-[#F5F5F5]">
-										Password reset link
+										{{ __("Password reset link") }}
 									</div>
 									<button
 										type="button"
@@ -407,8 +416,8 @@ async function deleteUser() {
 									>
 										{{
 											emailActing === "reset"
-												? "Sending…"
-												: "Send reset link"
+												? __("Sending…")
+												: __("Send reset link")
 										}}
 									</button>
 								</div>
@@ -427,7 +436,7 @@ async function deleteUser() {
 							:disabled="editSaving"
 							@click="deleteUser"
 						>
-							Delete user
+							{{ __("Delete user") }}
 						</button>
 						<div class="flex items-center gap-2">
 							<button
@@ -437,7 +446,7 @@ async function deleteUser() {
 								:disabled="editSaving"
 								@click="editOpen = false"
 							>
-								Cancel
+								{{ __("Cancel") }}
 							</button>
 							<button
 								type="button"
@@ -445,7 +454,7 @@ async function deleteUser() {
 								:disabled="editSaving"
 								@click="saveEdit"
 							>
-								{{ editSaving ? "Saving…" : "Save" }}
+								{{ editSaving ? __("Saving…") : __("Save") }}
 							</button>
 						</div>
 					</footer>

@@ -8,6 +8,7 @@ import "./style.css";
 import { applyBootToWindow, syncSessionFromCookie } from "./utils/session";
 import { useSessionStore } from "./stores/session";
 import { DEV_BOOT_METHOD } from "./utils/appRoute";
+import { translationPlugin } from "./utils/translate";
 
 const DEV_BOOT_URL = `/api/method/${DEV_BOOT_METHOD}`;
 
@@ -46,6 +47,8 @@ async function mountApp() {
 	setConfig("resourceFetcher", frappeRequest);
 
 	app.use(pinia);
+	// Before the router, so the first route's components already see `__`.
+	app.use(translationPlugin);
 
 	const sessionStore = useSessionStore(pinia);
 	await sessionStore.bootstrapSession();

@@ -48,7 +48,7 @@ defineProps({
 			<!-- Shortcut tiles — only when `links` is provided. -->
 			<div v-if="links.length" class="mb-6">
 				<div class="text-[11px] uppercase tracking-wider text-ink-500 font-semibold mb-2">
-					Module shortcuts
+					{{ __("Module shortcuts") }}
 				</div>
 				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
 					<WorkspaceShortcut
@@ -67,9 +67,9 @@ defineProps({
 				class="px-4 py-3 bg-ink-50 border border-ink-200 text-xs text-ink-600"
 				style="border-radius: 6px"
 			>
-				<div class="font-medium text-ink-700 mb-1">No shortcuts available</div>
+				<div class="font-medium text-ink-700 mb-1">{{ __("No shortcuts available") }}</div>
 				<p class="leading-relaxed">
-					There are no shortcuts configured for this workspace yet.
+					{{ __("There are no shortcuts configured for this workspace yet.") }}
 				</p>
 			</div>
 		</div>

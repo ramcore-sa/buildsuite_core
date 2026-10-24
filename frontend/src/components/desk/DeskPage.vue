@@ -33,7 +33,7 @@ const statusList = computed(() => {
 		<nav
 			v-if="breadcrumbs.length"
 			class="text-[11px] text-ink-500 flex items-center gap-1.5 flex-wrap mb-1.5"
-			aria-label="Breadcrumb"
+			:aria-label="__('Breadcrumb')"
 		>
 			<template v-for="(c, i) in breadcrumbs" :key="i">
 				<RouterLink v-if="c.to" :to="c.to" class="desk-link">{{ c.label }}</RouterLink>

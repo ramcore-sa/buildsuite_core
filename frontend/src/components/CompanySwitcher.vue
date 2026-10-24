@@ -27,7 +27,7 @@ function pickCompany(id) {
 		<button
 			@click="open = !open"
 			class="h-7 pl-1 pr-2 rounded-md hover:bg-ink-50 flex items-center gap-2 border border-ink-200"
-			:title="`Switch company · current: ${currentCompany.name}`"
+			:title="__('Switch company · current: {0}', [currentCompany.name])"
 		>
 			<span :class="currentCompany.color" class="w-5 h-5 rounded flex-shrink-0"></span>
 			<span class="text-xs font-medium text-ink-700 whitespace-nowrap">{{
@@ -58,7 +58,7 @@ function pickCompany(id) {
 				<div
 					class="px-3 py-2 text-[11px] font-semibold text-ink-500 uppercase tracking-wider border-b border-ink-200 bg-ink-50"
 				>
-					Switch company
+					{{ __("Switch company") }}
 				</div>
 				<div class="max-h-[65vh] overflow-y-auto scrollbar-thin">
 					<button
@@ -83,7 +83,7 @@ function pickCompany(id) {
 						<span
 							v-if="c.id === currentCompany.id"
 							class="text-brand-600 text-sm mt-0.5 flex-shrink-0"
-							aria-label="current company"
+							:aria-label="__('current company')"
 							>✓</span
 						>
 					</button>

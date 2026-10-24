@@ -46,5 +46,10 @@ const classes = computed(() => {
 </script>
 
 <template>
-	<span :class="classes">{{ status }}</span>
+	<!-- The status is a stored option value, compared above in English; only
+	     the rendered label is translated, as desk does for Select options. The
+	     "Status" context lets a word whose general translation means something
+	     else (Blocked, Delayed) read as a state here; without a contextual entry
+	     it falls back to the plain one. -->
+	<span :class="classes">{{ __(status, null, "Status") }}</span>
 </template>

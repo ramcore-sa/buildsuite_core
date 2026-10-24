@@ -10,6 +10,7 @@ import DocTypeListView from "@/components/doctype/DocTypeListView.vue";
 import { fmtCompactINR } from "@/utils/format";
 import { useDocTypeList } from "@/composables/useDocTypeList";
 import { usePermissions } from "@/composables/usePermissions";
+import { __ } from "@/utils/translate";
 
 const router = useRouter();
 const { canCreate } = usePermissions();
@@ -43,7 +44,7 @@ function companyName(id) {
 	return companiesResource.data?.find((c) => c.id === id)?.name || id;
 }
 
-const breadcrumbs = [{ label: "BuildSuite Core", to: "/" }, { label: "Project" }];
+const breadcrumbs = [{ label: "BuildSuite Core", to: "/" }, { label: __("Project") }];
 
 function onRowClick(row) {
 	const key = row.name;
@@ -52,10 +53,10 @@ function onRowClick(row) {
 </script>
 
 <template>
-	<DeskPage title="Project" :breadcrumbs="breadcrumbs">
+	<DeskPage :title="__('Project')" :breadcrumbs="breadcrumbs">
 		<template #actions>
 			<RouterLink v-if="canCreate('project')" to="/projects/new" class="desk-save-btn"
-				>+ New</RouterLink
+				>+ {{ __("New") }}</RouterLink
 			>
 		</template>
 
@@ -74,24 +75,24 @@ function onRowClick(row) {
 				'company',
 			]"
 			:columns="[
-				{ key: 'custom_project_id', label: 'Project ID' },
-				{ key: 'project_name', label: 'Project Name' },
-				{ key: 'customer', label: 'Client' },
-				{ key: 'project_type', label: 'Project Type' },
+				{ key: 'custom_project_id', label: __('Project ID') },
+				{ key: 'project_name', label: __('Project Name') },
+				{ key: 'customer', label: __('Client') },
+				{ key: 'project_type', label: __('Project Type') },
 				{
 					key: 'project_status',
-					label: 'Status',
+					label: __('Status'),
 					preset: 'status',
 				},
-				{ key: 'estimated_costing', label: 'Budget' },
-				{ key: 'percent_complete', label: 'Progress', preset: 'progress' },
+				{ key: 'estimated_costing', label: __('Budget') },
+				{ key: 'percent_complete', label: __('Progress'), preset: 'progress' },
 				{
 					key: 'timeline',
-					label: 'Timeline',
+					label: __('Timeline'),
 					preset: 'timeline',
 					fields: ['expected_start_date', 'expected_end_date'],
 				},
-				{ key: 'company', label: 'Company' },
+				{ key: 'company', label: __('Company') },
 			]"
 			:search-fields="['project_name', 'custom_project_id', 'customer', 'name']"
 			:base-filters="[['parent_project', 'is', 'not set']]"
@@ -103,25 +104,25 @@ function onRowClick(row) {
 			}"
 			cache-key="buildsuite-project-list-generic"
 			row-key="name"
-			search-placeholder="Search by name, code, client…"
+			:search-placeholder="__('Search by name, code, client…')"
 			@row-click="onRowClick"
 		>
 			<template #filter-chips>
 				<DeskSelect v-model="statusFilter" class="!w-32">
-					<option value="">Status: Any</option>
-					<option>New</option>
-					<option>Ongoing</option>
-					<option>Delayed</option>
-					<option>Completed</option>
+					<option value="">{{ __("Status: Any") }}</option>
+					<option value="New">{{ __("New") }}</option>
+					<option value="Ongoing">{{ __("Ongoing") }}</option>
+					<option value="Delayed">{{ __("Delayed", null, "Status") }}</option>
+					<option value="Completed">{{ __("Completed") }}</option>
 				</DeskSelect>
 
 				<DeskSelect v-model="typeFilter" class="!w-40">
-					<option value="">Type: Any</option>
-					<option>Commercial</option>
-					<option>Residential</option>
-					<option>Infrastructure</option>
-					<option>Industrial</option>
-					<option>Renovation</option>
+					<option value="">{{ __("Type: Any") }}</option>
+					<option value="Commercial">{{ __("Commercial") }}</option>
+					<option value="Residential">{{ __("Residential") }}</option>
+					<option value="Infrastructure">{{ __("Infrastructure") }}</option>
+					<option value="Industrial">{{ __("Industrial") }}</option>
+					<option value="Renovation">{{ __("Renovation") }}</option>
 				</DeskSelect>
 
 				<DeskLinkPicker
@@ -133,7 +134,7 @@ function onRowClick(row) {
 					value-field="name"
 					:search-fields="['name', 'abbr']"
 					:page-length="10"
-					placeholder="Company: Any"
+					:placeholder="__('Company: Any')"
 				/>
 			</template>
 
@@ -153,8 +154,8 @@ function onRowClick(row) {
 
 			<template #empty>
 				<div class="text-sm text-ink-500">
-					No projects match your filters ·
-					<DeskLink to="/projects/new">Create one →</DeskLink>
+					{{ __("No projects match your filters") }} ·
+					<DeskLink to="/projects/new">{{ __("Create one →") }}</DeskLink>
 				</div>
 			</template>
 		</DocTypeListView>

@@ -10,28 +10,32 @@
  *   }
  */
 
+import { __ } from "@/utils/translate";
+
 // Human-readable labels for common Frappe field names. Falls back to
 // Title-Cased snake_case for anything not listed.
 const FIELD_LABELS = {
-	company: "Company",
-	project_name: "Project Name",
-	custom_project_id: "Project ID",
-	customer: "Client",
-	project_type: "Project Type",
-	expected_start_date: "Start Date",
-	expected_end_date: "End Date",
-	estimated_costing: "Budget",
-	owner: "Project Manager",
-	task: "Task",
-	entry_date: "Entry Date",
-	cumulative_progress: "Progress",
-	work_package: "Work Package",
-	work_package_name: "Work Package Name",
-	subject: "Task Name",
-	status: "Status",
+	company: __("Company"),
+	project_name: __("Project Name"),
+	custom_project_id: __("Project ID"),
+	customer: __("Client"),
+	project_type: __("Project Type"),
+	expected_start_date: __("Start Date"),
+	expected_end_date: __("End Date"),
+	estimated_costing: __("Budget"),
+	owner: __("Project Manager"),
+	task: __("Task"),
+	entry_date: __("Entry Date"),
+	cumulative_progress: __("Progress"),
+	work_package: __("Work Package"),
+	work_package_name: __("Work Package Name"),
+	subject: __("Task Name"),
+	status: __("Status"),
 };
 
 function fieldLabel(name) {
+	// Unlisted fields fall back to the raw name title-cased; those are not in
+	// any catalogue, so they stay English.
 	return FIELD_LABELS[name] ?? name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
@@ -102,6 +106,10 @@ export function parseFrappeError(err) {
 		// Extract field names from the traceback tail:
 		//   MandatoryError: [DocType, Name]: field1\nfield2
 		const tbMatch = exc.match(/MandatoryError:\s*\[.*?\]:\s*([\s\S]+)$/);
+		// Labels are collected alongside the messages rather than recovered from
+		// them afterwards: the message is translated, so stripping an English
+		// " is required" suffix would no longer find anything.
+		const labelSet = new Set();
 		if (tbMatch) {
 			tbMatch[1]
 				.trim()
@@ -109,7 +117,8 @@ export function parseFrappeError(err) {
 				.map((f) => f.trim())
 				.filter(Boolean)
 				.forEach((f) => {
-					fieldErrors[f] = `${fieldLabel(f)} is required`;
+					fieldErrors[f] = __("{0} is required", [fieldLabel(f)]);
+					labelSet.add(fieldLabel(f));
 				});
 		}
 
@@ -123,25 +132,24 @@ export function parseFrappeError(err) {
 					.map((f) => f.trim())
 					.filter(Boolean)
 					.forEach((f) => {
-						fieldErrors[f] ??= `${fieldLabel(f)} is required`;
+						fieldErrors[f] ??= __("{0} is required", [fieldLabel(f)]);
+						labelSet.add(fieldLabel(f));
 					});
 			}
 		}
 
-		const labels = [
-			...new Set(Object.values(fieldErrors).map((e) => e.replace(" is required", ""))),
-		];
+		const labels = [...labelSet];
 		return {
 			summary: labels.length
-				? `Required: ${labels.join(", ")}`
-				: "Some required fields are missing",
+				? __("Required: {0}", [labels.join(", ")])
+				: __("Some required fields are missing"),
 			fieldErrors,
 		};
 	}
 
 	// For any other error type use the first server message, then err.message.
 	return {
-		summary: messages[0] ?? stripHtml(err.message) ?? "An unexpected error occurred",
+		summary: messages[0] ?? stripHtml(err.message) ?? __("An unexpected error occurred"),
 		fieldErrors: {},
 	};
 }

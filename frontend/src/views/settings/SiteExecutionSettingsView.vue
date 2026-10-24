@@ -12,6 +12,7 @@ import DeskActionBar from "@/components/desk/DeskActionBar.vue";
 import DeskSection from "@/components/desk/DeskSection.vue";
 import DeskField from "@/components/desk/DeskField.vue";
 import DeskSelect from "@/components/desk/DeskSelect.vue";
+import { __ } from "@/utils/translate";
 
 const store = useDataStore();
 
@@ -48,8 +49,8 @@ function onPrimary() {
 
 const breadcrumbs = [
 	{ label: "BuildSuite Core", to: "/" },
-	{ label: "Settings", to: "/settings" },
-	{ label: "Site Execution Settings" },
+	{ label: __("Settings"), to: "/settings" },
+	{ label: __("Site Execution Settings") },
 ];
 
 const TASK_TYPES = ["Activity", "Milestone", "Inspection"];
@@ -57,18 +58,18 @@ const TASK_TYPES = ["Activity", "Milestone", "Inspection"];
 
 <template>
 	<DeskPage
-		title="Site Execution Settings"
-		subtitle="Module operational defaults"
+		:title="__('Site Execution Settings')"
+		:subtitle="__('Module operational defaults')"
 		:breadcrumbs="breadcrumbs"
 	>
 		<DeskForm>
 			<template #action-bar>
 				<DeskActionBar
 					v-if="store.isAdmin"
-					:save-label="editing ? (saving ? 'Saving…' : 'Save') : 'Edit'"
+					:save-label="editing ? (saving ? __('Saving…') : __('Save')) : __('Edit')"
 					:show-cancel="editing"
 					:saving="saving"
-					cancel-label="Cancel"
+					:cancel-label="__('Cancel')"
 					@save="onPrimary"
 					@cancel="cancelEdit"
 				/>
@@ -76,32 +77,40 @@ const TASK_TYPES = ["Activity", "Milestone", "Inspection"];
 					v-else
 					class="px-3 py-2 bg-warning-50 border-b border-warning-100 text-xs text-warning-700"
 				>
-					Read-only. Editing requires Admin or BuildSuite Administrator role.
+					{{ __("Read-only. Editing requires Admin or BuildSuite Administrator role.") }}
 				</div>
 			</template>
 
 			<div class="max-w-3xl mx-auto">
-				<DeskSection title="Task defaults">
+				<DeskSection :title="__('Task defaults')">
 					<DeskField
-						label="Default task type"
-						hint="Pre-fills task type on new tasks. Choose Activity, Milestone or Inspection."
+						:label="__('Default task type')"
+						:hint="
+							__(
+								'Pre-fills task type on new tasks. Choose Activity, Milestone or Inspection.'
+							)
+						"
 					>
 						<div v-if="!editing" class="text-sm text-ink-900 py-1">
-							{{ store.siteExecutionSettings.default_task_type }}
+							{{ __(store.siteExecutionSettings.default_task_type) }}
 						</div>
 						<DeskSelect v-else v-model="form.default_task_type">
-							<option v-for="t in TASK_TYPES" :key="t">{{ t }}</option>
+							<option v-for="t in TASK_TYPES" :key="t" :value="t">{{ __(t) }}</option>
 						</DeskSelect>
 					</DeskField>
 				</DeskSection>
 
-				<DeskSection title="Company propagation">
+				<DeskSection :title="__('Company propagation')">
 					<DeskField
-						label="Auto-propagate company"
-						hint="When ON, child records (Work Package, Task, Progress Entry, Stage Planning, Attachments) inherit company from their parent project on create. When OFF, company is left blank and must be set explicitly."
+						:label="__('Auto-propagate company')"
+						:hint="
+							__(
+								'When ON, child records (Work Package, Task, Progress Entry, Stage Planning, Attachments) inherit company from their parent project on create. When OFF, company is left blank and must be set explicitly.'
+							)
+						"
 					>
 						<div v-if="!editing" class="text-sm text-ink-900 py-1">
-							{{ store.siteExecutionSettings.auto_propagate_company ? "On" : "Off" }}
+							{{ store.siteExecutionSettings.auto_propagate_company ? __("On") : __("Off") }}
 						</div>
 						<label v-else class="flex items-center gap-2 py-1 text-sm cursor-pointer">
 							<input
@@ -109,21 +118,25 @@ const TASK_TYPES = ["Activity", "Milestone", "Inspection"];
 								v-model="form.auto_propagate_company"
 								class="accent-brand-600"
 							/>
-							<span>{{ form.auto_propagate_company ? "On" : "Off" }}</span>
+							<span>{{ form.auto_propagate_company ? __("On") : __("Off") }}</span>
 						</label>
 					</DeskField>
 				</DeskSection>
 
-				<DeskSection title="Task Progress Entry">
+				<DeskSection :title="__('Task Progress Entry')">
 					<DeskField
-						label="Require attachment"
-						hint="When ON, filing a progress entry without at least one attachment is rejected. Enforces site photo discipline."
+						:label="__('Require attachment')"
+						:hint="
+							__(
+								'When ON, filing a progress entry without at least one attachment is rejected. Enforces site photo discipline.'
+							)
+						"
 					>
 						<div v-if="!editing" class="text-sm text-ink-900 py-1">
 							{{
 								store.siteExecutionSettings.tpe_attachment_required
-									? "Required"
-									: "Optional"
+									? __("Required")
+									: __("Optional")
 							}}
 						</div>
 						<label v-else class="flex items-center gap-2 py-1 text-sm cursor-pointer">
@@ -133,22 +146,26 @@ const TASK_TYPES = ["Activity", "Milestone", "Inspection"];
 								class="accent-brand-600"
 							/>
 							<span>{{
-								form.tpe_attachment_required ? "Required" : "Optional"
+								form.tpe_attachment_required ? __("Required") : __("Optional")
 							}}</span>
 						</label>
 					</DeskField>
 				</DeskSection>
 
-				<DeskSection title="Safety">
+				<DeskSection :title="__('Safety')">
 					<DeskField
-						label="Cascade-delete confirmation"
-						hint="When ON, deleting a Project, Work Package or Task shows a confirm dialog listing the cascaded child records. Off skips the prompt."
+						:label="__('Cascade-delete confirmation')"
+						:hint="
+							__(
+								'When ON, deleting a Project, Work Package or Task shows a confirm dialog listing the cascaded child records. Off skips the prompt.'
+							)
+						"
 					>
 						<div v-if="!editing" class="text-sm text-ink-900 py-1">
 							{{
 								store.siteExecutionSettings.cascade_delete_confirmation
-									? "On"
-									: "Off"
+									? __("On")
+									: __("Off")
 							}}
 						</div>
 						<label v-else class="flex items-center gap-2 py-1 text-sm cursor-pointer">
@@ -157,7 +174,7 @@ const TASK_TYPES = ["Activity", "Milestone", "Inspection"];
 								v-model="form.cascade_delete_confirmation"
 								class="accent-brand-600"
 							/>
-							<span>{{ form.cascade_delete_confirmation ? "On" : "Off" }}</span>
+							<span>{{ form.cascade_delete_confirmation ? __("On") : __("Off") }}</span>
 						</label>
 					</DeskField>
 				</DeskSection>

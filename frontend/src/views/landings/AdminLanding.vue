@@ -6,6 +6,7 @@ import { WORKSPACE_META, workspaceMetric } from "@/data/workspaces";
 import { useDataStore } from "@/stores";
 import LandingShell from "@/layouts/LandingShell.vue";
 import { fmtDate } from "@/utils/format";
+import { __ } from "@/utils/translate";
 
 const ROLE_ID = "admin";
 const role = ROLES.find((r) => r.id === ROLE_ID);
@@ -40,9 +41,9 @@ const recentActivity = computed(() => {
 		if (p.createdAt)
 			events.push({
 				key: `proj-${p.id}`,
-				kind: "Project",
+				kind: __("Project"),
 				kindClass: "bg-info-50 text-info-700",
-				title: `Project created: ${p.name}`,
+				title: __("Project created: {0}", [p.name]),
 				date: p.createdAt,
 				to: `/projects/${p.id}`,
 			});
@@ -54,7 +55,7 @@ const recentActivity = computed(() => {
 				key: `sco-raise-${s.id}`,
 				kind: "SCO",
 				kindClass: "bg-warning-50 text-warning-700",
-				title: `SCO raised: ${s.title}`,
+				title: __("SCO raised: {0}", [s.title]),
 				date: s.raisedDate,
 				sub: proj?.name,
 				to: "/sco",
@@ -68,7 +69,7 @@ const recentActivity = computed(() => {
 				key: `boq-appr-${b.id}`,
 				kind: "BOQ",
 				kindClass: "bg-success-50 text-success-700",
-				title: `BOQ revision ${b.revision} approved`,
+				title: __("BOQ revision {0} approved", [b.revision]),
 				date: b.approvedDate,
 				sub: proj?.name,
 				to: `/boq/${b.id}`,
@@ -79,7 +80,7 @@ const recentActivity = computed(() => {
 				key: `boq-prep-${b.id}`,
 				kind: "BOQ",
 				kindClass: "bg-ink-100 text-ink-600",
-				title: `BOQ revision ${b.revision} drafted`,
+				title: __("BOQ revision {0} drafted", [b.revision]),
 				date: b.preparedDate,
 				sub: proj?.name,
 				to: `/boq/${b.id}`,
@@ -94,10 +95,10 @@ const recentActivity = computed(() => {
 // System health — illustrative for now. The localStorage key and "last reset" would be
 // real once we track a reset timestamp; for the prototype these are descriptive.
 const systemHealth = [
-	{ label: "Data store", value: "localStorage · buildsuite:data:v1", tone: "ok" },
-	{ label: "Role preference", value: "localStorage · buildsuite:role", tone: "ok" },
-	{ label: "Last reset", value: "never (this session)", tone: "ok" },
-	{ label: "Build", value: "Vue 3 · Vite 5 · Pinia · Tailwind", tone: "ok" },
+	{ label: __("Data store"), value: "localStorage · buildsuite:data:v1", tone: "ok" },
+	{ label: __("Role preference"), value: "localStorage · buildsuite:role", tone: "ok" },
+	{ label: __("Last reset"), value: __("never (this session)"), tone: "ok" },
+	{ label: __("Build"), value: "Vue 3 · Vite 5 · Pinia · Tailwind", tone: "ok" },
 ];
 </script>
 
@@ -108,16 +109,16 @@ const systemHealth = [
 			<div class="flex items-center gap-3 mb-2">
 				<span :class="role.color" class="w-2.5 h-2.5 rounded-full"></span>
 				<p class="text-xs text-ink-500 uppercase tracking-wider font-medium">
-					{{ role.shortName }} · System overview
+					{{ role.shortName }} · {{ __("System overview") }}
 				</p>
 			</div>
-			<h1 class="text-2xl font-semibold text-ink-900 tracking-tight">All systems</h1>
+			<h1 class="text-2xl font-semibold text-ink-900 tracking-tight">{{ __("All systems") }}</h1>
 			<p class="text-sm text-ink-500 mt-1">
 				{{ todayLabel }} ·
-				<span class="text-ink-700 font-medium">{{ store.team.length }} users</span> ·
-				<span class="text-ink-700 font-medium">{{ store.projects.length }} projects</span>
+				<span class="text-ink-700 font-medium">{{ __("{0} users", [store.team.length]) }}</span> ·
+				<span class="text-ink-700 font-medium">{{ __("{0} projects", [store.projects.length]) }}</span>
 				·
-				<span class="text-ink-700 font-medium">12 workspaces installed</span>
+				<span class="text-ink-700 font-medium">{{ __("{0} workspaces installed", [12]) }}</span>
 			</p>
 
 			<!-- Workspace launcher -->
@@ -125,8 +126,10 @@ const systemHealth = [
 				<div class="flex items-baseline justify-between mb-3">
 					<h2 class="text-sm font-semibold text-ink-900">BuildSuite Core</h2>
 					<span class="text-[11px] text-ink-500"
-						>{{ buildsuiteTiles.length }} workspace{{
-							buildsuiteTiles.length === 1 ? "" : "s"
+						>{{
+							buildsuiteTiles.length === 1
+								? __("{0} workspace", [buildsuiteTiles.length])
+								: __("{0} workspaces", [buildsuiteTiles.length])
 						}}</span
 					>
 				</div>
@@ -166,8 +169,10 @@ const systemHealth = [
 						<h2 class="text-sm font-semibold text-ink-500">ERPNext</h2>
 					</div>
 					<span class="text-[11px] text-ink-500"
-						>{{ erpnextTiles.length }} workspace{{
-							erpnextTiles.length === 1 ? "" : "s"
+						>{{
+							erpnextTiles.length === 1
+								? __("{0} workspace", [erpnextTiles.length])
+								: __("{0} workspaces", [erpnextTiles.length])
 						}}</span
 					>
 				</div>
@@ -207,8 +212,8 @@ const systemHealth = [
 					class="lg:col-span-2 bg-white border border-ink-200 rounded-xl overflow-hidden"
 				>
 					<div class="px-4 py-3 border-b border-ink-200">
-						<h2 class="font-semibold text-ink-900 text-sm">Recent activity</h2>
-						<p class="text-[11px] text-ink-500 mt-0.5">Last 5 events from the store</p>
+						<h2 class="font-semibold text-ink-900 text-sm">{{ __("Recent activity") }}</h2>
+						<p class="text-[11px] text-ink-500 mt-0.5">{{ __("Last 5 events from the store") }}</p>
 					</div>
 					<div class="divide-y divide-ink-100">
 						<RouterLink
@@ -236,14 +241,14 @@ const systemHealth = [
 							v-if="!recentActivity.length"
 							class="px-4 py-8 text-center text-sm text-ink-400"
 						>
-							No activity yet.
+							{{ __("No activity yet.") }}
 						</div>
 					</div>
 				</div>
 
 				<div class="bg-white border border-ink-200 rounded-xl overflow-hidden">
 					<div class="px-4 py-3 border-b border-ink-200">
-						<h2 class="font-semibold text-ink-900 text-sm">System health</h2>
+						<h2 class="font-semibold text-ink-900 text-sm">{{ __("System health") }}</h2>
 					</div>
 					<div class="divide-y divide-ink-100">
 						<div

@@ -23,7 +23,7 @@ def get_context():
 	context.favicon = "/assets/buildsuite_core/images/bs-icon.svg"
 	context.meta = {
 		"title": "BuildSuite Core",
-		"description": "Construction operations workspace for BuildSuite Core",
+		"description": _("Construction operations workspace for BuildSuite Core"),
 	}
 	return context
 

@@ -25,6 +25,7 @@ import DeskSelect from "@/components/desk/DeskSelect.vue";
 import DeskTextarea from "@/components/desk/DeskTextarea.vue";
 import { fmtINR, fmtCompactINR, fmtDate } from "@/utils/format";
 import { getWorkspaceIconPath } from "@/utils/workspaceIcons";
+import { __ } from "@/utils/translate";
 
 const props = defineProps({ id: { type: String, required: true } });
 const router = useRouter();
@@ -98,9 +99,9 @@ function recalculate() {
 }
 async function submit() {
 	const ok = await confirmDialog({
-		title: "Submit for approval",
-		message: `Submit BOQ ${boq.value.id} for approval?`,
-		confirmLabel: "Submit",
+		title: __("Submit for approval"),
+		message: __("Submit BOQ {0} for approval?", [boq.value.id]),
+		confirmLabel: __("Submit"),
 	});
 	if (ok) store.submitBoq(boq.value.id);
 }
@@ -110,14 +111,25 @@ async function approve() {
 			b.projectId === boq.value.projectId && b.status === "Approved" && b.id !== boq.value.id
 	);
 	const msg = others.length
-		? `Approve revision ${boq.value.revision}? This will supersede the currently-active revision (${others[0].id}).`
-		: `Approve revision ${boq.value.revision}? It will become the live BOQ for this project.`;
-	if (await confirmDialog({ title: "Approve revision", message: msg, confirmLabel: "Approve" }))
+		? __(
+				"Approve revision {0}? This will supersede the currently-active revision ({1}).",
+				[boq.value.revision, others[0].id]
+		  )
+		: __("Approve revision {0}? It will become the live BOQ for this project.", [
+				boq.value.revision,
+		  ]);
+	if (
+		await confirmDialog({
+			title: __("Approve revision"),
+			message: msg,
+			confirmLabel: __("Approve"),
+		})
+	)
 		store.approveBoq(boq.value.id);
 }
 function createRevision() {
 	const note = window.prompt(
-		"Optional: enter SCO id to link this revision to (or leave blank).",
+		__("Optional: enter SCO id to link this revision to (or leave blank)."),
 		""
 	);
 	if (note === null) return;
@@ -127,9 +139,9 @@ function createRevision() {
 }
 async function removeBoq() {
 	const ok = await confirmDialog({
-		title: "Delete BOQ",
-		message: `Delete BOQ ${boq.value.id} and all its rows? This cannot be undone.`,
-		confirmLabel: "Delete",
+		title: __("Delete BOQ"),
+		message: __("Delete BOQ {0} and all its rows? This cannot be undone.", [boq.value.id]),
+		confirmLabel: __("Delete"),
 		destructive: true,
 	});
 	if (!ok) return;
@@ -161,7 +173,7 @@ function openEditGroup(g) {
 }
 function saveGroup() {
 	if (!groupForm.value.code.trim() || !groupForm.value.name.trim()) {
-		alert("Code and name are required.");
+		alert(__("Code and name are required."));
 		return;
 	}
 	if (groupModal.value.mode === "add") {
@@ -181,15 +193,21 @@ function saveGroup() {
 async function deleteGroupConfirm(g) {
 	const items = store.boqItemsByGroup(g.id);
 	const msg = items.length
-		? `Delete group "${g.code} — ${g.name}" along with ${items.length} item${
-				items.length === 1 ? "" : "s"
-		  } and their sub-items? This cannot be undone.`
-		: `Delete group "${g.code} — ${g.name}"?`;
+		? items.length === 1
+			? __(
+					'Delete group "{0} — {1}" along with 1 item and its sub-items? This cannot be undone.',
+					[g.code, g.name]
+			  )
+			: __(
+					'Delete group "{0} — {1}" along with {2} items and their sub-items? This cannot be undone.',
+					[g.code, g.name, items.length]
+			  )
+		: __('Delete group "{0} — {1}"?', [g.code, g.name]);
 	if (
 		await confirmDialog({
-			title: "Delete group",
+			title: __("Delete group"),
 			message: msg,
-			confirmLabel: "Delete",
+			confirmLabel: __("Delete"),
 			destructive: true,
 		})
 	)
@@ -239,7 +257,7 @@ function openEditItem(item) {
 function saveItem() {
 	const f = itemForm.value;
 	if (!f.code.trim() || !f.description.trim() || !f.unit.trim()) {
-		alert("Code, description, and unit are required.");
+		alert(__("Code, description, and unit are required."));
 		return;
 	}
 	const data = {
@@ -260,15 +278,21 @@ function saveItem() {
 async function deleteItemConfirm(item) {
 	const subs = store.boqSubItemsByItem(item.id);
 	const msg = subs.length
-		? `Delete item "${item.code} — ${item.description}" along with ${subs.length} sub-item${
-				subs.length === 1 ? "" : "s"
-		  }? This cannot be undone.`
-		: `Delete item "${item.code} — ${item.description}"?`;
+		? subs.length === 1
+			? __(
+					'Delete item "{0} — {1}" along with 1 sub-item? This cannot be undone.',
+					[item.code, item.description]
+			  )
+			: __(
+					'Delete item "{0} — {1}" along with {2} sub-items? This cannot be undone.',
+					[item.code, item.description, subs.length]
+			  )
+		: __('Delete item "{0} — {1}"?', [item.code, item.description]);
 	if (
 		await confirmDialog({
-			title: "Delete item",
+			title: __("Delete item"),
 			message: msg,
-			confirmLabel: "Delete",
+			confirmLabel: __("Delete"),
 			destructive: true,
 		})
 	)
@@ -314,7 +338,7 @@ const subItemAmountPreview = computed(
 function saveSubItem() {
 	const f = subItemForm.value;
 	if (!f.description.trim() || Number(f.qtyPerUnit) <= 0) {
-		alert("Description and a non-zero quantity per unit are required.");
+		alert(__("Description and a non-zero quantity per unit are required."));
 		return;
 	}
 	const data = {
@@ -333,9 +357,9 @@ function saveSubItem() {
 async function deleteSubItemConfirm(si) {
 	if (
 		await confirmDialog({
-			title: "Delete sub-item",
-			message: `Delete sub-item "${si.description}"?`,
-			confirmLabel: "Delete",
+			title: __("Delete sub-item"),
+			message: __('Delete sub-item "{0}"?', [si.description]),
+			confirmLabel: __("Delete"),
 			destructive: true,
 		})
 	)
@@ -345,7 +369,7 @@ async function deleteSubItemConfirm(si) {
 // Primary action dispatcher — Submit when Draft, Approve when Submitted, hidden when locked.
 const showPrimary = computed(() => canSubmit.value || canApprove.value);
 const primaryLabel = computed(() =>
-	canSubmit.value ? "Submit for approval" : canApprove.value ? "Approve" : ""
+	canSubmit.value ? __("Submit for approval") : canApprove.value ? __("Approve") : ""
 );
 function onPrimary() {
 	if (canSubmit.value) submit();
@@ -355,7 +379,7 @@ function onPrimary() {
 const breadcrumbs = computed(() => {
 	const out = [
 		{ label: "BuildSuite Core", to: "/" },
-		{ label: "BOQ", to: "/boq" },
+		{ label: __("BOQ"), to: "/boq" },
 	];
 	if (project.value)
 		out.push({ label: project.value.name, to: `/projects/${project.value.id}` });
@@ -372,9 +396,9 @@ const treeGridStyle =
 <template>
 	<div v-if="!boq" class="px-6 py-12 text-center text-ink-500">
 		<div class="text-sm">
-			BOQ <span class="font-mono">{{ id }}</span> not found.
+			{{ __("BOQ {0} not found.", [id]) }}
 		</div>
-		<DeskLink to="/boq" class="text-sm mt-2 inline-block">← Back to BOQ list</DeskLink>
+		<DeskLink to="/boq" class="text-sm mt-2 inline-block">{{ __("← Back to BOQ list") }}</DeskLink>
 	</div>
 
 	<DeskPage
@@ -394,7 +418,7 @@ const treeGridStyle =
 				>
 					<template #left>
 						<span v-if="sourceSco" class="text-xs text-ink-500">
-							from SCO
+							{{ __("from SCO") }}
 							<DeskLink to="/sco" class="font-mono">{{ sourceSco.id }}</DeskLink>
 						</span>
 					</template>
@@ -412,8 +436,8 @@ const treeGridStyle =
 						>
 							{{
 								compareMode
-									? "✓ Comparing R" + baseBoq.revision
-									: "Compare to R" + baseBoq.revision
+									? __("✓ Comparing R{0}", [baseBoq.revision])
+									: __("Compare to R{0}", [baseBoq.revision])
 							}}
 						</button>
 
@@ -423,7 +447,7 @@ const treeGridStyle =
 							style="border-radius: 2px"
 							@click="recalculate"
 						>
-							↻ Recalc actuals
+							{{ __("↻ Recalc actuals") }}
 						</button>
 
 						<button
@@ -432,7 +456,7 @@ const treeGridStyle =
 							style="border-radius: 2px"
 							@click="createRevision"
 						>
-							+ Revision
+							{{ __("+ Revision") }}
 						</button>
 
 						<button
@@ -442,7 +466,7 @@ const treeGridStyle =
 							style="border-radius: 2px; color: #b91c1c"
 							@click="removeBoq"
 						>
-							Delete
+							{{ __("Delete") }}
 						</button>
 					</template>
 				</DeskActionBar>
@@ -452,31 +476,31 @@ const treeGridStyle =
 			<div class="grid grid-cols-2 md:grid-cols-6 gap-2 mb-4">
 				<div class="bg-white border border-ink-200 px-3 py-2" style="border-radius: 2px">
 					<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-						Revision
+						{{ __("Revision") }}
 					</div>
 					<div class="text-base font-semibold text-ink-900 mt-0.5">
 						R{{ boq.revision }}
 					</div>
 					<div v-if="baseBoq" class="text-[10px] text-ink-500 mt-0.5">
-						from
+						{{ __("from") }}
 						<DeskLink :to="`/boq/${baseBoq.id}`" class="font-mono"
 							>R{{ baseBoq.revision }}</DeskLink
 						>
 					</div>
-					<div v-else class="text-[10px] text-ink-400 mt-0.5">original</div>
+					<div v-else class="text-[10px] text-ink-400 mt-0.5">{{ __("original") }}</div>
 				</div>
 				<div class="bg-white border border-ink-200 px-3 py-2" style="border-radius: 2px">
 					<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-						Groups · Items
+						{{ __("Groups · Items") }}
 					</div>
 					<div class="text-base font-semibold text-ink-900 mt-0.5">
 						{{ groups.length }} · {{ totals.itemCount }}
 					</div>
-					<div class="text-[10px] text-ink-500 mt-0.5">across this BOQ</div>
+					<div class="text-[10px] text-ink-500 mt-0.5">{{ __("across this BOQ") }}</div>
 				</div>
 				<div class="bg-white border border-ink-200 px-3 py-2" style="border-radius: 2px">
 					<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-						Planned
+						{{ __("Planned") }}
 					</div>
 					<div class="text-base font-semibold text-ink-900 mt-0.5 tabular-nums">
 						{{ fmtCompactINR(totals.planned) }}
@@ -487,18 +511,18 @@ const treeGridStyle =
 				</div>
 				<div class="bg-white border border-ink-200 px-3 py-2" style="border-radius: 2px">
 					<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-						Actual
+						{{ __("Actual") }}
 					</div>
 					<div class="text-base font-semibold text-ink-700 mt-0.5 tabular-nums">
 						{{ fmtCompactINR(totals.actual) }}
 					</div>
 					<div class="text-[10px] text-ink-500 mt-0.5">
-						{{ pctOf(totals.actual, totals.planned).toFixed(1) }}% of plan
+						{{ __("{0}% of plan", [pctOf(totals.actual, totals.planned).toFixed(1)]) }}
 					</div>
 				</div>
 				<div class="bg-white border border-ink-200 px-3 py-2" style="border-radius: 2px">
 					<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-						Variance
+						{{ __("Variance") }}
 					</div>
 					<div
 						class="text-base font-semibold mt-0.5 tabular-nums"
@@ -507,12 +531,12 @@ const treeGridStyle =
 						{{ totals.variancePct > 0 ? "+" : "" }}{{ totals.variancePct.toFixed(1) }}%
 					</div>
 					<div class="text-[10px] text-ink-500 mt-0.5 tabular-nums">
-						{{ fmtCompactINR(totals.variance) }} delta
+						{{ __("{0} delta", [fmtCompactINR(totals.variance)]) }}
 					</div>
 				</div>
 				<div class="bg-white border border-ink-200 px-3 py-2" style="border-radius: 2px">
 					<div class="text-[10px] uppercase tracking-wider text-ink-500 font-medium">
-						Prepared
+						{{ __("Prepared") }}
 					</div>
 					<div class="flex items-center gap-1 mt-1">
 						<UserAvatar :user-id="boq.preparedBy" size="xs" />
@@ -526,29 +550,29 @@ const treeGridStyle =
 							fmtDate(boq.approvedDate)
 						}}</span>
 					</div>
-					<div v-else class="text-[10px] text-ink-400 mt-1">awaiting approval</div>
+					<div v-else class="text-[10px] text-ink-400 mt-1">{{ __("awaiting approval") }}</div>
 				</div>
 			</div>
 
 			<!-- Toolbar above the tree -->
 			<div class="flex items-center gap-2 mb-1.5">
 				<button type="button" @click="expandAll" class="desk-link text-xs">
-					Expand all
+					{{ __("Expand all") }}
 				</button>
 				<span class="text-ink-300 text-xs">·</span>
 				<button type="button" @click="collapseAll" class="desk-link text-xs">
-					Collapse all
+					{{ __("Collapse all") }}
 				</button>
 				<div v-if="compareMode && baseBoq" class="ml-2 text-[11px] text-ink-500">
-					Δ vs R{{ baseBoq.revision }} shown on each item row
+					{{ __("Δ vs R{0} shown on each item row", [baseBoq.revision]) }}
 				</div>
 				<div class="ml-auto flex items-center gap-2">
 					<span v-if="!isEditable" class="text-[11px] text-ink-400 italic">
-						{{ boq.status }} — read-only · use
+						{{ __("{0} — read-only · use", [__(boq.status)]) }}
 						<button type="button" @click="createRevision" class="desk-link">
-							+ Revision
+							{{ __("+ Revision") }}
 						</button>
-						to make changes
+						{{ __("to make changes") }}
 					</span>
 					<button
 						v-if="isEditable"
@@ -556,7 +580,7 @@ const treeGridStyle =
 						class="desk-save-btn"
 						@click="openAddGroup"
 					>
-						+ Add Group
+						{{ __("+ Add Group") }}
 					</button>
 				</div>
 			</div>
@@ -569,15 +593,15 @@ const treeGridStyle =
 					:style="treeGridStyle"
 				>
 					<div></div>
-					<div class="px-3 py-2">Code</div>
-					<div class="px-3 py-2">Description</div>
-					<div class="px-3 py-2">Unit</div>
-					<div class="px-3 py-2 text-right">Plan Qty</div>
-					<div class="px-3 py-2 text-right">Rate (₹)</div>
-					<div class="px-3 py-2 text-right">Planned</div>
-					<div class="px-3 py-2 text-right">Actual</div>
-					<div class="px-3 py-2 text-right">Variance</div>
-					<div class="px-3 py-2 text-center">Task</div>
+					<div class="px-3 py-2">{{ __("Code") }}</div>
+					<div class="px-3 py-2">{{ __("Description") }}</div>
+					<div class="px-3 py-2">{{ __("Unit") }}</div>
+					<div class="px-3 py-2 text-right">{{ __("Plan Qty") }}</div>
+					<div class="px-3 py-2 text-right">{{ __("Rate (₹)") }}</div>
+					<div class="px-3 py-2 text-right">{{ __("Planned") }}</div>
+					<div class="px-3 py-2 text-right">{{ __("Actual") }}</div>
+					<div class="px-3 py-2 text-right">{{ __("Variance") }}</div>
+					<div class="px-3 py-2 text-center">{{ __("Task") }}</div>
 				</div>
 
 				<template v-for="g in groups" :key="g.id">
@@ -597,7 +621,7 @@ const treeGridStyle =
 						<div></div>
 						<div></div>
 						<div class="px-3 py-2 text-right text-[11px] text-ink-500">
-							{{ groupTotals(g.id).count }} items
+							{{ __("{0} items", [groupTotals(g.id).count]) }}
 						</div>
 						<div
 							class="px-3 py-2 text-right tabular-nums text-sm font-medium text-ink-900"
@@ -640,7 +664,7 @@ const treeGridStyle =
 								type="button"
 								@click.stop="openEditGroup(g)"
 								class="px-1.5 py-0.5 text-xs hover:bg-ink-50"
-								title="Edit group"
+								:title="__('Edit group')"
 							>
 								<svg
 									class="w-3.5 h-3.5"
@@ -658,7 +682,7 @@ const treeGridStyle =
 								type="button"
 								@click.stop="deleteGroupConfirm(g)"
 								class="px-1.5 py-0.5 text-xs text-danger-700 hover:bg-danger-50"
-								title="Delete group"
+								:title="__('Delete group')"
 							>
 								<svg
 									class="w-3.5 h-3.5"
@@ -693,7 +717,7 @@ const treeGridStyle =
 										type="button"
 										@click.stop="openEditItem(item)"
 										class="px-1.5 py-0.5 text-xs hover:bg-ink-50"
-										title="Edit item"
+										:title="__('Edit item')"
 									>
 										<svg
 											class="w-3.5 h-3.5"
@@ -711,7 +735,7 @@ const treeGridStyle =
 										type="button"
 										@click.stop="deleteItemConfirm(item)"
 										class="px-1.5 py-0.5 text-xs text-danger-700 hover:bg-danger-50"
-										title="Delete item"
+										:title="__('Delete item')"
 									>
 										<svg
 											class="w-3.5 h-3.5"
@@ -874,7 +898,7 @@ const treeGridStyle =
 										{{ fmtINR(si.amount) }}
 									</div>
 									<div class="px-3 py-1 text-right text-[10px] text-ink-400">
-										per {{ item.unit }}
+										{{ __("per {0}", [item.unit]) }}
 									</div>
 									<div></div>
 									<div></div>
@@ -889,7 +913,7 @@ const treeGridStyle =
 											type="button"
 											@click.stop="openEditSubItem(si, item)"
 											class="px-1.5 py-0.5 text-xs hover:bg-ink-50"
-											title="Edit sub-item"
+											:title="__('Edit sub-item')"
 										>
 											<svg
 												class="w-3.5 h-3.5"
@@ -907,7 +931,7 @@ const treeGridStyle =
 											type="button"
 											@click.stop="deleteSubItemConfirm(si)"
 											class="px-1.5 py-0.5 text-xs text-danger-700 hover:bg-danger-50"
-											title="Delete sub-item"
+											:title="__('Delete sub-item')"
 										>
 											<svg
 												class="w-3.5 h-3.5"
@@ -931,7 +955,7 @@ const treeGridStyle =
 									<div></div>
 									<div></div>
 									<div class="px-3 py-1 pl-10">
-										No rate analysis recorded for this item.
+										{{ __("No rate analysis recorded for this item.") }}
 									</div>
 									<div></div>
 									<div></div>
@@ -954,7 +978,7 @@ const treeGridStyle =
 									<div
 										class="px-3 py-1 pl-10 text-[11px] text-brand-700 font-medium"
 									>
-										+ Add sub-item to {{ item.code }}
+										{{ __("+ Add sub-item to {0}", [item.code]) }}
 									</div>
 									<div></div>
 									<div></div>
@@ -977,7 +1001,7 @@ const treeGridStyle =
 							<div></div>
 							<div></div>
 							<div class="px-3 py-1.5 text-xs text-brand-700 font-medium">
-								+ Add item to {{ g.code }} — {{ g.name }}
+								{{ __("+ Add item to {0} — {1}", [g.code, g.name]) }}
 							</div>
 							<div></div>
 							<div></div>
@@ -991,14 +1015,14 @@ const treeGridStyle =
 				</template>
 
 				<div v-if="!groups.length" class="px-4 py-12 text-center text-sm text-ink-400">
-					This BOQ has no groups yet.
+					{{ __("This BOQ has no groups yet.") }}
 					<button
 						v-if="isEditable"
 						type="button"
 						class="desk-link ml-1"
 						@click="openAddGroup"
 					>
-						+ Add the first group
+						{{ __("+ Add the first group") }}
 					</button>
 				</div>
 			</div>
@@ -1016,13 +1040,13 @@ const treeGridStyle =
 				>
 					<div class="px-4 py-3 border-b border-ink-200 flex items-center">
 						<h2 class="text-sm font-semibold text-ink-900">
-							{{ groupModal.mode === "add" ? "New group" : "Edit group" }}
+							{{ groupModal.mode === "add" ? __("New group") : __("Edit group") }}
 						</h2>
 						<button
 							type="button"
 							@click="groupModal = null"
 							class="ml-auto text-ink-400 hover:text-ink-900"
-							aria-label="Close"
+							:aria-label="__('Close')"
 						>
 							<svg
 								class="w-4 h-4"
@@ -1039,14 +1063,14 @@ const treeGridStyle =
 					</div>
 					<div class="p-4 space-y-3">
 						<div class="grid grid-cols-3 gap-3">
-							<DeskField label="Code" required>
-								<DeskInput v-model="groupForm.code" placeholder="A, B, C…" />
+							<DeskField :label="__('Code')" required>
+								<DeskInput v-model="groupForm.code" :placeholder="__('A, B, C…')" />
 							</DeskField>
 							<div class="col-span-2">
-								<DeskField label="Name" required>
+								<DeskField :label="__('Name')" required>
 									<DeskInput
 										v-model="groupForm.name"
-										placeholder="e.g. Civil Works — RCC"
+										:placeholder="__('e.g. Civil Works — RCC')"
 									/>
 								</DeskField>
 							</div>
@@ -1060,10 +1084,10 @@ const treeGridStyle =
 							@click="groupModal = null"
 							class="text-xs text-ink-600 hover:text-ink-900 px-2 py-1"
 						>
-							Cancel
+							{{ __("Cancel") }}
 						</button>
 						<button type="button" @click="saveGroup" class="desk-save-btn">
-							{{ groupModal.mode === "add" ? "Create group" : "Save changes" }}
+							{{ groupModal.mode === "add" ? __("Create group") : __("Save changes") }}
 						</button>
 					</div>
 				</div>
@@ -1082,13 +1106,13 @@ const treeGridStyle =
 				>
 					<div class="px-4 py-3 border-b border-ink-200 flex items-center">
 						<h2 class="text-sm font-semibold text-ink-900">
-							{{ itemModal.mode === "add" ? "New item" : "Edit item" }}
+							{{ itemModal.mode === "add" ? __("New item") : __("Edit item") }}
 						</h2>
 						<button
 							type="button"
 							@click="itemModal = null"
 							class="ml-auto text-ink-400 hover:text-ink-900"
-							aria-label="Close"
+							:aria-label="__('Close')"
 						>
 							<svg
 								class="w-4 h-4"
@@ -1105,41 +1129,41 @@ const treeGridStyle =
 					</div>
 					<div class="p-4 space-y-3">
 						<div class="grid grid-cols-3 gap-3">
-							<DeskField label="Code" required hint="e.g. A.05, B.12">
+							<DeskField :label="__('Code')" required :hint="__('e.g. A.05, B.12')">
 								<DeskInput v-model="itemForm.code" />
 							</DeskField>
 							<div class="col-span-2">
-								<DeskField label="Unit" required hint="m³, kg, m², nos, lot…">
+								<DeskField :label="__('Unit')" required :hint="__('m³, kg, m², nos, lot…')">
 									<DeskInput v-model="itemForm.unit" />
 								</DeskField>
 							</div>
 						</div>
-						<DeskField label="Description" required>
+						<DeskField :label="__('Description')" required>
 							<DeskTextarea
 								v-model="itemForm.description"
 								:rows="2"
-								placeholder="What does this line of work include?"
+								:placeholder="__('What does this line of work include?')"
 							/>
 						</DeskField>
 						<div class="grid grid-cols-3 gap-3">
-							<DeskField label="Planned qty">
+							<DeskField :label="__('Planned qty')">
 								<DeskInput v-model="itemForm.plannedQty" type="number" />
 							</DeskField>
-							<DeskField label="Rate (₹)">
+							<DeskField :label="__('Rate (₹)')">
 								<DeskInput v-model="itemForm.rate" type="number" />
 							</DeskField>
-							<DeskField label="Planned amount" hint="qty × rate (auto)">
+							<DeskField :label="__('Planned amount')" :hint="__('qty × rate (auto)')">
 								<div class="desk-input bg-ink-50 text-right tabular-nums">
 									{{ fmtINR(itemPlannedAmountPreview) }}
 								</div>
 							</DeskField>
 						</div>
 						<DeskField
-							label="Link to task"
-							hint="Optional · drives live actuals from task progress"
+							:label="__('Link to task')"
+							:hint="__('Optional · drives live actuals from task progress')"
 						>
 							<DeskSelect v-model="itemForm.taskId">
-								<option :value="null">— Not linked —</option>
+								<option :value="null">{{ __("— Not linked —") }}</option>
 								<option v-for="t in availableTasks" :key="t.id" :value="t.id">
 									{{ t.id.slice(-4) }} · {{ t.name }}
 								</option>
@@ -1154,10 +1178,10 @@ const treeGridStyle =
 							@click="itemModal = null"
 							class="text-xs text-ink-600 hover:text-ink-900 px-2 py-1"
 						>
-							Cancel
+							{{ __("Cancel") }}
 						</button>
 						<button type="button" @click="saveItem" class="desk-save-btn">
-							{{ itemModal.mode === "add" ? "Create item" : "Save changes" }}
+							{{ itemModal.mode === "add" ? __("Create item") : __("Save changes") }}
 						</button>
 					</div>
 				</div>
@@ -1178,15 +1202,15 @@ const treeGridStyle =
 						<h2 class="text-sm font-semibold text-ink-900">
 							{{
 								subItemModal.mode === "add"
-									? "New sub-item · rate analysis"
-									: "Edit sub-item"
+									? __("New sub-item · rate analysis")
+									: __("Edit sub-item")
 							}}
 						</h2>
 						<button
 							type="button"
 							@click="subItemModal = null"
 							class="ml-auto text-ink-400 hover:text-ink-900"
-							aria-label="Close"
+							:aria-label="__('Close')"
 						>
 							<svg
 								class="w-4 h-4"
@@ -1203,8 +1227,12 @@ const treeGridStyle =
 					</div>
 					<div class="p-4 space-y-3">
 						<DeskField
-							label="From Rate Master"
-							hint="Optional · pick to auto-fill description + rate. Updates to the rate master auto-flow to BOQs that use it."
+:label="__('From Rate Master')"
+							:hint="
+								__(
+									'Optional · pick to auto-fill description + rate. Updates to the rate master auto-flow to BOQs that use it.'
+								)
+							"
 						>
 							<DeskSelect
 								:model-value="subItemForm.rateMasterId"
@@ -1215,7 +1243,7 @@ const treeGridStyle =
 									}
 								"
 							>
-								<option :value="null">— Manual entry —</option>
+								<option :value="null">{{ __("— Manual entry —") }}</option>
 								<option
 									v-for="rm in rateMasterOptions"
 									:key="rm.id"
@@ -1224,28 +1252,28 @@ const treeGridStyle =
 									{{ rm.code }} · {{ rm.description }} · ₹{{
 										rm.currentRate
 									}}
-									per {{ rm.unit }}
+									{{ __("per {0}", [rm.unit]) }}
 								</option>
 							</DeskSelect>
 						</DeskField>
-						<DeskField label="Description" required>
+						<DeskField :label="__('Description')" required>
 							<DeskInput
 								v-model="subItemForm.description"
-								placeholder="e.g. Mason (skilled), Cement OPC 53, Vibrator needle…"
+								:placeholder="__('e.g. Mason (skilled), Cement OPC 53, Vibrator needle…')"
 							/>
 						</DeskField>
 						<div class="grid grid-cols-3 gap-3">
 							<DeskField
-								label="Qty per unit"
+:label="__('Qty per unit')"
 								required
-								:hint="`per ${subItemModal.parentUnit || 'unit'}`"
+								:hint="__('per {0}', [subItemModal.parentUnit || __('unit')])"
 							>
 								<DeskInput v-model="subItemForm.qtyPerUnit" type="number" />
 							</DeskField>
-							<DeskField label="Rate (₹)">
+							<DeskField :label="__('Rate (₹)')">
 								<DeskInput v-model="subItemForm.rate" type="number" />
 							</DeskField>
-							<DeskField label="Amount" hint="qty × rate (auto)">
+							<DeskField :label="__('Amount')" :hint="__('qty × rate (auto)')">
 								<div class="desk-input bg-ink-50 text-right tabular-nums">
 									{{ fmtINR(subItemAmountPreview) }}
 								</div>
@@ -1260,10 +1288,10 @@ const treeGridStyle =
 							@click="subItemModal = null"
 							class="text-xs text-ink-600 hover:text-ink-900 px-2 py-1"
 						>
-							Cancel
+							{{ __("Cancel") }}
 						</button>
 						<button type="button" @click="saveSubItem" class="desk-save-btn">
-							{{ subItemModal.mode === "add" ? "Create sub-item" : "Save changes" }}
+							{{ subItemModal.mode === "add" ? __("Create sub-item") : __("Save changes") }}
 						</button>
 					</div>
 				</div>
@@ -1283,8 +1311,10 @@ const treeGridStyle =
 							stroke-linejoin="round"
 							aria-hidden="true"
 							v-html="getWorkspaceIconPath('message-circle')"
-						/><span>Comments — <span class="font-medium text-ink-700">0</span></span>
-						<span class="text-ink-400 italic ml-1">stub</span>
+						/><span
+							>{{ __("Comments") }} — <span class="font-medium text-ink-700">0</span></span
+						>
+						<span class="text-ink-400 italic ml-1">{{ __("stub") }}</span>
 					</div>
 					<div class="flex items-center gap-1.5">
 						<svg
@@ -1298,9 +1328,9 @@ const treeGridStyle =
 							aria-hidden="true"
 							v-html="getWorkspaceIconPath('paperclip')"
 						/><span
-							>Attachments — <span class="font-medium text-ink-700">0</span></span
+							>{{ __("Attachments") }} — <span class="font-medium text-ink-700">0</span></span
 						>
-						<span class="text-ink-400 italic ml-1">stub</span>
+						<span class="text-ink-400 italic ml-1">{{ __("stub") }}</span>
 					</div>
 					<div class="flex items-center gap-1.5">
 						<svg
@@ -1313,7 +1343,7 @@ const treeGridStyle =
 							stroke-linejoin="round"
 							aria-hidden="true"
 							v-html="getWorkspaceIconPath('users')"
-						/><span>Prepared by —</span>
+						/><span>{{ __("Prepared by") }} —</span>
 						<UserAvatar :user-id="boq.preparedBy" size="xs" />
 					</div>
 				</div>

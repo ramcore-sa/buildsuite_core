@@ -13,34 +13,35 @@
 
 import DeskPage from "@/components/desk/DeskPage.vue";
 import WorkspaceShortcut from "@/components/WorkspaceShortcut.vue";
+import { __ } from "@/utils/translate";
 
-const breadcrumbs = [{ label: "BuildSuite Core", to: "/" }, { label: "Accounting" }];
+const breadcrumbs = [{ label: "BuildSuite Core", to: "/" }, { label: __("Accounting") }];
 
 // Number Cards: ERPNext-standard KPI tiles at the top of the workspace. All values
 // illustrative — no accounting data exists in seed (M8 Project Finance handles petty
 // cash only). Real values would come from GL aggregation.
 const numberCards = [
-	{ label: "Outstanding receivables", value: "₹—", sub: "AR aging" },
-	{ label: "Outstanding payables", value: "₹—", sub: "AP aging" },
-	{ label: "Total bank balance", value: "₹—", sub: "all bank accounts" },
-	{ label: "Net profit (YTD)", value: "₹—", sub: "fiscal year to date" },
+	{ label: __("Outstanding receivables"), value: "₹—", sub: __("AR aging") },
+	{ label: __("Outstanding payables"), value: "₹—", sub: __("AP aging") },
+	{ label: __("Total bank balance"), value: "₹—", sub: __("all bank accounts") },
+	{ label: __("Net profit (YTD)"), value: "₹—", sub: __("fiscal year to date") },
 ];
 
 // Shortcuts: large primary-action tiles. ERPNext picks the 5–6 most frequent docs.
 // `bs: true` marks the ones BuildSuite Core extends with custom fields (§12.6).
 const shortcuts = [
-	{ label: "Sales Invoice", icon: "📄", to: "#" },
-	{ label: "Purchase Invoice", icon: "📥", to: "#" },
+	{ label: __("Sales Invoice"), icon: "📄", to: "#" },
+	{ label: __("Purchase Invoice"), icon: "📥", to: "#" },
 	{
-		label: "Journal Entry",
+		label: __("Journal Entry"),
 		icon: "📋",
 		to: "#",
 		bs: true,
 		bsNote: "BS adds project + petty_cash_request links",
 	},
-	{ label: "Payment Entry", icon: "💸", to: "#" },
-	{ label: "Bank Reconciliation", icon: "🏦", to: "#" },
-	{ label: "Chart of Accounts", icon: "📊", to: "#" },
+	{ label: __("Payment Entry"), icon: "💸", to: "#" },
+	{ label: __("Bank Reconciliation"), icon: "🏦", to: "#" },
+	{ label: __("Chart of Accounts"), icon: "📊", to: "#" },
 ];
 
 // Sections: grouped link lists below the shortcuts. Order and grouping match ERPNext V16's
@@ -48,103 +49,103 @@ const shortcuts = [
 // with a small "report" hint instead of plain link).
 const sections = [
 	{
-		title: "Accounting Masters",
+		title: __("Accounting Masters"),
 		items: [
-			{ label: "Company" },
-			{ label: "Account" },
-			{ label: "Cost Center" },
-			{ label: "Fiscal Year" },
-			{ label: "Mode of Payment" },
-			{ label: "Payment Terms Template" },
-			{ label: "Accounts Settings" },
-			{ label: "Accounting Dimension" },
+			{ label: __("Company") },
+			{ label: __("Account") },
+			{ label: __("Cost Center") },
+			{ label: __("Fiscal Year") },
+			{ label: __("Mode of Payment") },
+			{ label: __("Payment Terms Template") },
+			{ label: __("Accounts Settings") },
+			{ label: __("Accounting Dimension") },
 		],
 	},
 	{
-		title: "General Ledger",
+		title: __("General Ledger"),
 		items: [
-			{ label: "Journal Entry", bs: true },
-			{ label: "Payment Entry" },
-			{ label: "Period Closing Voucher" },
-			{ label: "General Ledger", report: true },
-			{ label: "Trial Balance", report: true },
+			{ label: __("Journal Entry"), bs: true },
+			{ label: __("Payment Entry") },
+			{ label: __("Period Closing Voucher") },
+			{ label: __("General Ledger"), report: true },
+			{ label: __("Trial Balance"), report: true },
 		],
 	},
 	{
-		title: "Accounts Receivable",
+		title: __("Accounts Receivable"),
 		items: [
-			{ label: "Customer" },
-			{ label: "Sales Invoice" },
-			{ label: "Payment Request" },
-			{ label: "Customer Group" },
-			{ label: "Sales Person" },
-			{ label: "Dunning", hint: "rarely used in construction; kept for AMC contracts" },
-			{ label: "Accounts Receivable", report: true },
-			{ label: "Customer Ledger Summary", report: true },
+			{ label: __("Customer") },
+			{ label: __("Sales Invoice") },
+			{ label: __("Payment Request") },
+			{ label: __("Customer Group") },
+			{ label: __("Sales Person") },
+			{ label: __("Dunning"), hint: "rarely used in construction; kept for AMC contracts" },
+			{ label: __("Accounts Receivable"), report: true },
+			{ label: __("Customer Ledger Summary"), report: true },
 		],
 	},
 	{
-		title: "Accounts Payable",
+		title: __("Accounts Payable"),
 		items: [
-			{ label: "Supplier" },
-			{ label: "Purchase Invoice" },
-			{ label: "Supplier Group" },
-			{ label: "Payment Entry" },
-			{ label: "Accounts Payable", report: true },
-			{ label: "Supplier Ledger Summary", report: true },
+			{ label: __("Supplier") },
+			{ label: __("Purchase Invoice") },
+			{ label: __("Supplier Group") },
+			{ label: __("Payment Entry") },
+			{ label: __("Accounts Payable"), report: true },
+			{ label: __("Supplier Ledger Summary"), report: true },
 		],
 	},
 	{
-		title: "Banking",
+		title: __("Banking"),
 		items: [
-			{ label: "Bank" },
-			{ label: "Bank Account" },
-			{ label: "Bank Statement Import" },
-			{ label: "Bank Reconciliation Statement" },
-			{ label: "Bank Clearance Summary", report: true },
+			{ label: __("Bank") },
+			{ label: __("Bank Account") },
+			{ label: __("Bank Statement Import") },
+			{ label: __("Bank Reconciliation Statement") },
+			{ label: __("Bank Clearance Summary"), report: true },
 		],
 	},
 	{
-		title: "Financial Reports",
+		title: __("Financial Reports"),
 		items: [
-			{ label: "Profit and Loss Statement", report: true },
-			{ label: "Balance Sheet", report: true },
-			{ label: "Cash Flow", report: true },
-			{ label: "General Ledger", report: true },
-			{ label: "Trial Balance", report: true },
-			{ label: "Sales Register", report: true },
-			{ label: "Purchase Register", report: true },
-			{ label: "Gross and Net Profit Report", report: true },
+			{ label: __("Profit and Loss Statement"), report: true },
+			{ label: __("Balance Sheet"), report: true },
+			{ label: __("Cash Flow"), report: true },
+			{ label: __("General Ledger"), report: true },
+			{ label: __("Trial Balance"), report: true },
+			{ label: __("Sales Register"), report: true },
+			{ label: __("Purchase Register"), report: true },
+			{ label: __("Gross and Net Profit Report"), report: true },
 		],
 	},
 	{
-		title: "Tax & Compliance (India)",
+		title: __("Tax & Compliance (India)"),
 		items: [
-			{ label: "GST Settings" },
-			{ label: "HSN Code" },
-			{ label: "Tax Category" },
-			{ label: "Tax Rule" },
-			{ label: "Tax Withholding Category" },
-			{ label: "Sales Taxes and Charges Template" },
-			{ label: "Purchase Taxes and Charges Template" },
-			{ label: "GSTR-1", report: true },
-			{ label: "GSTR-3B", report: true },
-			{ label: "GST Reconciliation", report: true },
-			{ label: "HSN-wise Outward Summary", report: true },
+			{ label: __("GST Settings") },
+			{ label: __("HSN Code") },
+			{ label: __("Tax Category") },
+			{ label: __("Tax Rule") },
+			{ label: __("Tax Withholding Category") },
+			{ label: __("Sales Taxes and Charges Template") },
+			{ label: __("Purchase Taxes and Charges Template") },
+			{ label: __("GSTR-1"), report: true },
+			{ label: __("GSTR-3B"), report: true },
+			{ label: __("GST Reconciliation"), report: true },
+			{ label: __("HSN-wise Outward Summary"), report: true },
 		],
 	},
 	{
-		title: "Multi-Currency",
+		title: __("Multi-Currency"),
 		items: [
-			{ label: "Currency" },
-			{ label: "Currency Exchange" },
-			{ label: "Exchange Rate Revaluation" },
+			{ label: __("Currency") },
+			{ label: __("Currency Exchange") },
+			{ label: __("Exchange Rate Revaluation") },
 		],
 		note: "rare in domestic construction; relevant for projects with foreign material imports",
 	},
 	{
-		title: "Cheque Printing",
-		items: [{ label: "Cheque Print Template" }],
+		title: __("Cheque Printing"),
+		items: [{ label: __("Cheque Print Template") }],
 		note: "still common in India for vendor payments",
 	},
 ];
@@ -152,8 +153,8 @@ const sections = [
 
 <template>
 	<DeskPage
-		title="Accounting"
-		subtitle="General ledger, receivables, payables and financial reports"
+		:title="__('Accounting')"
+		:subtitle="__('General ledger, receivables, payables and financial reports')"
 		:breadcrumbs="breadcrumbs"
 	>
 		<!-- Number Cards -->
@@ -175,7 +176,7 @@ const sections = [
 		</div>
 
 		<section class="mb-5">
-			<h2 class="desk-section-title">Shortcuts</h2>
+			<h2 class="desk-section-title">{{ __("Shortcuts") }}</h2>
 			<hr class="desk-divider" />
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
 				<WorkspaceShortcut
@@ -205,7 +206,7 @@ const sections = [
 						<span
 							v-if="i.report"
 							class="text-[9px] uppercase tracking-wider text-ink-400 font-semibold"
-							>report</span
+							>{{ __("report") }}</span
 						>
 					</li>
 				</ul>

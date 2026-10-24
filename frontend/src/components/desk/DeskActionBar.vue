@@ -4,12 +4,16 @@
 // muted text link. Slots: `left` for additional left-side controls, `menu` for an
 // Actions/Menu dropdown beside the save button.
 
+import { __ } from "@/utils/translate";
+
+// Default labels are factories so each instance translates them at render time;
+// callers passing their own label are expected to translate it themselves.
 defineProps({
 	canSave: { type: Boolean, default: true },
 	saving: { type: Boolean, default: false },
-	savingLabel: { type: String, default: "Saving…" },
-	saveLabel: { type: String, default: "Save" },
-	cancelLabel: { type: String, default: "Cancel" },
+	savingLabel: { type: String, default: () => __("Saving…") },
+	saveLabel: { type: String, default: () => __("Save") },
+	cancelLabel: { type: String, default: () => __("Cancel") },
 	showCancel: { type: Boolean, default: true },
 	showSave: { type: Boolean, default: true }, // hide entirely for locked records with no workflow action
 });

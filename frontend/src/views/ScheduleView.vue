@@ -82,15 +82,15 @@ function barColor(item) {
 	<div class="px-6 py-4">
 		<div class="flex items-center justify-between mb-4">
 			<div>
-				<h1 class="text-lg font-semibold text-ink-900">Schedule</h1>
-				<p class="text-xs text-ink-500 mt-0.5">Gantt-style timeline view</p>
+				<h1 class="text-lg font-semibold text-ink-900">{{ __("Schedule") }}</h1>
+				<p class="text-xs text-ink-500 mt-0.5">{{ __("Gantt-style timeline view") }}</p>
 			</div>
 		</div>
 
 		<!-- Controls -->
 		<div class="card rounded-b-none border-b-0 px-3 py-2 flex items-center gap-3 flex-wrap">
 			<div class="flex items-center gap-2">
-				<label class="text-xs text-ink-500">Project</label>
+				<label class="text-xs text-ink-500">{{ __("Project") }}</label>
 				<select
 					v-model="selectedProject"
 					class="text-xs px-2 py-1.5 border border-ink-200 rounded bg-white"
@@ -110,7 +110,7 @@ function barColor(item) {
 					"
 					class="px-3 py-1 text-xs"
 				>
-					Work Packages
+					{{ __("Work Packages") }}
 				</button>
 				<button
 					@click="view = 'tasks'"
@@ -119,16 +119,16 @@ function barColor(item) {
 					"
 					class="px-3 py-1 text-xs border-l border-ink-200"
 				>
-					Tasks
+					{{ __("Tasks") }}
 				</button>
 			</div>
-			<div class="ml-auto text-xs text-ink-500">{{ items.length }} items</div>
+			<div class="ml-auto text-xs text-ink-500">{{ __("{0} items", [items.length]) }}</div>
 		</div>
 
 		<!-- Gantt -->
 		<div class="card rounded-t-none overflow-hidden">
 			<div v-if="!items.length" class="p-10 text-center text-sm text-ink-400">
-				No scheduled items for this view.
+				{{ __("No scheduled items for this view.") }}
 			</div>
 			<div v-else>
 				<!-- Month headers -->
@@ -136,7 +136,7 @@ function barColor(item) {
 					<div
 						class="w-72 flex-shrink-0 border-r border-ink-200 px-3 py-1.5 text-[11px] uppercase tracking-wider text-ink-500 font-medium"
 					>
-						Item
+						{{ __("Item") }}
 					</div>
 					<div class="flex-1 relative">
 						<div
@@ -189,19 +189,19 @@ function barColor(item) {
 					class="px-4 py-2 bg-ink-50 border-t border-ink-200 flex items-center gap-4 text-xs text-ink-600"
 				>
 					<div class="flex items-center gap-1.5">
-						<span class="w-3 h-3 rounded bg-success-500"></span>Completed
+						<span class="w-3 h-3 rounded bg-success-500"></span>{{ __("Completed") }}
 					</div>
 					<div class="flex items-center gap-1.5">
-						<span class="w-3 h-3 rounded bg-brand-500"></span>In Progress
+						<span class="w-3 h-3 rounded bg-brand-500"></span>{{ __("In Progress") }}
 					</div>
 					<div class="flex items-center gap-1.5">
-						<span class="w-3 h-3 rounded bg-ink-300"></span>Planned / Open
+						<span class="w-3 h-3 rounded bg-ink-300"></span>{{ __("Planned / Open") }}
 					</div>
 					<div class="flex items-center gap-1.5">
-						<span class="w-3 h-3 rounded bg-warning-500"></span>On Hold
+						<span class="w-3 h-3 rounded bg-warning-500"></span>{{ __("On Hold") }}
 					</div>
 					<div class="ml-auto flex items-center gap-1.5">
-						<span class="w-px h-3 bg-danger-500/60"></span>Today
+						<span class="w-px h-3 bg-danger-500/60"></span>{{ __("Today") }}
 					</div>
 				</div>
 			</div>

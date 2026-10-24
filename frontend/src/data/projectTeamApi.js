@@ -1,6 +1,8 @@
 // Thin wrappers around the buildsuite_core.api.project_team whitelisted methods.
 // Mirrors data/usersApi.js.
 
+import { __ } from "@/utils/translate";
+
 function serverMessage(data, status) {
 	if (data?._server_messages) {
 		try {
@@ -11,7 +13,7 @@ function serverMessage(data, status) {
 			/* fall through */
 		}
 	}
-	return data?.exception || data?.exc_type || `Request failed (${status})`;
+	return data?.exception || data?.exc_type || __("Request failed ({0})", [status]);
 }
 
 async function call(method, args) {

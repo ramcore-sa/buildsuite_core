@@ -46,13 +46,13 @@ function onCustomerCreated(name) {
 					style="border-radius: 12px 12px 0 0"
 				>
 					<div class="min-w-0 flex-1">
-						<h2 class="text-sm font-semibold text-ink-900">Edit project</h2>
+						<h2 class="text-sm font-semibold text-ink-900">{{ __("Edit project") }}</h2>
 						<p class="text-[11px] text-ink-500 mt-0.5 truncate">{{ project?.name }}</p>
 					</div>
 					<button
 						type="button"
 						class="text-ink-500 hover:text-ink-900 text-lg leading-none flex-shrink-0 ml-3"
-						aria-label="Close"
+						:aria-label="__('Close')"
 						@click="emit('close')"
 					>
 						x
@@ -60,21 +60,21 @@ function onCustomerCreated(name) {
 				</header>
 
 				<div class="p-5 overflow-y-auto flex-1">
-					<DeskSection title="Basic information">
-						<DeskField label="Project name" required :error="errors.name">
+					<DeskSection :title="__('Basic information')">
+						<DeskField :label="__('Project name')" required :error="errors.name">
 							<DeskInput
 								v-model="editForm.name"
 								@input="emit('clear-error', 'name')"
 							/>
 						</DeskField>
-						<DeskField label="Client" :error="errors.client">
+						<DeskField :label="__('Client')" :error="errors.client">
 							<div class="flex items-center gap-2">
 								<div class="flex-1 min-w-0">
 									<DeskLinkPicker
 										:key="customerPickerKey"
 										v-model="editForm.client"
 										doctype="Customer"
-										placeholder="Select customer"
+										:placeholder="__('Select customer')"
 										label-field="customer_name"
 										value-field="name"
 										:search-fields="['customer_name', 'name']"
@@ -90,15 +90,15 @@ function onCustomerCreated(name) {
 									style="border-radius: 6px"
 									@click="customerModalOpen = true"
 								>
-									+ New
+									+ {{ __("New") }}
 								</button>
 							</div>
 						</DeskField>
-						<DeskField label="Type" :error="errors.type">
+						<DeskField :label="__('Type')" :error="errors.type">
 							<DeskLinkPicker
 								v-model="editForm.type"
 								doctype="Project Type"
-								placeholder="Select project type"
+								:placeholder="__('Select project type')"
 								label-field="name"
 								value-field="name"
 								:search-fields="['name']"
@@ -110,21 +110,28 @@ function onCustomerCreated(name) {
 						</DeskField>
 						<!-- Company is inferred and locked server-side (§14) — not editable
                  here. It remains visible read-only on the Overview tab. -->
-						<DeskField label="Location">
+						<DeskField :label="__('Location')">
 							<DeskInput v-model="editForm.location" />
 						</DeskField>
-						<DeskField label="Note">
+						<DeskField :label="__('Note')">
 							<DeskTextarea v-model="editForm.description" :rows="3" />
 						</DeskField>
 						<DeskField
 							v-if="!isSubproject"
-							label="Subprojects"
+							:label="__('Subprojects')"
 							:hint="
-								subsCount > 0
-									? `Locked on - this project has ${subsCount} subproject${
-											subsCount === 1 ? '' : 's'
-									  }. Delete or move them out before turning this off.`
-									: 'Turn on to break this project into subprojects (e.g. Block A / Block B / Tower 1).'
+								subsCount === 1
+									? __(
+											'Locked on - this project has 1 subproject. Delete or move it out before turning this off.'
+									  )
+									: subsCount > 1
+									? __(
+											'Locked on - this project has {0} subprojects. Delete or move them out before turning this off.',
+											[subsCount]
+									  )
+									: __(
+											'Turn on to break this project into subprojects (e.g. Block A / Block B / Tower 1).'
+									  )
 							"
 						>
 							<label
@@ -137,33 +144,33 @@ function onCustomerCreated(name) {
 									class="accent-brand-600 disabled:cursor-not-allowed"
 								/>
 								<span class="text-sm text-ink-700"
-									>Allow subprojects under this project</span
+									>{{ __("Allow subprojects under this project") }}</span
 								>
 							</label>
 						</DeskField>
 					</DeskSection>
 
-					<DeskSection title="Schedule & cost">
-						<DeskField label="Start date">
+					<DeskSection :title="__('Schedule & cost')">
+						<DeskField :label="__('Start date')">
 							<DeskInput v-model="editForm.startDate" type="date" />
 						</DeskField>
-						<DeskField label="End date">
+						<DeskField :label="__('End date')">
 							<DeskInput v-model="editForm.endDate" type="date" />
 						</DeskField>
-						<DeskField label="Budget" hint="In INR">
+						<DeskField :label="__('Budget')" :hint="__('In INR')">
 							<DeskInput v-model="editForm.budget" type="number" />
 						</DeskField>
-						<DeskField label="Progress" hint="0-100">
+						<DeskField :label="__('Progress')" hint="0-100">
 							<DeskInput v-model="editForm.progress" type="number" />
 						</DeskField>
 					</DeskSection>
 
-					<DeskSection title="Team & status">
-						<DeskField label="Project Manager" :error="errors.pm">
+					<DeskSection :title="__('Team & status')">
+						<DeskField :label="__('Project Manager')" :error="errors.pm">
 							<DeskLinkPicker
 								v-model="editForm.pm"
 								doctype="User"
-								placeholder="Select project manager"
+								:placeholder="__('Select project manager')"
 								label-field="full_name"
 								value-field="name"
 								:search-fields="['full_name', 'name', 'email']"
@@ -174,19 +181,19 @@ function onCustomerCreated(name) {
 								@change="emit('clear-error', 'pm')"
 							/>
 						</DeskField>
-						<DeskField label="Status">
+						<DeskField :label="__('Status')">
 							<DeskSelect v-model="editForm.status">
-								<option>New</option>
-								<option>Ongoing</option>
-								<option>Delayed</option>
-								<option>Completed</option>
+								<option value="New">{{ __("New") }}</option>
+								<option value="Ongoing">{{ __("Ongoing") }}</option>
+								<option value="Delayed">{{ __("Delayed", null, "Status") }}</option>
+								<option value="Completed">{{ __("Completed") }}</option>
 							</DeskSelect>
 						</DeskField>
-						<DeskField label="Priority">
+						<DeskField :label="__('Priority')">
 							<DeskSelect v-model="editForm.priority">
-								<option>Low</option>
-								<option>Medium</option>
-								<option>High</option>
+								<option value="Low">{{ __("Low") }}</option>
+								<option value="Medium">{{ __("Medium") }}</option>
+								<option value="High">{{ __("High") }}</option>
 							</DeskSelect>
 						</DeskField>
 					</DeskSection>
@@ -202,9 +209,9 @@ function onCustomerCreated(name) {
 						style="border-radius: 6px"
 						@click="emit('close')"
 					>
-						Cancel
+						{{ __("Cancel") }}
 					</button>
-					<button type="button" class="desk-save-btn" @click="emit('save')">Save</button>
+					<button type="button" class="desk-save-btn" @click="emit('save')">{{ __("Save") }}</button>
 				</footer>
 			</div>
 		</div>
